@@ -31,7 +31,6 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    // Getters và Setters
     public int getUserId() {
         return userId;
     }

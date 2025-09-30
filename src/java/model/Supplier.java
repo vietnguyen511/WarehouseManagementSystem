@@ -90,4 +90,6 @@ public class Supplier {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+    
+    
 }
