@@ -4,8 +4,24 @@
         <servlet-name>NewServlet</servlet-name>
         <servlet-class>controller.NewServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>NewServlet1</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.NewServlet1</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CurrentInventoryServlet</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.CurrentInventoryServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NewServlet1</servlet-name>
+        <url-pattern>/new1</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CurrentInventoryServlet</servlet-name>
+        <url-pattern>/current-inventory</url-pattern>
     </servlet-mapping>
 </web-app>
