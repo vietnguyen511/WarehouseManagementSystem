@@ -141,7 +141,6 @@ catalina.*.log
 
 # GlassFish
 /domains/
-/lib/
 /logs/
 
 # JBoss/WildFly
