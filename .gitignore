@@ -54,7 +54,7 @@ build/
 # Ant
 build/
 dist/
-lib/
+# lib/ - commented out to allow lib folder to be tracked
 
 # ===================================================================
 # IDE CONFIGURATION FILES
