@@ -69,6 +69,18 @@ nbproject/
 build.xml
 manifest.mf
 
+# Explicitly ignore NetBeans private config file
+nbproject/private/private.xml
+
+# NetBeans specific files
+nbproject/private/
+nbproject/genfiles.properties
+nbproject/project.xml
+nbproject/build-impl.xml
+nbproject/build-impl.xml~
+nbproject/ant-deploy.xml
+nbproject/project.properties
+
 # Eclipse
 .metadata
 bin/
