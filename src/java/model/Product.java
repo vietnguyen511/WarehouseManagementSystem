@@ -18,11 +18,9 @@ public class Product {
     private Date createdAt;
     private Date updatedAt;
 
-    // Constructor mặc định
     public Product() {
     }
 
-    // Constructor đầy đủ
     public Product(int productId, String code, String name, int categoryId, String unit, int quantity, double importPrice, double exportPrice, String description, String image, boolean status, Date createdAt, Date updatedAt) {
         this.productId = productId;
         this.code = code;
@@ -39,7 +37,6 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    // Getters và Setters
     public int getProductId() {
         return productId;
     }
