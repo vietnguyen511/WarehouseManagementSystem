@@ -19,20 +19,9 @@ import model.InventoryItem;
  * CurrentInventoryServlet - Handles requests for current inventory reporting
  * Displays product inventory with filtering and search capabilities
  * 
- * @author lengo
+ * @author admin
  */
 public class CurrentInventoryServlet extends HttpServlet {
-
-    private InventoryDAO inventoryDAO;
-    private CategoryDAO categoryDAO;
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        // Initialize DAOs
-        inventoryDAO = new InventoryDAO();
-        categoryDAO = new CategoryDAO();
-    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -50,11 +39,19 @@ public class CurrentInventoryServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         try {
+            System.out.println("=== CurrentInventoryServlet START ===");
+            
+            // Create fresh DAO instances for each request to avoid connection timeout issues
+            InventoryDAO inventoryDAO = new InventoryDAO();
+            CategoryDAO categoryDAO = new CategoryDAO();
+            System.out.println("DAOs created successfully");
+            
             // Get filter parameters from request
             String categoryIdParam = request.getParameter("categoryId");
             String searchQuery = request.getParameter("q");
             String pageParam = request.getParameter("page");
             String pageSizeParam = request.getParameter("pageSize");
+            System.out.println("Parameters: categoryId=" + categoryIdParam + ", q=" + searchQuery + ", page=" + pageParam);
             
             // Parse category ID
             Integer categoryId = null;
@@ -68,7 +65,7 @@ public class CurrentInventoryServlet extends HttpServlet {
             
             // Pagination defaults
             int page = 1;
-            int pageSize = 10;
+            int pageSize = 5;
             try {
                 if (pageParam != null && !pageParam.isEmpty()) {
                     page = Math.max(Integer.parseInt(pageParam), 1);
@@ -81,19 +78,34 @@ public class CurrentInventoryServlet extends HttpServlet {
             }
 
             // Get total count and page data
+            System.out.println("Calling countCurrentInventory...");
             int totalItems = inventoryDAO.countCurrentInventory(categoryId, searchQuery);
+            System.out.println("Total items: " + totalItems);
+            
             int totalPages = (int) Math.ceil(totalItems / (double) pageSize);
             if (totalPages == 0) totalPages = 1;
             if (page > totalPages) page = totalPages;
 
-            // Get inventory data with filters and pagination
-            List<InventoryItem> inventoryList = inventoryDAO.getCurrentInventoryPaged(categoryId, searchQuery, page, pageSize);
+            // Get inventory data with filters - use simple query without pagination for now
+            System.out.println("Calling getCurrentInventory (without pagination)...");
+            List<InventoryItem> allItems = inventoryDAO.getCurrentInventory(categoryId, searchQuery);
+            System.out.println("Retrieved " + allItems.size() + " total items");
+            
+            // Manual pagination in Java (temporary workaround)
+            int startIdx = Math.max(0, (page - 1) * pageSize);
+            int endIdx = Math.min(allItems.size(), startIdx + pageSize);
+            List<InventoryItem> inventoryList = allItems.subList(startIdx, endIdx);
+            System.out.println("Showing items " + startIdx + " to " + endIdx);
 
             // Get all categories for the filter dropdown
+            System.out.println("Calling getAllCategories...");
             List<Category> categories = categoryDAO.getAllCategories();
+            System.out.println("Retrieved " + categories.size() + " categories");
             
             // Get inventory statistics (optional - for future dashboard use)
+            System.out.println("Calling getInventoryStatistics...");
             Object[] statistics = inventoryDAO.getInventoryStatistics();
+            System.out.println("Statistics retrieved");
             
             // Set attributes for JSP
             request.setAttribute("inventoryList", inventoryList);
@@ -112,8 +124,10 @@ public class CurrentInventoryServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             
             // Forward to JSP
-            request.getRequestDispatcher("/statisticsAndReporting/current-inventory.jsp")
+            System.out.println("Forwarding to JSP...");
+            request.getRequestDispatcher("/statistics-and-reporting/current-inventory.jsp")
                    .forward(request, response);
+            System.out.println("=== CurrentInventoryServlet END ===");
             
         } catch (Exception e) {
             System.out.println("Error in CurrentInventoryServlet: " + e.getMessage());
@@ -124,7 +138,7 @@ public class CurrentInventoryServlet extends HttpServlet {
             request.setAttribute("inventoryList", new java.util.ArrayList<InventoryItem>());
             request.setAttribute("categories", new java.util.ArrayList<Category>());
             
-            request.getRequestDispatcher("/statisticsAndReporting/current-inventory.jsp")
+            request.getRequestDispatcher("/statistics-and-reporting/current-inventory.jsp")
                    .forward(request, response);
         }
     }

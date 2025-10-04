@@ -5,6 +5,7 @@
 package dal;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +21,16 @@ import model.InventoryItem;
  */
 public class InventoryDAO extends DBContext {
     
+    // Constructor for standalone use
+    public InventoryDAO() {
+        super();
+    }
+
+    // Constructor for transaction management (shares connection)
+    public InventoryDAO(Connection connection) {
+        super(connection);
+    }
+    
     /**
      * Get current inventory with optional filters
      * @param categoryId Filter by category (null or 0 for all categories)
@@ -30,38 +41,40 @@ public class InventoryDAO extends DBContext {
         List<InventoryItem> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
 		
+		// Query directly from Products table - quantity is maintained automatically
 		sql.append("SELECT ");
-		sql.append("    v.product_id, ");
-		sql.append("    v.product_code, ");
-		sql.append("    v.product_name, ");
-		sql.append("    v.category_id, ");
-		sql.append("    v.category_name, ");
-		sql.append("    v.unit, ");
-		sql.append("    v.import_price, ");
-		sql.append("    v.export_price, ");
-		sql.append("    v.status, ");
-		sql.append("    v.quantity_on_hand, ");
-		sql.append("    v.inventory_value ");
-		sql.append("FROM vw_CurrentInventory v ");
+		sql.append("    p.product_id, ");
+		sql.append("    p.code AS product_code, ");
+		sql.append("    p.name AS product_name, ");
+		sql.append("    ISNULL(p.category_id, 0) AS category_id, ");
+		sql.append("    ISNULL(c.name, 'Uncategorized') AS category_name, ");
+		sql.append("    p.unit, ");
+		sql.append("    p.import_price, ");
+		sql.append("    p.export_price, ");
+		sql.append("    p.status, ");
+		sql.append("    p.quantity AS quantity_on_hand, ");
+		sql.append("    (p.quantity * ISNULL(p.import_price, 0)) AS inventory_value ");
+		sql.append("FROM Products p ");
+		sql.append("LEFT JOIN Categories c ON p.category_id = c.category_id ");
+		sql.append("WHERE p.status = 1 ");
         
         // Add category filter if provided
         if (categoryId != null && categoryId > 0) {
-			sql.append("WHERE v.category_id = ? ");
+			sql.append("AND p.category_id = ? ");
         }
         
         // Add search filter if provided
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-			if (categoryId != null && categoryId > 0) {
-				sql.append("AND (v.product_code LIKE ? OR v.product_name LIKE ?) ");
-			} else {
-				sql.append("WHERE (v.product_code LIKE ? OR v.product_name LIKE ?) ");
-			}
+			sql.append("AND (p.code LIKE ? OR p.name LIKE ?) ");
         }
         
-		sql.append("ORDER BY v.product_code ASC");
+		sql.append("ORDER BY p.code ASC");
         
+        PreparedStatement st = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement st = connection.prepareStatement(sql.toString());
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30); // 30 seconds timeout
             
             int paramIndex = 1;
             
@@ -77,7 +90,7 @@ public class InventoryDAO extends DBContext {
                 st.setString(paramIndex++, searchPattern);
             }
             
-            ResultSet rs = st.executeQuery();
+            rs = st.executeQuery();
             
             while (rs.next()) {
                 InventoryItem item = new InventoryItem();
@@ -101,6 +114,13 @@ public class InventoryDAO extends DBContext {
         } catch (SQLException e) {
             System.out.println("Error in getCurrentInventory: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
         }
         
         return list;
@@ -131,18 +151,24 @@ public class InventoryDAO extends DBContext {
 		sql.append("    v.quantity_on_hand, ");
 		sql.append("    v.inventory_value ");
 		sql.append("FROM vw_CurrentInventory v ");
+		sql.append("WHERE 1=1 ");
         
         if (categoryId != null && categoryId > 0) {
-            sql.append("AND p.category_id = ? ");
+            sql.append("AND v.category_id = ? ");
         }
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            sql.append("AND (p.code LIKE ? OR p.name LIKE ?) ");
+            sql.append("AND (v.product_code LIKE ? OR v.product_name LIKE ?) ");
         }
 		sql.append("ORDER BY v.product_code ASC ");
 		sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
         
+        PreparedStatement st = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement st = connection.prepareStatement(sql.toString());
+            System.out.println("SQL: " + sql.toString());
+            
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30); // 30 seconds timeout
             int paramIndex = 1;
             if (categoryId != null && categoryId > 0) {
                 st.setInt(paramIndex++, categoryId);
@@ -152,11 +178,19 @@ public class InventoryDAO extends DBContext {
                 st.setString(paramIndex++, searchPattern);
                 st.setString(paramIndex++, searchPattern);
             }
-            int offset = Math.max(page - 1, 0) * Math.max(pageSize, 0);
-            st.setInt(paramIndex++, offset);
-            st.setInt(paramIndex++, pageSize);
             
-            ResultSet rs = st.executeQuery();
+            // Ensure pageSize is at least 1
+            int safePageSize = Math.max(pageSize, 1);
+            int offset = Math.max(page - 1, 0) * safePageSize;
+            System.out.println("Pagination: offset=" + offset + ", pageSize=" + safePageSize);
+            
+            st.setInt(paramIndex++, offset);
+            st.setInt(paramIndex++, safePageSize);
+            
+            System.out.println("Executing query...");
+            rs = st.executeQuery();
+            System.out.println("Query executed, processing results...");
+            
             while (rs.next()) {
                 InventoryItem item = new InventoryItem();
                 item.setProductId(rs.getInt("product_id"));
@@ -173,9 +207,17 @@ public class InventoryDAO extends DBContext {
                 item.setInventoryValue(inventoryValue != null ? inventoryValue : java.math.BigDecimal.ZERO);
                 list.add(item);
             }
+            System.out.println("Processed " + list.size() + " items");
         } catch (SQLException e) {
             System.out.println("Error in getCurrentInventoryPaged: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
         }
         return list;
     }
@@ -185,15 +227,19 @@ public class InventoryDAO extends DBContext {
      */
     public int countCurrentInventory(Integer categoryId, String searchQuery) {
 		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT COUNT(*) AS total FROM vw_CurrentInventory v WHERE 1=1 ");
+		sql.append("SELECT COUNT(*) AS total FROM Products p WHERE p.status = 1 ");
         if (categoryId != null && categoryId > 0) {
-			sql.append("AND v.category_id = ? ");
+			sql.append("AND p.category_id = ? ");
         }
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-			sql.append("AND (v.product_code LIKE ? OR v.product_name LIKE ?) ");
+			sql.append("AND (p.code LIKE ? OR p.name LIKE ?) ");
         }
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement st = connection.prepareStatement(sql.toString());
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30); // 30 seconds timeout
             int paramIndex = 1;
             if (categoryId != null && categoryId > 0) {
                 st.setInt(paramIndex++, categoryId);
@@ -203,13 +249,20 @@ public class InventoryDAO extends DBContext {
                 st.setString(paramIndex++, searchPattern);
                 st.setString(paramIndex++, searchPattern);
             }
-            ResultSet rs = st.executeQuery();
+            rs = st.executeQuery();
             if (rs.next()) {
                 return rs.getInt("total");
             }
         } catch (SQLException e) {
             System.out.println("Error in countCurrentInventory: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
         }
         return 0;
     }
@@ -230,14 +283,18 @@ public class InventoryDAO extends DBContext {
 		String sql =
 			"SELECT " +
 			"    COUNT(*) AS total_products, " +
-			"    SUM(v.inventory_value) AS total_value, " +
-			"    SUM(CASE WHEN v.quantity_on_hand > 0 AND v.quantity_on_hand <= 20 THEN 1 ELSE 0 END) AS low_stock_count, " +
-			"    SUM(CASE WHEN v.quantity_on_hand = 0 THEN 1 ELSE 0 END) AS out_of_stock_count " +
-			"FROM vw_CurrentInventory v";
+			"    SUM(p.quantity * ISNULL(p.import_price, 0)) AS total_value, " +
+			"    SUM(CASE WHEN p.quantity > 0 AND p.quantity <= 20 THEN 1 ELSE 0 END) AS low_stock_count, " +
+			"    SUM(CASE WHEN p.quantity = 0 THEN 1 ELSE 0 END) AS out_of_stock_count " +
+			"FROM Products p " +
+			"WHERE p.status = 1";
 		
+		PreparedStatement st = null;
+		ResultSet rs = null;
 		try {
-			PreparedStatement st = connection.prepareStatement(sql);
-			ResultSet rs = st.executeQuery();
+			st = connection.prepareStatement(sql);
+			st.setQueryTimeout(30); // 30 seconds timeout
+			rs = st.executeQuery();
 			
 			if (rs.next()) {
 				return new Object[] {
@@ -250,6 +307,13 @@ public class InventoryDAO extends DBContext {
 		} catch (SQLException e) {
 			System.out.println("Error in getInventoryStatistics: " + e.getMessage());
 			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (st != null) st.close();
+			} catch (SQLException e) {
+				System.out.println("Error closing resources: " + e.getMessage());
+			}
 		}
 		
 		return new Object[] {0, BigDecimal.ZERO, 0, 0};
