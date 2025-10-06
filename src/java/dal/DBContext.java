@@ -27,4 +27,9 @@ public class DBContext {
             System.out.println(ex);
         }
     }
+
+    // Constructor that accepts an existing connection (for transaction management)
+    public DBContext(Connection connection) {
+        this.connection = connection;
+    }
 }

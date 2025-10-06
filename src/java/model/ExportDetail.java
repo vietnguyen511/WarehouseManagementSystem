@@ -2,45 +2,36 @@ package model;
 
 import java.math.BigDecimal;
 
-public class ImportDetail {
-    private int importDetailId;
-    private int importId;
+public class ExportDetail {
+    private int exportDetailId;
+    private int exportId;
     private int productId;
     private int quantity;
     private BigDecimal price;
     private BigDecimal amount;
+    
+    // For displaying product info
     private String productCode;
     private String productName;
-    private Integer categoryId;
 
-    public ImportDetail() {
+    public ExportDetail() {
     }
 
-    public ImportDetail(int importDetailId, int importId, int productId, int quantity, BigDecimal price, BigDecimal amount, String productCode, String productName) {
-        this.importDetailId = importDetailId;
-        this.importId = importId;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.price = price;
-        this.amount = amount;
-        this.productCode = productCode;
-        this.productName = productName;
+    // Getters and Setters
+    public int getExportDetailId() {
+        return exportDetailId;
     }
 
-    public int getImportDetailId() {
-        return importDetailId;
+    public void setExportDetailId(int exportDetailId) {
+        this.exportDetailId = exportDetailId;
     }
 
-    public void setImportDetailId(int importDetailId) {
-        this.importDetailId = importDetailId;
+    public int getExportId() {
+        return exportId;
     }
 
-    public int getImportId() {
-        return importId;
-    }
-
-    public void setImportId(int importId) {
-        this.importId = importId;
+    public void setExportId(int exportId) {
+        this.exportId = exportId;
     }
 
     public int getProductId() {
@@ -91,14 +82,18 @@ public class ImportDetail {
         this.productName = productName;
     }
 
-    public Integer getCategoryId() {
-        return categoryId;
+    @Override
+    public String toString() {
+        return "ExportDetail{" +
+                "exportDetailId=" + exportDetailId +
+                ", exportId=" + exportId +
+                ", productId=" + productId +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", amount=" + amount +
+                ", productCode='" + productCode + '\'' +
+                ", productName='" + productName + '\'' +
+                '}';
     }
-
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-    
 }
-
 

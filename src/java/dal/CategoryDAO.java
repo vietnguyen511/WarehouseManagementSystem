@@ -1,1 +1,123 @@
-/* * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template */package dal;import java.sql.PreparedStatement;import java.sql.ResultSet;import java.sql.SQLException;import java.util.ArrayList;import java.util.List;import model.Category;/** * CategoryDAO - Data Access Object for Categories table * Handles all database operations related to product categories * * @author lengo */public class CategoryDAO extends DBContext {    /**     * Get all active categories from the database     * @return List of Category objects     */    public List<Category> getAllCategories() {        List<Category> list = new ArrayList<>();        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +                     "FROM Categories " +                     "WHERE status = 1 " +                     "ORDER BY name ASC";        try {            PreparedStatement st = connection.prepareStatement(sql);            ResultSet rs = st.executeQuery();            while (rs.next()) {                Category category = new Category();                category.setCategoryId(rs.getInt("category_id"));                category.setName(rs.getString("name"));                category.setDescription(rs.getString("description"));                category.setStatus(rs.getBoolean("status"));                category.setCreatedAt(rs.getTimestamp("created_at"));                category.setUpdatedAt(rs.getTimestamp("updated_at"));                list.add(category);            }        } catch (SQLException e) {            System.out.println("Error in getAllCategories: " + e.getMessage());            e.printStackTrace();        }        return list;    }    /**     * Get category by ID     * @param categoryId The category ID to search for     * @return Category object or null if not found     */    public Category getCategoryById(int categoryId) {        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +                     "FROM Categories " +                     "WHERE category_id = ?";        try {            PreparedStatement st = connection.prepareStatement(sql);            st.setInt(1, categoryId);            ResultSet rs = st.executeQuery();            if (rs.next()) {                Category category = new Category();                category.setCategoryId(rs.getInt("category_id"));                category.setName(rs.getString("name"));                category.setDescription(rs.getString("description"));                category.setStatus(rs.getBoolean("status"));                category.setCreatedAt(rs.getTimestamp("created_at"));                category.setUpdatedAt(rs.getTimestamp("updated_at"));                return category;            }        } catch (SQLException e) {            System.out.println("Error in getCategoryById: " + e.getMessage());            e.printStackTrace();        }        return null;    }    /**     * Test method to verify database connection and data retrieval     */    public static void main(String[] args) {        CategoryDAO dao = new CategoryDAO();        List<Category> categories = dao.getAllCategories();        System.out.println("Total categories found: " + categories.size());        for (Category category : categories) {            System.out.println(category);        }    }}
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package dal;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.Category;
+
+/**
+ * CategoryDAO - Data Access Object for Categories table
+ * Handles all database operations related to product categories
+ *
+ * @author lengo
+ */
+public class CategoryDAO extends DBContext {
+
+    // Constructor for standalone use
+    public CategoryDAO() {
+        super();
+    }
+
+    // Constructor for transaction management (shares connection)
+    public CategoryDAO(Connection connection) {
+        super(connection);
+    }
+
+    /**
+     * Get all active categories from the database
+     * @return List of Category objects
+     */
+    public List<Category> getAllCategories() {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +
+                     "FROM Categories " +
+                     "WHERE status = 1 " +
+                     "ORDER BY name ASC";
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                Category category = new Category();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                category.setDescription(rs.getString("description"));
+                category.setStatus(rs.getBoolean("status"));
+                category.setCreatedAt(rs.getTimestamp("created_at"));
+                category.setUpdatedAt(rs.getTimestamp("updated_at"));
+                list.add(category);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getAllCategories: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Get category by ID
+     * @param categoryId The category ID to search for
+     * @return Category object or null if not found
+     */
+    public Category getCategoryById(int categoryId) {
+        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +
+                     "FROM Categories " +
+                     "WHERE category_id = ?";
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql);
+            st.setInt(1, categoryId);
+            rs = st.executeQuery();
+            if (rs.next()) {
+                Category category = new Category();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setName(rs.getString("name"));
+                category.setDescription(rs.getString("description"));
+                category.setStatus(rs.getBoolean("status"));
+                category.setCreatedAt(rs.getTimestamp("created_at"));
+                category.setUpdatedAt(rs.getTimestamp("updated_at"));
+                return category;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getCategoryById: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Test method to verify database connection and data retrieval
+     */
+    public static void main(String[] args) {
+        CategoryDAO dao = new CategoryDAO();
+        List<Category> categories = dao.getAllCategories();
+
+        System.out.println("Total categories found: " + categories.size());
+        for (Category category : categories) {
+            System.out.println(category);
+        }
+    }
+}
