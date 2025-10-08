@@ -51,7 +51,9 @@ public class CurrentInventoryServlet extends HttpServlet {
             String searchQuery = request.getParameter("q");
             String pageParam = request.getParameter("page");
             String pageSizeParam = request.getParameter("pageSize");
-            System.out.println("Parameters: categoryId=" + categoryIdParam + ", q=" + searchQuery + ", page=" + pageParam);
+            String lowStockOnlyParam = request.getParameter("lowStockOnly");
+            String thresholdParam = request.getParameter("threshold");
+            System.out.println("Parameters: categoryId=" + categoryIdParam + ", q=" + searchQuery + ", page=" + pageParam + ", lowStockOnly=" + lowStockOnlyParam);
             
             // Parse category ID
             Integer categoryId = null;
@@ -60,6 +62,20 @@ public class CurrentInventoryServlet extends HttpServlet {
                     categoryId = Integer.parseInt(categoryIdParam);
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid category ID: " + categoryIdParam);
+                }
+            }
+            
+            // Parse low stock filter
+            boolean lowStockOnly = "true".equalsIgnoreCase(lowStockOnlyParam) || "on".equalsIgnoreCase(lowStockOnlyParam);
+            
+            // Parse threshold (default 20)
+            int threshold = 20;
+            if (thresholdParam != null && !thresholdParam.trim().isEmpty()) {
+                try {
+                    threshold = Integer.parseInt(thresholdParam);
+                    if (threshold < 1) threshold = 20;
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid threshold: " + thresholdParam);
                 }
             }
             
@@ -86,9 +102,33 @@ public class CurrentInventoryServlet extends HttpServlet {
             if (totalPages == 0) totalPages = 1;
             if (page > totalPages) page = totalPages;
 
-            // Get inventory data with filters - use simple query without pagination for now
-            System.out.println("Calling getCurrentInventory (without pagination)...");
-            List<InventoryItem> allItems = inventoryDAO.getCurrentInventory(categoryId, searchQuery);
+            // Get inventory data with filters
+            System.out.println("Calling getCurrentInventory...");
+            List<InventoryItem> allItems;
+            
+            if (lowStockOnly) {
+                // Get only low stock items
+                allItems = inventoryDAO.getLowStockAlerts(threshold);
+                // Apply category filter if needed
+                if (categoryId != null && categoryId > 0) {
+                    final int catId = categoryId;
+                    allItems = allItems.stream()
+                        .filter(item -> item.getCategoryId() == catId)
+                        .collect(java.util.stream.Collectors.toList());
+                }
+                // Apply search filter if needed
+                if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                    final String query = searchQuery.toLowerCase();
+                    allItems = allItems.stream()
+                        .filter(item -> item.getProductCode().toLowerCase().contains(query) || 
+                                       item.getProductName().toLowerCase().contains(query))
+                        .collect(java.util.stream.Collectors.toList());
+                }
+            } else {
+                // Get all items with filters
+                allItems = inventoryDAO.getCurrentInventory(categoryId, searchQuery);
+            }
+            
             System.out.println("Retrieved " + allItems.size() + " total items");
             
             // Manual pagination in Java (temporary workaround)
@@ -122,6 +162,8 @@ public class CurrentInventoryServlet extends HttpServlet {
             request.setAttribute("pageSize", pageSize);
             request.setAttribute("totalItems", totalItems);
             request.setAttribute("totalPages", totalPages);
+            request.setAttribute("lowStockOnly", lowStockOnly);
+            request.setAttribute("threshold", threshold);
             
             // Forward to JSP
             System.out.println("Forwarding to JSP...");

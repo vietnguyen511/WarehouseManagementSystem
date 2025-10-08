@@ -5,6 +5,7 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * InventoryItem Model - Represents current inventory data for reporting
@@ -25,6 +26,7 @@ public class InventoryItem {
     private BigDecimal exportPrice;
     private boolean status;
     private int reorderThreshold; // For determining stock status (low/ok/out)
+    private Date updatedAt; // Last update timestamp
 
     public InventoryItem() {
         this.reorderThreshold = 20; // Default threshold
@@ -142,6 +144,14 @@ public class InventoryItem {
 
     public void setReorderThreshold(int reorderThreshold) {
         this.reorderThreshold = reorderThreshold;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     /**

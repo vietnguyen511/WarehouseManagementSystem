@@ -75,7 +75,6 @@
                 </a>
                 <ul class="sidebar-submenu">
                     <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink">Current Inventory</a></li>
-                    <li><a href="${pageContext.request.contextPath}/inventory-alerts" class="sidebar-sublink">Inventory Alerts</a></li>
                     <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink">Import/Export Stats</a></li>
                     <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink">Revenue Report</a></li>
                     <li><a href="${pageContext.request.contextPath}/activity-logs" class="sidebar-sublink">Activity Logs</a></li>
