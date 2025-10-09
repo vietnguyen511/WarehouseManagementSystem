@@ -11,7 +11,7 @@
         <ul class="sidebar-menu">
             <!-- Dashboard -->
             <li class="sidebar-item">
-                <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link">
+                <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -23,7 +23,7 @@
             </li>
 
             <!-- Products & Categories -->
-            <li class="sidebar-item sidebar-dropdown">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -34,14 +34,14 @@
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/products" class="sidebar-sublink">Product List</a></li>
-                    <li><a href="${pageContext.request.contextPath}/products/add" class="sidebar-sublink">Add Product</a></li>
-                    <li><a href="${pageContext.request.contextPath}/categories" class="sidebar-sublink">Categories</a></li>
+                    <li><a href="${pageContext.request.contextPath}/products" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Product List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/products/add" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add Product</a></li>
+                    <li><a href="${pageContext.request.contextPath}/categories" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Categories</a></li>
                 </ul>
             </li>
 
             <!-- Warehouse Operations -->
-            <li class="sidebar-item sidebar-dropdown">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'import-receipts' || activePage == 'export-receipts' || activePage == 'suppliers' || activePage == 'customers' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -53,15 +53,15 @@
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/import" class="sidebar-sublink">Import Receipts</a></li>
-                    <li><a href="${pageContext.request.contextPath}/export" class="sidebar-sublink">Export Receipts</a></li>
-                    <li><a href="${pageContext.request.contextPath}/suppliers" class="sidebar-sublink">Suppliers</a></li>
-                    <li><a href="${pageContext.request.contextPath}/customers" class="sidebar-sublink">Customers</a></li>
+                    <li><a href="${pageContext.request.contextPath}/import" class="sidebar-sublink ${activePage == 'import-receipts' ? 'active' : ''}">Import Receipts</a></li>
+                    <li><a href="${pageContext.request.contextPath}/export" class="sidebar-sublink ${activePage == 'export-receipts' ? 'active' : ''}">Export Receipts</a></li>
+                    <li><a href="${pageContext.request.contextPath}/suppliers" class="sidebar-sublink ${activePage == 'suppliers' ? 'active' : ''}">Suppliers</a></li>
+                    <li><a href="${pageContext.request.contextPath}/customers" class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
                 </ul>
             </li>
 
             <!-- Statistics & Reports -->
-            <li class="sidebar-item sidebar-dropdown">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'activity-logs' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
@@ -74,17 +74,17 @@
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink">Current Inventory</a></li>
-                    <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink">Import/Export Stats</a></li>
-                    <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink">Revenue Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/activity-logs" class="sidebar-sublink">Activity Logs</a></li>
+                    <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink ${activePage == 'current-inventory' ? 'active' : ''}">Current Inventory</a></li>
+                    <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink ${activePage == 'import-export-stats' ? 'active' : ''}">Import/Export Stats</a></li>
+                    <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink ${activePage == 'revenue-report' ? 'active' : ''}">Revenue Report</a></li>
+                    <li><a href="${pageContext.request.contextPath}/activity-logs" class="sidebar-sublink ${activePage == 'activity-logs' ? 'active' : ''}">Activity Logs</a></li>
                 </ul>
             </li>
 
             <!-- User Management (Admin only) -->
             <c:if test="${sessionScope.user != null && sessionScope.user.role == 'admin'}">
                 <li class="sidebar-item">
-                    <a href="${pageContext.request.contextPath}/users" class="sidebar-link">
+                    <a href="${pageContext.request.contextPath}/users" class="sidebar-link ${activePage == 'users' ? 'active' : ''}">
                         <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>

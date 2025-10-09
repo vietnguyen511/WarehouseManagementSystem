@@ -110,23 +110,20 @@
             });
         });
 
-        // Highlight active sidebar links
-        const currentPath = window.location.pathname;
-        const sidebarLinks = document.querySelectorAll('.sidebar-link, .sidebar-sublink');
+        // Note: Sidebar highlighting is now handled by JSP/JSTL using activePage variable
+        // This ensures precise matching without URL substring conflicts
 
-        sidebarLinks.forEach(function(link) {
-            const href = link.getAttribute('href');
-
-            if (href && currentPath.includes(href) && href !== '/') {
-                link.classList.add('active');
-
-                // If it's a submenu item, expand the parent dropdown
-                const parentDropdown = link.closest('.sidebar-dropdown');
+        // Expand dropdown if it contains an active link (set by JSP)
+        // Use setTimeout to ensure this runs after JSP rendering
+        setTimeout(function() {
+            const activeSublinks = document.querySelectorAll('.sidebar-sublink.active');
+            activeSublinks.forEach(function(activeLink) {
+                const parentDropdown = activeLink.closest('.sidebar-dropdown');
                 if (parentDropdown) {
                     parentDropdown.classList.add('active');
                 }
-            }
-        });
+            });
+        }, 50);
     }
     
     /**

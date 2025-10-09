@@ -147,12 +147,22 @@ public class CurrentInventoryServlet extends HttpServlet {
             Object[] statistics = inventoryDAO.getInventoryStatistics();
             System.out.println("Statistics retrieved");
             
+            // Calculate low stock count based on current threshold
+            int currentLowStockCount = 0;
+            List<InventoryItem> allInventoryItems = inventoryDAO.getCurrentInventory(null, null);
+            for (InventoryItem item : allInventoryItems) {
+                if (item.getQuantityOnHand() > 0 && item.getQuantityOnHand() <= threshold) {
+                    currentLowStockCount++;
+                }
+            }
+            System.out.println("Low stock count with threshold " + threshold + ": " + currentLowStockCount);
+            
             // Set attributes for JSP
             request.setAttribute("inventoryList", inventoryList);
             request.setAttribute("categories", categories);
             request.setAttribute("totalProducts", statistics[0]);
             request.setAttribute("totalValue", statistics[1]);
-            request.setAttribute("lowStockCount", statistics[2]);
+            request.setAttribute("lowStockCount", currentLowStockCount);
             request.setAttribute("outOfStockCount", statistics[3]);
             
             // Set filter values for maintaining state

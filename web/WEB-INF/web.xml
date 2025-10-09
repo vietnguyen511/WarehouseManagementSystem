@@ -24,6 +24,10 @@
         <servlet-name>CategoryLookupServlet</servlet-name>
         <servlet-class>controller.warehouseImportMgt.CategoryLookupServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ImportExportStatsServlet</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.ImportExportStatsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
@@ -47,5 +51,9 @@
     <servlet-mapping>
         <servlet-name>CategoryLookupServlet</servlet-name>
         <url-pattern>/api/category-lookup</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportExportStatsServlet</servlet-name>
+        <url-pattern>/import-export-stats</url-pattern>
     </servlet-mapping>
 </web-app>
