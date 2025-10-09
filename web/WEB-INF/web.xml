@@ -28,6 +28,14 @@
         <servlet-name>ImportExportStatsServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.ImportExportStatsServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ImportReceiptListServlet</servlet-name>
+        <servlet-class>controller.warehouseImportMgt.ImportReceiptListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ImportReceiptDetailServlet</servlet-name>
+        <servlet-class>controller.warehouseImportMgt.ImportReceiptDetailServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
@@ -55,5 +63,13 @@
     <servlet-mapping>
         <servlet-name>ImportExportStatsServlet</servlet-name>
         <url-pattern>/import-export-stats</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportReceiptListServlet</servlet-name>
+        <url-pattern>/warehouse-import-mgt/import-receipt-list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportReceiptDetailServlet</servlet-name>
+        <url-pattern>/warehouse-import-mgt/import-receipt-detail</url-pattern>
     </servlet-mapping>
 </web-app>
