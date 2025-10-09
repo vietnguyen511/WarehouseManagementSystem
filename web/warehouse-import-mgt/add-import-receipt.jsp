@@ -78,7 +78,7 @@
                     <p class="card-subtitle">Enter receipt info and product items</p>
                 </div>
                 <div class="action-bar">
-                    <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary">Back to List</a>
+                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">Back to List</a>
                 </div>
             </div>
 
@@ -192,7 +192,7 @@
                 <div class="card-footer" style="margin-top: var(--spacing-lg);">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success">Save</button>
-                        <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">Cancel</a>
                     </div>
                 </div>
             </form>

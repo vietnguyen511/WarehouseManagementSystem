@@ -11,6 +11,8 @@ public class ImportDetail {
     private BigDecimal amount;
     private String productCode;
     private String productName;
+    private String unit;
+    private String categoryName;
     private Integer categoryId;
 
     public ImportDetail() {
@@ -89,6 +91,22 @@ public class ImportDetail {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public Integer getCategoryId() {
