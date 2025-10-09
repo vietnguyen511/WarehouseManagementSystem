@@ -136,15 +136,22 @@
             background-color: var(--gray-50);
             border-radius: var(--radius-lg);
             border: 1px solid var(--gray-200);
+            width: 100%;
         }
         
         .search-input {
-            flex: 1;
-            max-width: 300px;
+            flex: 3;
+            min-width: 0;
         }
         
         .filter-select {
-            min-width: 150px;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .search-filter-bar .btn {
+            flex: 0 0 auto;
+            min-width: 80px;
         }
         
         /* Pagination styles */
@@ -241,11 +248,19 @@
             .search-filter-bar {
                 flex-direction: column;
                 align-items: stretch;
+                gap: var(--spacing-sm);
             }
             
             .search-input,
             .filter-select {
-                max-width: none;
+                flex: none;
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .search-filter-bar .btn {
+                flex: none;
+                width: 100%;
                 min-width: auto;
             }
             
