@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="activePage" value="import-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -202,20 +203,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Force sidebar active state for Import Receipts
-            const sidebarLinks = document.querySelectorAll('.sidebar-sublink');
-            sidebarLinks.forEach(function(link) {
-                const href = link.getAttribute('href');
-                // Only match exact /import link (Import Receipts)
-                if (href && (href.endsWith('/import') || href.includes('/import?'))) {
-                    link.classList.add('active');
-                    const parentDropdown = link.closest('.sidebar-dropdown');
-                    if (parentDropdown) {
-                        parentDropdown.classList.add('active');
-                    }
-                }
-            });
-
             const table = document.getElementById('productsTable');
             const tbody = table.querySelector('tbody');
             const grandTotalEl = document.getElementById('grandTotal');

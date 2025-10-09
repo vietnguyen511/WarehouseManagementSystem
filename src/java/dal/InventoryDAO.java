@@ -320,6 +320,85 @@ public class InventoryDAO extends DBContext {
 	}
     
     /**
+     * Get low stock alerts - products that are running low on inventory
+     * @param threshold the quantity threshold for low stock alert (default 20)
+     * @return List of InventoryItem objects with low stock
+     */
+    public List<InventoryItem> getLowStockAlerts(Integer threshold) {
+        List<InventoryItem> list = new ArrayList<>();
+        int alertThreshold = (threshold != null && threshold > 0) ? threshold : 20;
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ");
+        sql.append("    p.product_id, ");
+        sql.append("    p.code AS product_code, ");
+        sql.append("    p.name AS product_name, ");
+        sql.append("    ISNULL(p.category_id, 0) AS category_id, ");
+        sql.append("    ISNULL(c.name, 'Uncategorized') AS category_name, ");
+        sql.append("    p.unit, ");
+        sql.append("    p.import_price, ");
+        sql.append("    p.export_price, ");
+        sql.append("    p.status, ");
+        sql.append("    p.quantity AS quantity_on_hand, ");
+        sql.append("    (p.quantity * ISNULL(p.import_price, 0)) AS inventory_value, ");
+        sql.append("    p.updated_at ");
+        sql.append("FROM Products p ");
+        sql.append("LEFT JOIN Categories c ON p.category_id = c.category_id ");
+        sql.append("WHERE p.status = 1 ");
+        sql.append("AND p.quantity > 0 ");
+        sql.append("AND p.quantity <= ? ");
+        sql.append("ORDER BY p.quantity ASC, p.code ASC");
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30);
+            st.setInt(1, alertThreshold);
+            
+            rs = st.executeQuery();
+            
+            while (rs.next()) {
+                InventoryItem item = new InventoryItem();
+                item.setProductId(rs.getInt("product_id"));
+                item.setProductCode(rs.getString("product_code"));
+                item.setProductName(rs.getString("product_name"));
+                item.setQuantityOnHand(rs.getInt("quantity_on_hand"));
+                item.setUnitName(rs.getString("unit"));
+                item.setImportPrice(rs.getBigDecimal("import_price"));
+                item.setExportPrice(rs.getBigDecimal("export_price"));
+                item.setStatus(rs.getBoolean("status"));
+                item.setCategoryId(rs.getInt("category_id"));
+                item.setCategoryName(rs.getString("category_name"));
+                item.setReorderThreshold(alertThreshold);
+                
+                // Set updated_at timestamp
+                java.sql.Timestamp updatedAt = rs.getTimestamp("updated_at");
+                if (updatedAt != null) {
+                    item.setUpdatedAt(new java.util.Date(updatedAt.getTime()));
+                }
+                
+                BigDecimal inventoryValue = rs.getBigDecimal("inventory_value");
+                item.setInventoryValue(inventoryValue != null ? inventoryValue : BigDecimal.ZERO);
+                
+                list.add(item);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getLowStockAlerts: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        
+        return list;
+    }
+    
+    /**
      * Test method to verify database connection and data retrieval
      */
     public static void main(String[] args) {
