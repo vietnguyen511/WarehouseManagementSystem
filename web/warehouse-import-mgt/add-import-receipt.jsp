@@ -140,7 +140,7 @@
                                         <select name="items[0].categoryId" class="form-select category-select" required>
                                             <option value="" disabled selected hidden>Select category</option>
                                             <c:forEach var="cat" items="${categories}">
-                                                <option value="${cat.categoryId}">${cat.name}</option>
+                                                <option value="${cat.categoryId}">${cat.code} - ${cat.name}</option>
                                             </c:forEach>
                                         </select>
                                         <input type="hidden" name="items[0].categoryId" class="category-id-hidden">
@@ -264,7 +264,7 @@
             function getCategoryOptionsHTML() {
                 let html = '<option value="" disabled selected hidden>Select category...</option>';
                 <c:forEach var="cat" items="${categories}">
-                html += '<option value="${cat.categoryId}">${cat.name}</option>';
+                html += '<option value="${cat.categoryId}">${cat.code} - ${cat.name}</option>';
                 </c:forEach>
                 return html;
             }

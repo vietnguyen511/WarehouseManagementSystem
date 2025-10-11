@@ -117,7 +117,7 @@
                             <option value="">All Categories</option>
                             <c:forEach var="c" items="${categories}">
                                 <option value="${c.categoryId}" <c:if test='${param.categoryId == c.categoryId}'>selected</c:if>>
-                                    ${c.name}
+                                    ${c.code} - ${c.name}
                                 </option>
                             </c:forEach>
                         </select>
@@ -203,7 +203,7 @@
                                                 <div class="font-medium">${item.productName}</div>
                                             </td>
                                             <td>
-                                                <span class="text-muted">${item.categoryName}</span>
+                                                <span class="text-muted">${item.categoryCode} - ${item.categoryName}</span>
                                             </td>
                                             <td style="text-align: center;">
                                                 <span class="font-semibold">${item.quantityOnHand}</span>

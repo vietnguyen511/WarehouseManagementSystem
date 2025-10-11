@@ -36,7 +36,7 @@ public class CategoryDAO extends DBContext {
      */
     public List<Category> getAllCategories() {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +
+        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at " +
                      "FROM Categories " +
                      "WHERE status = 1 " +
                      "ORDER BY name ASC";
@@ -48,6 +48,7 @@ public class CategoryDAO extends DBContext {
             while (rs.next()) {
                 Category category = new Category();
                 category.setCategoryId(rs.getInt("category_id"));
+                category.setCode(rs.getString("code"));
                 category.setName(rs.getString("name"));
                 category.setDescription(rs.getString("description"));
                 category.setStatus(rs.getBoolean("status"));
@@ -75,7 +76,7 @@ public class CategoryDAO extends DBContext {
      * @return Category object or null if not found
      */
     public Category getCategoryById(int categoryId) {
-        String sql = "SELECT category_id, name, description, status, created_at, updated_at " +
+        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at " +
                      "FROM Categories " +
                      "WHERE category_id = ?";
         PreparedStatement st = null;
@@ -87,6 +88,7 @@ public class CategoryDAO extends DBContext {
             if (rs.next()) {
                 Category category = new Category();
                 category.setCategoryId(rs.getInt("category_id"));
+                category.setCode(rs.getString("code"));
                 category.setName(rs.getString("name"));
                 category.setDescription(rs.getString("description"));
                 category.setStatus(rs.getBoolean("status"));
