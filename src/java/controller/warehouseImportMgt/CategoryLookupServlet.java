@@ -25,6 +25,7 @@ public class CategoryLookupServlet extends HttpServlet {
                 Category c = categories.get(i);
                 json.append("{");
                 json.append("\"categoryId\":").append(c.getCategoryId()).append(",");
+                json.append("\"code\":\"").append(escape(c.getCode())).append("\",");
                 json.append("\"name\":\"").append(escape(c.getName())).append("\"");
                 json.append("}");
                 if (i < categories.size() - 1) {

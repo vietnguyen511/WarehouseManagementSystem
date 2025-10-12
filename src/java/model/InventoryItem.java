@@ -21,6 +21,7 @@ public class InventoryItem {
     private String unitName;
     private BigDecimal inventoryValue;
     private int categoryId;
+    private String categoryCode;
     private String categoryName;
     private BigDecimal importPrice;
     private BigDecimal exportPrice;
@@ -34,7 +35,7 @@ public class InventoryItem {
 
     public InventoryItem(int productId, String productCode, String productName, 
                         int quantityOnHand, String unitName, BigDecimal inventoryValue,
-                        int categoryId, String categoryName, BigDecimal importPrice, 
+                        int categoryId, String categoryCode, String categoryName, BigDecimal importPrice, 
                         BigDecimal exportPrice, boolean status) {
         this.productId = productId;
         this.productCode = productCode;
@@ -43,6 +44,7 @@ public class InventoryItem {
         this.unitName = unitName;
         this.inventoryValue = inventoryValue;
         this.categoryId = categoryId;
+        this.categoryCode = categoryCode;
         this.categoryName = categoryName;
         this.importPrice = importPrice;
         this.exportPrice = exportPrice;
@@ -104,6 +106,14 @@ public class InventoryItem {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+    
+    public String getCategoryCode() {
+        return categoryCode;
+    }
+    
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
     }
 
     public String getCategoryName() {
@@ -177,6 +187,7 @@ public class InventoryItem {
                 ", quantityOnHand=" + quantityOnHand +
                 ", unitName='" + unitName + '\'' +
                 ", inventoryValue=" + inventoryValue +
+                ", categoryCode='" + categoryCode + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", status=" + status +
                 '}';

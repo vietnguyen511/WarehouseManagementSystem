@@ -47,6 +47,7 @@ public class InventoryDAO extends DBContext {
 		sql.append("    p.code AS product_code, ");
 		sql.append("    p.name AS product_name, ");
 		sql.append("    ISNULL(p.category_id, 0) AS category_id, ");
+		sql.append("    ISNULL(c.code, 'N/A') AS category_code, ");
 		sql.append("    ISNULL(c.name, 'Uncategorized') AS category_name, ");
 		sql.append("    p.unit, ");
 		sql.append("    p.import_price, ");
@@ -103,6 +104,7 @@ public class InventoryDAO extends DBContext {
                 item.setExportPrice(rs.getBigDecimal("export_price"));
                 item.setStatus(rs.getBoolean("status"));
                 item.setCategoryId(rs.getInt("category_id"));
+                item.setCategoryCode(rs.getString("category_code"));
                 item.setCategoryName(rs.getString("category_name"));
                 
                 // Calculate inventory value
@@ -143,6 +145,7 @@ public class InventoryDAO extends DBContext {
 		sql.append("    v.product_code, ");
 		sql.append("    v.product_name, ");
 		sql.append("    v.category_id, ");
+		sql.append("    v.category_code, ");
 		sql.append("    v.category_name, ");
 		sql.append("    v.unit, ");
 		sql.append("    v.import_price, ");
@@ -202,6 +205,7 @@ public class InventoryDAO extends DBContext {
                 item.setExportPrice(rs.getBigDecimal("export_price"));
                 item.setStatus(rs.getBoolean("status"));
                 item.setCategoryId(rs.getInt("category_id"));
+                item.setCategoryCode(rs.getString("category_code"));
                 item.setCategoryName(rs.getString("category_name"));
                 java.math.BigDecimal inventoryValue = rs.getBigDecimal("inventory_value");
                 item.setInventoryValue(inventoryValue != null ? inventoryValue : java.math.BigDecimal.ZERO);
@@ -334,6 +338,7 @@ public class InventoryDAO extends DBContext {
         sql.append("    p.code AS product_code, ");
         sql.append("    p.name AS product_name, ");
         sql.append("    ISNULL(p.category_id, 0) AS category_id, ");
+        sql.append("    ISNULL(c.code, 'N/A') AS category_code, ");
         sql.append("    ISNULL(c.name, 'Uncategorized') AS category_name, ");
         sql.append("    p.unit, ");
         sql.append("    p.import_price, ");
@@ -369,6 +374,7 @@ public class InventoryDAO extends DBContext {
                 item.setExportPrice(rs.getBigDecimal("export_price"));
                 item.setStatus(rs.getBoolean("status"));
                 item.setCategoryId(rs.getInt("category_id"));
+                item.setCategoryCode(rs.getString("category_code"));
                 item.setCategoryName(rs.getString("category_name"));
                 item.setReorderThreshold(alertThreshold);
                 
