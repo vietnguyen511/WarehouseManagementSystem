@@ -15,8 +15,8 @@ import java.util.Set;
 import model.Category;
 
 /**
- * CategoryDAO - Data Access Object for Categories table Handles all database
- * operations related to product categories
+ * CategoryDAO - Data Access Object for Categories table
+ * Handles all database operations related to product categories
  *
  * @author lengo
  */
@@ -42,7 +42,7 @@ public class CategoryDAO extends DBContext {
         String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
                 + "FROM Categories "
                 + "WHERE status = 1 "
-                + "ORDER BY name ASC";
+                + "ORDER BY category_id ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {

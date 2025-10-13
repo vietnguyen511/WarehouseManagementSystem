@@ -1,0 +1,215 @@
+<%-- 
+    Document   : category-management
+    Created on : Oct 13, 2025, 10:27:11 AM
+    Author     : DANG
+--%>
+
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set var="activePage" value="categories" scope="request" />
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Category Management - Warehouse Management System</title>
+
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
+        <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
+
+        <style>
+            html, body {
+                height: auto;
+                overflow: auto;
+            }
+            .main-content-with-sidebar {
+                padding: var(--spacing-lg);
+                flex: 1;
+            }
+            .card {
+                background: #fff;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+                overflow: hidden;
+            }
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--spacing-md) var(--spacing-lg);
+                border-bottom: 1px solid var(--gray-200);
+            }
+            .card-body {
+                padding: var(--spacing-lg);
+            }
+            .table-wrapper {
+                overflow-x: auto;
+                margin-top: var(--spacing-md);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 0.75rem;
+                border-bottom: 1px solid var(--gray-200);
+                text-align: left;
+            }
+            th {
+                background: var(--gray-50);
+                font-weight: 600;
+            }
+            .action-bar {
+                display: flex;
+                gap: var(--spacing-sm);
+            }
+            .btn-danger {
+                background-color: var(--danger-600);
+                color: white;
+            }
+            .btn-danger:hover {
+                background-color: var(--danger-700);
+            }
+            .alert {
+                padding: 0.75rem 1rem;
+                border-radius: var(--radius-md);
+                margin-top: var(--spacing-md);
+            }
+            .alert-success {
+                background-color: var(--success-50);
+                color: var(--success-700);
+                border: 1px solid var(--success-200);
+            }
+            .alert-danger {
+                background-color: var(--danger-50);
+                color: var(--danger-700);
+                border: 1px solid var(--danger-200);
+            }
+            .search-form {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #f9fafb;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                padding: 6px 10px;
+                transition: all 0.2s ease-in-out;
+            }
+
+            .search-form input[type="text"] {
+                flex: 1;
+                border: none;
+                outline: none;
+                background: transparent;
+                padding: 6px;
+                font-size: 0.95rem;
+            }
+
+            .search-form button {
+                background: var(--primary-600);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                transition: background 0.2s ease-in-out;
+            }
+
+            .search-form button:hover {
+                background: var(--primary-700);
+            }
+
+            .search-form:focus-within {
+                box-shadow: 0 0 0 2px var(--primary-200);
+                background: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Top Header -->
+        <jsp:include page="/components/top-header.jsp" />
+        <!-- Sidebar -->
+        <jsp:include page="/components/sidebar-nav.jsp" />
+
+        <div class="main-content-with-sidebar">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h1 class="card-title">Category Management</h1>
+                        <p class="card-subtitle">Manage product categories in the warehouse</p>
+                    </div>
+                    <div class="action-bar">
+                        <!-- search form -->
+                        <form action="${pageContext.request.contextPath}/category-management" method="get" class="search-form">
+                            <input type="text" name="searchValue" value="${searchValue}" placeholder="Search by ID or Name">
+                            <button type="submit">Search</button>
+                        </form>
+                        <!-- add button -->
+                        <form action="${pageContext.request.contextPath}/addCategory" method="get" style="display:inline;">
+                            <button type="submit" class="btn btn-success">
+                                + Add Category
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Code</th>
+                                    <th>Category Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Updated At</th>
+                                    <th style="text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="category" items="${categoryList}">
+                                    <tr>
+                                        <td>${category.categoryId}</td>
+                                        <td>${category.code}</td>
+                                        <td>${category.name}</td>
+                                        <td>${category.description}</td>
+                                        <td>${category.status}</td>
+                                        <td>${category.createdAt}</td>
+                                        <td>${category.updatedAt}</td>
+
+                                        <td style="text-align:center;">
+                                            <form method="get" action="${pageContext.request.contextPath}/editCategory" style="display:inline;">
+                                                <input type="hidden" name="id" value="${category.categoryId}">
+                                                <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                            </form>
+                                            <form method="post" action="${pageContext.request.contextPath}/deleteCategory" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                                                <input type="hidden" name="id" value="${category.categoryId}">
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+
+                                <c:if test="${empty categoryList}">
+                                    <tr><td colspan="4" style="text-align:center; color:var(--gray-500);">No categories found.</td></tr>
+                                </c:if>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${successMessage}</div>
+                    </c:if>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger">${errorMessage}</div>
+                    </c:if>
+                </div>
+            </div>
+        </div>
+
+        <jsp:include page="/components/footer.jsp" />
+    </body>
+</html
