@@ -309,3 +309,9 @@ yarn.lock
 !.gitkeep
 !README.md
 !LICENSE
+
+# Allow tracking of bundled libraries in lib/ despite global *.jar ignore
+!/lib/
+!/lib/**
+!lib/*.jar
+!lib/**/*.jar
