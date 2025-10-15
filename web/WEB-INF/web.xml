@@ -36,6 +36,10 @@
         <servlet-name>ImportReceiptDetailServlet</servlet-name>
         <servlet-class>controller.warehouseImportMgt.ImportReceiptDetailServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>RevenueReportServlet</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.RevenueReportServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
@@ -71,5 +75,9 @@
     <servlet-mapping>
         <servlet-name>ImportReceiptDetailServlet</servlet-name>
         <url-pattern>/warehouse-import-mgt/import-receipt-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RevenueReportServlet</servlet-name>
+        <url-pattern>/revenue-report</url-pattern>
     </servlet-mapping>
 </web-app>

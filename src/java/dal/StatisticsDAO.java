@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import model.ImportExportStatDTO;
+import model.RevenueStatDTO;
 
 /**
  * StatisticsDAO - Data Access Object for warehouse statistics and reporting
@@ -233,6 +234,331 @@ public class StatisticsDAO extends DBContext {
         }
         
         return new Object[]{0, 0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO};
+    }
+
+    /**
+     * Get revenue statistics for a date range with optional product/category filtering
+     * @param startDate Start date (null for 30 days ago)
+     * @param endDate End date (null for today)
+     * @param groupBy "day", "month", "product", or "category"
+     * @param productId Product ID filter (null for all products)
+     * @param categoryId Category ID filter (null for all categories)
+     * @return List of revenue statistics
+     */
+    public List<RevenueStatDTO> getRevenueStatistics(Date startDate, Date endDate, String groupBy, 
+                                                    Integer productId, Integer categoryId) {
+        List<RevenueStatDTO> stats = new ArrayList<>();
+        
+        // Default to last 30 days if no dates provided
+        if (endDate == null) {
+            endDate = new Date();
+        }
+        if (startDate == null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(endDate);
+            cal.add(java.util.Calendar.DAY_OF_MONTH, -30);
+            startDate = cal.getTime();
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        
+        // Base query for revenue data
+        sql.append("SELECT ");
+        
+        // Select fields based on grouping
+        if ("product".equalsIgnoreCase(groupBy)) {
+            sql.append("    NULL AS report_date, ");
+            sql.append("    'All Periods' AS date_label, ");
+            sql.append("    p.product_id, ");
+            sql.append("    p.code AS product_code, ");
+            sql.append("    p.name AS product_name, ");
+            sql.append("    p.category_id, ");
+            sql.append("    c.code AS category_code, ");
+            sql.append("    c.name AS category_name, ");
+        } else if ("category".equalsIgnoreCase(groupBy)) {
+            sql.append("    NULL AS report_date, ");
+            sql.append("    'All Periods' AS date_label, ");
+            sql.append("    NULL AS product_id, ");
+            sql.append("    NULL AS product_code, ");
+            sql.append("    NULL AS product_name, ");
+            sql.append("    c.category_id, ");
+            sql.append("    c.code AS category_code, ");
+            sql.append("    c.name AS category_name, ");
+        } else {
+            // Date-based grouping (day/month)
+            if ("month".equalsIgnoreCase(groupBy)) {
+                sql.append("    CAST(er.date AS DATE) AS report_date, ");
+                sql.append("    FORMAT(er.date, 'MMM yyyy') AS date_label, ");
+            } else {
+                sql.append("    CAST(er.date AS DATE) AS report_date, ");
+                sql.append("    FORMAT(er.date, 'dd-MMM') AS date_label, ");
+            }
+            sql.append("    NULL AS product_id, ");
+            sql.append("    NULL AS product_code, ");
+            sql.append("    NULL AS product_name, ");
+            sql.append("    NULL AS category_id, ");
+            sql.append("    NULL AS category_code, ");
+            sql.append("    NULL AS category_name, ");
+        }
+        
+        sql.append("    ISNULL(SUM(ed.quantity), 0) AS total_quantity, ");
+        sql.append("    ISNULL(SUM(ed.amount), 0) AS total_value, ");
+        sql.append("    COUNT(DISTINCT er.export_id) AS receipt_count ");
+        sql.append("FROM ExportReceipts er ");
+        sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
+        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
+        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        
+        // Add filters
+        if (productId != null) {
+            sql.append("AND p.product_id = ? ");
+        }
+        if (categoryId != null) {
+            sql.append("AND c.category_id = ? ");
+        }
+        
+        // Group by clause
+        sql.append("GROUP BY ");
+        if ("product".equalsIgnoreCase(groupBy)) {
+            sql.append("    p.product_id, p.code, p.name, p.category_id, c.code, c.name ");
+        } else if ("category".equalsIgnoreCase(groupBy)) {
+            sql.append("    c.category_id, c.code, c.name ");
+        } else {
+            if ("month".equalsIgnoreCase(groupBy)) {
+                sql.append("    CAST(er.date AS DATE), FORMAT(er.date, 'MMM yyyy') ");
+            } else {
+                sql.append("    CAST(er.date AS DATE), FORMAT(er.date, 'dd-MMM') ");
+            }
+        }
+        
+        sql.append("ORDER BY ");
+        if ("product".equalsIgnoreCase(groupBy)) {
+            sql.append("    total_value DESC ");
+        } else if ("category".equalsIgnoreCase(groupBy)) {
+            sql.append("    total_value DESC ");
+        } else {
+            sql.append("    report_date ");
+        }
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(60);
+            
+            // Set parameters
+            java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
+            java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+            
+            int paramIndex = 1;
+            st.setDate(paramIndex++, sqlStartDate);
+            st.setDate(paramIndex++, sqlEndDate);
+            
+            if (productId != null) {
+                st.setInt(paramIndex++, productId);
+            }
+            if (categoryId != null) {
+                st.setInt(paramIndex++, categoryId);
+            }
+            
+            rs = st.executeQuery();
+            
+            while (rs.next()) {
+                RevenueStatDTO stat = new RevenueStatDTO();
+                
+                // Set date information
+                Date reportDate = rs.getDate("report_date");
+                stat.setDate(reportDate);
+                stat.setDateLabel(rs.getString("date_label"));
+                
+                // Set product information
+                Integer prodId = (Integer) rs.getObject("product_id");
+                if (prodId != null) {
+                    stat.setProductId(prodId);
+                    stat.setProductCode(rs.getString("product_code"));
+                    stat.setProductName(rs.getString("product_name"));
+                }
+                
+                // Set category information
+                Integer catId = (Integer) rs.getObject("category_id");
+                if (catId != null) {
+                    stat.setCategoryId(catId);
+                    stat.setCategoryCode(rs.getString("category_code"));
+                    stat.setCategoryName(rs.getString("category_name"));
+                }
+                
+                // Set revenue data
+                stat.setTotalQuantity(rs.getInt("total_quantity"));
+                BigDecimal totalValue = rs.getBigDecimal("total_value");
+                stat.setTotalValue(totalValue != null ? totalValue : BigDecimal.ZERO);
+                stat.setReceiptCount(rs.getInt("receipt_count"));
+                
+                stats.add(stat);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getRevenueStatistics: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        
+        return stats;
+    }
+
+    /**
+     * Get revenue summary statistics for dashboard
+     * @param startDate Start date (null for 30 days ago)
+     * @param endDate End date (null for today)
+     * @param productId Product ID filter (null for all products)
+     * @param categoryId Category ID filter (null for all categories)
+     * @return Array: [totalRevenue, totalQuantity, totalReceipts, averageOrderValue, topProductRevenue]
+     */
+    public Object[] getRevenueSummaryStatistics(Date startDate, Date endDate, Integer productId, Integer categoryId) {
+        // Default to last 30 days if no dates provided
+        if (endDate == null) {
+            endDate = new Date();
+        }
+        if (startDate == null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(endDate);
+            cal.add(java.util.Calendar.DAY_OF_MONTH, -30);
+            startDate = cal.getTime();
+        }
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ");
+        sql.append("    ISNULL(SUM(ed.amount), 0) AS total_revenue, ");
+        sql.append("    ISNULL(SUM(ed.quantity), 0) AS total_quantity, ");
+        sql.append("    COUNT(DISTINCT er.export_id) AS total_receipts, ");
+        sql.append("    CASE WHEN COUNT(DISTINCT er.export_id) > 0 ");
+        sql.append("         THEN ISNULL(SUM(ed.amount), 0) / COUNT(DISTINCT er.export_id) ");
+        sql.append("         ELSE 0 END AS avg_order_value ");
+        sql.append("FROM ExportReceipts er ");
+        sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
+        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
+        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        
+        if (productId != null) {
+            sql.append("AND p.product_id = ? ");
+        }
+        if (categoryId != null) {
+            sql.append("AND c.category_id = ? ");
+        }
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30);
+            
+            java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
+            java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+            
+            int paramIndex = 1;
+            st.setDate(paramIndex++, sqlStartDate);
+            st.setDate(paramIndex++, sqlEndDate);
+            
+            if (productId != null) {
+                st.setInt(paramIndex++, productId);
+            }
+            if (categoryId != null) {
+                st.setInt(paramIndex++, categoryId);
+            }
+            
+            rs = st.executeQuery();
+            
+            if (rs.next()) {
+                BigDecimal totalRevenue = rs.getBigDecimal("total_revenue");
+                int totalQuantity = rs.getInt("total_quantity");
+                int totalReceipts = rs.getInt("total_receipts");
+                BigDecimal avgOrderValue = rs.getBigDecimal("avg_order_value");
+                
+                // Get top product revenue
+                BigDecimal topProductRevenue = getTopProductRevenue(startDate, endDate, productId, categoryId);
+                
+                return new Object[]{totalRevenue, totalQuantity, totalReceipts, avgOrderValue, topProductRevenue};
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getRevenueSummaryStatistics: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        
+        return new Object[]{BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, BigDecimal.ZERO};
+    }
+
+    /**
+     * Get top product revenue for summary
+     */
+    private BigDecimal getTopProductRevenue(Date startDate, Date endDate, Integer productId, Integer categoryId) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT TOP 1 ISNULL(SUM(ed.amount), 0) AS top_revenue ");
+        sql.append("FROM ExportReceipts er ");
+        sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
+        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
+        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        
+        if (productId != null) {
+            sql.append("AND p.product_id = ? ");
+        }
+        if (categoryId != null) {
+            sql.append("AND c.category_id = ? ");
+        }
+        
+        sql.append("GROUP BY p.product_id, p.name ");
+        sql.append("ORDER BY SUM(ed.amount) DESC ");
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30);
+            
+            java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
+            java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+            
+            int paramIndex = 1;
+            st.setDate(paramIndex++, sqlStartDate);
+            st.setDate(paramIndex++, sqlEndDate);
+            
+            if (productId != null) {
+                st.setInt(paramIndex++, productId);
+            }
+            if (categoryId != null) {
+                st.setInt(paramIndex++, categoryId);
+            }
+            
+            rs = st.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getBigDecimal("top_revenue");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getTopProductRevenue: " + e.getMessage());
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        
+        return BigDecimal.ZERO;
     }
 }
 
