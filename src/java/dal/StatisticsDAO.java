@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import model.ImportExportStatDTO;
 import model.RevenueStatDTO;
+import model.ExportReportDTO;
 
 /**
  * StatisticsDAO - Data Access Object for warehouse statistics and reporting
@@ -557,8 +558,212 @@ public class StatisticsDAO extends DBContext {
                 System.out.println("Error closing resources: " + e.getMessage());
             }
         }
-        
+
         return BigDecimal.ZERO;
+    }
+
+    /**
+     * Get comprehensive report data for export functionality
+     * @param reportType Type of report: "inventory", "import-export", "revenue", "comprehensive"
+     * @param startDate Start date (null for 30 days ago)
+     * @param endDate End date (null for today)
+     * @param productId Optional product filter (null for all products)
+     * @param categoryId Optional category filter (null for all categories)
+     * @return List of export report data
+     */
+    public List<ExportReportDTO> getComprehensiveReportData(String reportType, Date startDate, Date endDate,
+                                                           Integer productId, Integer categoryId) {
+        List<ExportReportDTO> reports = new ArrayList<>();
+
+        // Default to last 30 days if no dates provided
+        if (endDate == null) {
+            endDate = new Date();
+        }
+        if (startDate == null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(endDate);
+            cal.add(java.util.Calendar.DAY_OF_MONTH, -30);
+            startDate = cal.getTime();
+        }
+
+        String sql = buildExportReportQuery(reportType);
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            int paramIndex = 1;
+
+            // Set date parameters
+            ps.setString(paramIndex++, sdf.format(startDate));
+            ps.setString(paramIndex++, sdf.format(endDate));
+
+            // For non-inventory reports, set additional date parameters for import/export data
+            if (!"inventory".equals(reportType)) {
+                ps.setString(paramIndex++, sdf.format(startDate));
+                ps.setString(paramIndex++, sdf.format(endDate));
+                ps.setString(paramIndex++, sdf.format(startDate));
+                ps.setString(paramIndex++, sdf.format(endDate));
+                ps.setString(paramIndex++, reportType); // For comprehensive filter
+            }
+
+            // Set optional filters (these would need to be added to the WHERE clause)
+            if (productId != null) {
+                // ps.setInt(paramIndex++, productId);
+            }
+            if (categoryId != null) {
+                // ps.setInt(paramIndex++, categoryId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ExportReportDTO report = new ExportReportDTO();
+
+                    // Basic information
+                    report.setReportDate(rs.getDate("report_date"));
+                    report.setDateLabel(rs.getString("date_label"));
+                    report.setReportPeriod(sdf.format(startDate) + " to " + sdf.format(endDate));
+
+                    // Product information
+                    report.setProductId(rs.getInt("product_id"));
+                    report.setProductCode(rs.getString("product_code"));
+                    report.setProductName(rs.getString("product_name"));
+                    report.setUnit(rs.getString("unit"));
+                    report.setCategoryId(rs.getInt("category_id"));
+                    report.setCategoryName(rs.getString("category_name"));
+
+                    // Supplier information
+                    report.setSupplierId(rs.getInt("supplier_id"));
+                    report.setSupplierName(rs.getString("supplier_name"));
+
+                    // Current inventory
+                    report.setCurrentStock(rs.getInt("current_stock"));
+                    report.setImportPrice(rs.getBigDecimal("import_price"));
+                    report.setExportPrice(rs.getBigDecimal("export_price"));
+
+                    // Import/Export data
+                    report.setImportQuantity(rs.getInt("import_quantity"));
+                    report.setExportQuantity(rs.getInt("export_quantity"));
+                    report.setImportValue(rs.getBigDecimal("import_value"));
+                    report.setExportValue(rs.getBigDecimal("export_value"));
+                    report.setImportReceiptCount(rs.getInt("import_receipt_count"));
+                    report.setExportReceiptCount(rs.getInt("export_receipt_count"));
+                    report.setAverageImportValue(rs.getBigDecimal("avg_import_value"));
+                    report.setAverageExportValue(rs.getBigDecimal("avg_export_value"));
+
+                    // Calculate derived fields
+                    report.calculateStockValue();
+                    report.calculateStockMovement();
+                    report.calculateProfitMargin();
+                    report.calculateProfitPercentage();
+                    report.calculateTurnoverRatio();
+
+                    reports.add(report);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reports;
+    }
+
+    /**
+     * Build SQL query based on report type
+     */
+    private String buildExportReportQuery(String reportType) {
+        String baseQuery = """
+            WITH DateSeries AS (
+                SELECT CAST(? AS DATE) AS report_date
+                UNION ALL
+                SELECT DATEADD(day, 1, report_date)
+                FROM DateSeries
+                WHERE report_date < CAST(? AS DATE)
+            ),
+            ProductData AS (
+                SELECT
+                    p.product_id as product_id,
+                    p.code as product_code,
+                    p.name as product_name,
+                    p.unit as unit,
+                    p.quantity as current_stock,
+                    p.import_price as import_price,
+                    p.export_price as export_price,
+                    c.category_id as category_id,
+                    c.name as category_name,
+                    NULL as supplier_id,
+                    'N/A' as supplier_name
+                FROM Products p
+                LEFT JOIN Categories c ON p.category_id = c.category_id
+                WHERE 1=1
+            """;
+
+        if (reportType.equals("inventory")) {
+            return baseQuery + """
+                )
+                SELECT
+                    GETDATE() as report_date,
+                    'Current Inventory' as date_label,
+                    pd.*,
+                    0 as import_quantity,
+                    0 as export_quantity,
+                    0.0 as import_value,
+                    0.0 as export_value,
+                    0 as import_receipt_count,
+                    0 as export_receipt_count,
+                    0.0 as avg_import_value,
+                    0.0 as avg_export_value
+                FROM ProductData pd
+                ORDER BY pd.category_name, pd.product_name
+                """;
+        } else {
+            return baseQuery + """
+                ),
+                ImportData AS (
+                    SELECT
+                        CAST(ir.date AS DATE) as import_date,
+                        id.product_id,
+                        SUM(id.quantity) as import_quantity,
+                        SUM(id.quantity * id.price) as import_value,
+                        COUNT(DISTINCT ir.import_id) as import_receipt_count,
+                        AVG(id.quantity * id.price) as avg_import_value
+                    FROM ImportReceipts ir
+                    JOIN ImportDetails id ON ir.import_id = id.import_id
+                    WHERE ir.date >= ? AND ir.date <= ?
+                    GROUP BY CAST(ir.date AS DATE), id.product_id
+                ),
+                ExportData AS (
+                    SELECT
+                        CAST(er.date AS DATE) as export_date,
+                        ed.product_id,
+                        SUM(ed.quantity) as export_quantity,
+                        SUM(ed.quantity * ed.price) as export_value,
+                        COUNT(DISTINCT er.export_id) as export_receipt_count,
+                        AVG(ed.quantity * ed.price) as avg_export_value
+                    FROM ExportReceipts er
+                    JOIN ExportDetails ed ON er.export_id = ed.export_id
+                    WHERE er.date >= ? AND er.date <= ?
+                    GROUP BY CAST(er.date AS DATE), ed.product_id
+                )
+                SELECT
+                    ds.report_date,
+                    FORMAT(ds.report_date, 'yyyy-MM-dd') as date_label,
+                    pd.*,
+                    ISNULL(imp.import_quantity, 0) as import_quantity,
+                    ISNULL(exp.export_quantity, 0) as export_quantity,
+                    ISNULL(imp.import_value, 0.0) as import_value,
+                    ISNULL(exp.export_value, 0.0) as export_value,
+                    ISNULL(imp.import_receipt_count, 0) as import_receipt_count,
+                    ISNULL(exp.export_receipt_count, 0) as export_receipt_count,
+                    ISNULL(imp.avg_import_value, 0.0) as avg_import_value,
+                    ISNULL(exp.avg_export_value, 0.0) as avg_export_value
+                FROM DateSeries ds
+                CROSS JOIN ProductData pd
+                LEFT JOIN ImportData imp ON ds.report_date = imp.import_date AND pd.product_id = imp.product_id
+                LEFT JOIN ExportData exp ON ds.report_date = exp.export_date AND pd.product_id = exp.product_id
+                WHERE (imp.import_quantity > 0 OR exp.export_quantity > 0 OR ? = 'comprehensive')
+                ORDER BY ds.report_date, pd.category_name, pd.product_name
+                OPTION (MAXRECURSION 0)
+                """;
+        }
     }
 }
 

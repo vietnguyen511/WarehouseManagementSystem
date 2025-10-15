@@ -40,6 +40,10 @@
         <servlet-name>RevenueReportServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.RevenueReportServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExportReportServlet</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.ExportReportServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
@@ -79,5 +83,9 @@
     <servlet-mapping>
         <servlet-name>RevenueReportServlet</servlet-name>
         <url-pattern>/revenue-report</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportReportServlet</servlet-name>
+        <url-pattern>/export-report</url-pattern>
     </servlet-mapping>
 </web-app>
