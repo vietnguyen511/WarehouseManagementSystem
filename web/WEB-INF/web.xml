@@ -41,6 +41,46 @@
         <servlet-class>controller.statisticsAndReporting.RevenueReportServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ViewSuppliersListServlet</servlet-name>
+        <servlet-class>controller.supplierMgt.ViewSuppliersListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CreateSupplierServlet</servlet-name>
+        <servlet-class>controller.supplierMgt.CreateSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditSupplierServlet</servlet-name>
+        <servlet-class>controller.supplierMgt.EditSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteSupplierServlet</servlet-name>
+        <servlet-class>controller.supplierMgt.DeleteSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewSupplierDetailServlet</servlet-name>
+        <servlet-class>controller.supplierMgt.ViewSupplierDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewSuppliersListServlet</servlet-name>
+        <url-pattern>/suppliers</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateSupplierServlet</servlet-name>
+        <url-pattern>/suppliers/new</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditSupplierServlet</servlet-name>
+        <url-pattern>/suppliers/edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteSupplierServlet</servlet-name>
+        <url-pattern>/suppliers/delete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewSupplierDetailServlet</servlet-name>
+        <url-pattern>/suppliers/view</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>ExportReportServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.ExportReportServlet</servlet-class>
     </servlet>
