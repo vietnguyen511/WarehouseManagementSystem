@@ -253,6 +253,15 @@
             modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
             document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
             confirmBtn.addEventListener('click', function(){ if (pendingForm) pendingForm.submit(); });
+            // Auto-hide success alerts after 3 seconds
+            window.addEventListener('load', function(){
+                const successAlerts = document.querySelectorAll('.alert.alert-success');
+                if (successAlerts && successAlerts.length) {
+                    setTimeout(function(){
+                        successAlerts.forEach(function(el){ el.style.display = 'none'; });
+                    }, 3000);
+                }
+            });
         })();
     </script>
 </body>
