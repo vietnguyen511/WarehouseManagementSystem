@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDAO extends DBContext {
 
@@ -107,6 +109,54 @@ public class ProductDAO extends DBContext {
             return p;
         }
         return null;
+    }
+
+    /**
+     * Get all active products from the database
+     * @return List of Product objects
+     */
+    public List<model.Product> getAllProducts() {
+        List<model.Product> list = new ArrayList<>();
+        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name " +
+                     "FROM Products p " +
+                     "LEFT JOIN Categories c ON p.category_id = c.category_id " +
+                     "WHERE p.status = 1 " +
+                     "ORDER BY p.name ASC";
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                model.Product product = new model.Product();
+                product.setProductId(rs.getInt("product_id"));
+                product.setCode(rs.getString("code"));
+                product.setName(rs.getString("name"));
+                product.setUnit(rs.getString("unit"));
+                product.setQuantity(rs.getInt("quantity"));
+                product.setImportPrice(rs.getBigDecimal("import_price"));
+                product.setExportPrice(rs.getBigDecimal("export_price"));
+                product.setStatus(rs.getBoolean("status"));
+                
+                // Get category info
+                int categoryId = rs.getInt("category_id");
+                product.setCategoryId(rs.wasNull() ? null : categoryId);
+                product.setCategoryName(rs.getString("category_name"));
+                
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getAllProducts: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        return list;
     }
 }
 
