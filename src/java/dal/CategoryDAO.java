@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import model.Category;
 
 /**
@@ -32,14 +34,15 @@ public class CategoryDAO extends DBContext {
 
     /**
      * Get all active categories from the database
+     *
      * @return List of Category objects
      */
     public List<Category> getAllCategories() {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at " +
-                     "FROM Categories " +
-                     "WHERE status = 1 " +
-                     "ORDER BY name ASC";
+        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
+                + "FROM Categories "
+                + "WHERE status = 1 "
+                + "ORDER BY category_id ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -48,7 +51,7 @@ public class CategoryDAO extends DBContext {
             while (rs.next()) {
                 Category category = new Category();
                 category.setCategoryId(rs.getInt("category_id"));
-                category.setCode(rs.getString("code"));
+                category.setCode(rs.getString("code"));              
                 category.setName(rs.getString("name"));
                 category.setDescription(rs.getString("description"));
                 category.setStatus(rs.getBoolean("status"));
@@ -61,8 +64,12 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Error closing resources: " + e.getMessage());
             }
@@ -72,13 +79,14 @@ public class CategoryDAO extends DBContext {
 
     /**
      * Get category by ID
+     *
      * @param categoryId The category ID to search for
      * @return Category object or null if not found
      */
     public Category getCategoryById(int categoryId) {
-        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at " +
-                     "FROM Categories " +
-                     "WHERE category_id = ?";
+        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
+                + "FROM Categories "
+                + "WHERE category_id = ?";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -101,13 +109,68 @@ public class CategoryDAO extends DBContext {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Error closing resources: " + e.getMessage());
             }
         }
         return null;
+    }
+
+    /**
+     * Get categories whose name contains the given keyword (case-insensitive)
+     *
+     * @param keyword the search keyword
+     * @return List of matching Category objects
+     */
+    public List<Category> getCategoryByName(String keyword) {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
+                + "FROM Categories "
+                + "WHERE name LIKE ?";
+
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
+        try {
+            st = connection.prepareStatement(sql);
+            st.setString(1, "%" + keyword + "%");
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                Category category = new Category();
+                category.setCategoryId(rs.getInt("category_id"));
+                category.setCode(rs.getString("code"));
+                category.setName(rs.getString("name"));
+                category.setDescription(rs.getString("description"));
+                category.setStatus(rs.getBoolean("status"));
+                category.setCreatedAt(rs.getTimestamp("created_at"));
+                category.setUpdatedAt(rs.getTimestamp("updated_at"));
+                list.add(category);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error in getCategoryByName: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+
+        return list;
     }
 
     /**
@@ -120,6 +183,26 @@ public class CategoryDAO extends DBContext {
         System.out.println("Total categories found: " + categories.size());
         for (Category category : categories) {
             System.out.println(category);
+        }
+        // Test getCategoryByID
+        int testId = 2;
+        Category byId = dao.getCategoryById(testId);
+        System.out.println("\n== Search by ID result: " + testId + " ==");
+        if (byId != null) {
+            System.out.println(byId);
+        } else {
+            System.out.println("Not found categories have ID = " + testId);
+        }
+        // Test getCategoryByName
+        String keyword = "Food";
+        List<Category> byName = dao.getCategoryByName(keyword);
+        System.out.println("\n== Search by name result: '" + keyword + "' ==");
+        if (byName.isEmpty()) {
+            System.out.println("Not found categories.");
+        } else {
+            for (Category c : byName) {
+                System.out.println(c);
+            }
         }
     }
 }
