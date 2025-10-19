@@ -54,7 +54,7 @@
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/import" class="sidebar-sublink ${activePage == 'import-receipts' ? 'active' : ''}">Import Receipts</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="sidebar-sublink ${activePage == 'import-receipts' ? 'active' : ''}">Import Receipts</a></li>
                     <li><a href="${pageContext.request.contextPath}/export" class="sidebar-sublink ${activePage == 'export-receipts' ? 'active' : ''}">Export Receipts</a></li>
                     <li><a href="${pageContext.request.contextPath}/suppliers" class="sidebar-sublink ${activePage == 'suppliers' ? 'active' : ''}">Suppliers</a></li>
                     <li><a href="${pageContext.request.contextPath}/customers" class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
