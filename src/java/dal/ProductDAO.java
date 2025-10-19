@@ -26,13 +26,15 @@ public class ProductDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sql);
         st.setString(1, code);
         ResultSet rs = st.executeQuery();
-        if (rs.next()) return rs.getInt(1);
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
         return null;
     }
 
     public int createProduct(String code, String name, BigDecimal importPrice, Integer categoryId) throws SQLException {
         String sql = "INSERT INTO Products (code, name, category_id, unit, quantity, import_price, status, created_at, updated_at) "
-                   + "VALUES (?, ?, ?, 'piece', 0, ?, 1, GETDATE(), GETDATE())";
+                + "VALUES (?, ?, ?, 'piece', 0, ?, 1, GETDATE(), GETDATE())";
         PreparedStatement st = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         st.setString(1, code);
         st.setString(2, name != null ? name : code);
@@ -44,10 +46,12 @@ public class ProductDAO extends DBContext {
         st.setBigDecimal(4, importPrice);
         st.executeUpdate();
         ResultSet rs = st.getGeneratedKeys();
-        if (rs.next()) return rs.getInt(1);
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
         throw new SQLException("Failed to create product for code: " + code);
     }
-    
+
     // Overloaded method for backward compatibility
     public int createProduct(String code, String name, BigDecimal importPrice) throws SQLException {
         return createProduct(code, name, importPrice, null);
@@ -85,10 +89,10 @@ public class ProductDAO extends DBContext {
     }
 
     public model.Product getProductByCode(String code) throws SQLException {
-        String sql = "SELECT TOP 1 p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name " +
-                     "FROM Products p " +
-                     "LEFT JOIN Categories c ON p.category_id = c.category_id " +
-                     "WHERE p.code = ?";
+        String sql = "SELECT TOP 1 p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.category_id "
+                + "WHERE p.code = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setString(1, code);
         ResultSet rs = st.executeQuery();
@@ -113,15 +117,16 @@ public class ProductDAO extends DBContext {
 
     /**
      * Get all active products from the database
+     *
      * @return List of Product objects
      */
     public List<model.Product> getAllProducts() {
         List<model.Product> list = new ArrayList<>();
-        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name " +
-                     "FROM Products p " +
-                     "LEFT JOIN Categories c ON p.category_id = c.category_id " +
-                     "WHERE p.status = 1 " +
-                     "ORDER BY p.name ASC";
+        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.category_id "
+                + "WHERE p.status = 1 "
+                + "ORDER BY p.name ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -137,12 +142,12 @@ public class ProductDAO extends DBContext {
                 product.setImportPrice(rs.getBigDecimal("import_price"));
                 product.setExportPrice(rs.getBigDecimal("export_price"));
                 product.setStatus(rs.getBoolean("status"));
-                
+
                 // Get category info
                 int categoryId = rs.getInt("category_id");
                 product.setCategoryId(rs.wasNull() ? null : categoryId);
                 product.setCategoryName(rs.getString("category_name"));
-                
+
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -150,14 +155,83 @@ public class ProductDAO extends DBContext {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (st != null) st.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
             } catch (SQLException e) {
                 System.out.println("Error closing resources: " + e.getMessage());
             }
         }
         return list;
     }
+
+    public model.Product getProductById(int productId) {
+        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, "
+                + "p.status, p.category_id, c.name AS category_name, p.created_at, p.updated_at "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.category_id "
+                + "WHERE p.product_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setInt(1, productId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    model.Product product = new model.Product();
+                    product.setProductId(rs.getInt("product_id"));
+                    product.setCode(rs.getString("code"));
+                    product.setName(rs.getString("name"));
+                    product.setUnit(rs.getString("unit"));
+                    product.setQuantity(rs.getInt("quantity"));
+                    product.setImportPrice(rs.getBigDecimal("import_price"));
+                    product.setExportPrice(rs.getBigDecimal("export_price"));
+                    product.setStatus(rs.getBoolean("status"));
+                    int categoryId = rs.getInt("category_id");
+                    product.setCategoryId(rs.wasNull() ? null : categoryId);
+                    product.setCategoryName(rs.getString("category_name"));
+                    return product;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getProductById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<model.Product> getProductByName(String name) {
+        List<model.Product> list = new ArrayList<>();
+        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, "
+                + "p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+                + "FROM Products p "
+                + "LEFT JOIN Categories c ON p.category_id = c.category_id "
+                + "WHERE p.name LIKE ? "
+                + "ORDER BY p.name ASC";
+
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, "%" + name + "%"); // tìm các sản phẩm có tên chứa từ khóa
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    model.Product product = new model.Product();
+                    product.setProductId(rs.getInt("product_id"));
+                    product.setCode(rs.getString("code"));
+                    product.setName(rs.getString("name"));
+                    product.setUnit(rs.getString("unit"));
+                    product.setQuantity(rs.getInt("quantity"));
+                    product.setImportPrice(rs.getBigDecimal("import_price"));
+                    product.setExportPrice(rs.getBigDecimal("export_price"));
+                    product.setStatus(rs.getBoolean("status"));
+                    int categoryId = rs.getInt("category_id");
+                    product.setCategoryId(rs.wasNull() ? null : categoryId);
+                    product.setCategoryName(rs.getString("category_name"));
+                    list.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error in getProductByName: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
-
-
