@@ -172,6 +172,28 @@ public class CategoryDAO extends DBContext {
 
         return list;
     }
+    
+        /**
+     * Insert a new category into the database
+     *
+     * @param category Category object to be inserted
+     * @return true if inserted successfully, false otherwise
+     */
+    public boolean insertCategory(Category category) {
+        String sql = "INSERT INTO Categories (code, name, description, status, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            st.setString(1, category.getCode());
+            st.setString(2, category.getName());
+            st.setString(3, category.getDescription());
+            st.setBoolean(4, category.isStatus());
+            return st.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Error in insertCategory: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Test method to verify database connection and data retrieval
@@ -183,26 +205,6 @@ public class CategoryDAO extends DBContext {
         System.out.println("Total categories found: " + categories.size());
         for (Category category : categories) {
             System.out.println(category);
-        }
-        // Test getCategoryByID
-        int testId = 2;
-        Category byId = dao.getCategoryById(testId);
-        System.out.println("\n== Search by ID result: " + testId + " ==");
-        if (byId != null) {
-            System.out.println(byId);
-        } else {
-            System.out.println("Not found categories have ID = " + testId);
-        }
-        // Test getCategoryByName
-        String keyword = "Food";
-        List<Category> byName = dao.getCategoryByName(keyword);
-        System.out.println("\n== Search by name result: '" + keyword + "' ==");
-        if (byName.isEmpty()) {
-            System.out.println("Not found categories.");
-        } else {
-            for (Category c : byName) {
-                System.out.println(c);
-            }
         }
     }
 }
