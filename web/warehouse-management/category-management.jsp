@@ -14,7 +14,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Category Management - Warehouse Management System</title>
-
+        
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
         <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
 
@@ -166,7 +166,7 @@
                             <button type="button" class="btn-reset" onclick="window.location.href='${pageContext.request.contextPath}/category-management'">Reset</button>
                         </form>
                         <!-- add button -->
-                        <form action="${pageContext.request.contextPath}/addCategory" method="get" style="display:inline;">
+                        <form action="${pageContext.request.contextPath}/add-category" method="get" style="display:inline;">
                             <button type="submit" class="btn btn-success">
                                 + Add Category
                             </button>

@@ -68,6 +68,10 @@
         <servlet-name>ProductManagementServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.ProductManagementServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddCategoryServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.AddCategoryServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
         <url-pattern>/suppliers</url-pattern>
@@ -143,5 +147,9 @@
     <servlet-mapping>
         <servlet-name>ProductManagementServlet</servlet-name>
         <url-pattern>/warehouse-management/product-management</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddCategoryServlet</servlet-name>
+        <url-pattern>/warehouse-management/add-category</url-pattern>
     </servlet-mapping>
 </web-app>

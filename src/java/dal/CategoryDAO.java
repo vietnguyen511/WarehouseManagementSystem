@@ -15,8 +15,8 @@ import java.util.Set;
 import model.Category;
 
 /**
- * CategoryDAO - Data Access Object for Categories table
- * Handles all database operations related to product categories
+ * CategoryDAO - Data Access Object for Categories table Handles all database
+ * operations related to product categories
  *
  * @author lengo
  */
@@ -51,7 +51,7 @@ public class CategoryDAO extends DBContext {
             while (rs.next()) {
                 Category category = new Category();
                 category.setCategoryId(rs.getInt("category_id"));
-                category.setCode(rs.getString("code"));              
+                category.setCode(rs.getString("code"));
                 category.setName(rs.getString("name"));
                 category.setDescription(rs.getString("description"));
                 category.setStatus(rs.getBoolean("status"));
@@ -172,14 +172,19 @@ public class CategoryDAO extends DBContext {
 
         return list;
     }
-    
-        /**
+
+    /**
      * Insert a new category into the database
      *
      * @param category Category object to be inserted
      * @return true if inserted successfully, false otherwise
      */
     public boolean insertCategory(Category category) {
+        if (category == null
+                || category.getCode() == null || category.getCode().trim().isEmpty()
+                || category.getName() == null || category.getName().trim().isEmpty()) {
+            return false;
+        }
         String sql = "INSERT INTO Categories (code, name, description, status, created_at, updated_at) "
                 + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
         try (PreparedStatement st = connection.prepareStatement(sql)) {

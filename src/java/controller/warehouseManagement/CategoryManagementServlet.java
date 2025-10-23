@@ -32,16 +32,16 @@ public class CategoryManagementServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {       
-        String searchValue = request.getParameter("searchValue");      
+            throws ServletException, IOException {
+        String searchValue = request.getParameter("searchValue");
         CategoryDAO dao = new CategoryDAO();
-        List<Category> categoryList = new ArrayList<>();      
-        
+        List<Category> categoryList = new ArrayList<>();
+
         // check if search value is not null and its trimmed value is not empty
         if (searchValue != null && !searchValue.trim().isEmpty()) {
-            try {               
+            try {
                 int categoryId = Integer.parseInt(searchValue.trim());
-                Category category = dao.getCategoryById(categoryId);               
+                Category category = dao.getCategoryById(categoryId);
                 // check if category is not null
                 if (category != null) {
                     categoryList.add(category);
@@ -52,9 +52,14 @@ public class CategoryManagementServlet extends HttpServlet {
         } else {
             categoryList = dao.getAllCategories();
         }
-        
+
+        String successParam = request.getParameter("success");
+        if ("1".equals(successParam)) {
+            request.setAttribute("successMessage", "Category added successfully!");
+        }
+
         request.setAttribute("categoryList", categoryList);
         request.setAttribute("searchValue", searchValue);
-            request.getRequestDispatcher("/warehouse-management/category-management.jsp").forward(request, response);
+        request.getRequestDispatcher("/warehouse-management/category-management.jsp").forward(request, response);
     }
 }
