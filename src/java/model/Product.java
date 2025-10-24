@@ -6,6 +6,7 @@ public class Product {
     private int productId;
     private String code;
     private String name;
+    private String material;
     private String unit;
     private int quantity;
     private BigDecimal importPrice;
@@ -17,10 +18,11 @@ public class Product {
     public Product() {
     }
 
-    public Product(int productId, String code, String name, String unit, int quantity, BigDecimal importPrice, BigDecimal exportPrice, boolean status) {
+    public Product(int productId, String code, String name, String material, String unit, int quantity, BigDecimal importPrice, BigDecimal exportPrice, boolean status) {
         this.productId = productId;
         this.code = code;
         this.name = name;
+        this.material = material;
         this.unit = unit;
         this.quantity = quantity;
         this.importPrice = importPrice;
@@ -50,6 +52,14 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
     }
 
     public String getUnit() {
