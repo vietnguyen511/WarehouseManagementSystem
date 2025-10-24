@@ -1,4 +1,4 @@
-package Personal_management;
+package controller.userLogging;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -12,9 +12,9 @@ package Personal_management;
 public class Iconstant {
     public static final String GOOGLE_CLIENT_ID = "579372688479-lkvchdvb1skp5309dgaegd98ob5l3qsg.apps.googleusercontent.com";
 
-    public static final String GOOGLE_CLIENT_SECRET = "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";
+    public static final String GOOGLE_CLIENT_SECRET = "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";
 
-    public static final String GOOGLE_REDIRECT_URI = "http://localhost:8080/WarehouseManagementSystem_temp_3/loginemail";
+    public static final String GOOGLE_REDIRECT_URI = "http://localhost:8080/WarehouseManagementSystem/loginemail";
 
     public static final String GOOGLE_GRANT_TYPE = "authorization_code";
 

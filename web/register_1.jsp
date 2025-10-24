@@ -1,3 +1,5 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,9 +17,17 @@
     <h2>Register form</h2>
 
     <form action="registerStep1" method="post">
-        <input type="text" name="firstName" placeholder="First name" required>
-        <input type="text" name="lastName" placeholder="Last name" required>
-
+        <input type="text" name="firstname" placeholder="First name" required>
+        <input type="text" name="lastname" placeholder="Last name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        
+           <!-- Error message if email fails -->
+         <% String error =(String) request.getAttribute("error");
+           if (error != null) { %>
+            <p class="error"> <%= error %> </p>
+        <% } %>
+        <input type="text" name="phone" placeholder="Phone number" required>
+         
         <input type="date" name="birthday" required>
 
         <!-- Gender side by side -->
@@ -25,15 +35,7 @@
             Gender: 
             <label><input type="radio" name="gender" value="Male" required> Male</label>
             <label><input type="radio" name="gender" value="Female"> Female</label>
-        </div>
-
-        <input type="email" name="email" placeholder="Email" required>
-         <!-- Error message if email fails -->
-        <% String error = request.getParameter("error");
-           if (error != null) { %>
-            <p class="error"> <%= error %> </p>
-        <% } %>
-        <input type="text" name="phone" placeholder="Phone number" required>
+        </div>        
         <input type="text" name="role" placeholder="Role" required>
 
         <button type="submit" class="btn">Continue</button>

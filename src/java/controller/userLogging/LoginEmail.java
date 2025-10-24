@@ -1,4 +1,4 @@
-package Personal_management;
+package controller.userLogging;
 
 import java.io.*;
 import jakarta.servlet.*;
@@ -27,5 +27,6 @@ protected void processRequest(HttpServletRequest request, HttpServletResponse re
         //System.out.println(acc);
         out.println( acc.getEmail());
         out.println(acc.getName());
+        out.println("<p>well that's all bro");
     }
 }
