@@ -6,7 +6,7 @@
 
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="activePage" value="categories" scope="request" />
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -14,7 +14,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Category Management - Warehouse Management System</title>
-
+        
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
         <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
 
@@ -124,12 +124,31 @@
                 box-shadow: 0 0 0 2px var(--primary-200);
                 background: #fff;
             }
+            .btn-refresh {
+                display: inline-block;
+                background-color: var(--primary-600);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                font-size: 0.95rem;
+                text-decoration: none;
+                line-height: normal;
+                cursor: pointer;
+                transition: background 0.2s ease-in-out;
+            }
+
+            .btn-refresh:hover {
+                background-color: var(--primary-700);
+                color: white;
+                text-decoration: none;
+            }
         </style>
     </head>
     <body>
-        <!-- Top Header -->
+        <!--top header-->
         <jsp:include page="/components/top-header.jsp" />
-        <!-- Sidebar -->
+        <!--sidebar-->
         <jsp:include page="/components/sidebar-nav.jsp" />
 
         <div class="main-content-with-sidebar">
@@ -144,9 +163,10 @@
                         <form action="${pageContext.request.contextPath}/category-management" method="get" class="search-form">
                             <input type="text" name="searchValue" value="${searchValue}" placeholder="Search by ID or Name">
                             <button type="submit">Search</button>
+                            <button type="button" class="btn-reset" onclick="window.location.href='${pageContext.request.contextPath}/category-management'">Reset</button>
                         </form>
                         <!-- add button -->
-                        <form action="${pageContext.request.contextPath}/addCategory" method="get" style="display:inline;">
+                        <form action="${pageContext.request.contextPath}/add-category" method="get" style="display:inline;">
                             <button type="submit" class="btn btn-success">
                                 + Add Category
                             </button>
@@ -192,9 +212,8 @@
                                         </td>
                                     </tr>
                                 </c:forEach>
-
                                 <c:if test="${empty categoryList}">
-                                    <tr><td colspan="4" style="text-align:center; color:var(--gray-500);">No categories found.</td></tr>
+                                    <tr><td colspan="4" style="text-align:center; color:var(--gray-500);">No category found.</td></tr>
                                 </c:if>
                             </tbody>
                         </table>
@@ -212,4 +231,4 @@
 
         <jsp:include page="/components/footer.jsp" />
     </body>
-</html
+</html>

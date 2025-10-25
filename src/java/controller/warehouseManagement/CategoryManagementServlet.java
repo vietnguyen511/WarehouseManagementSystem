@@ -33,60 +33,31 @@ public class CategoryManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-// for testing       
-//        response.setContentType("text/plain");
-//        PrintWriter out = response.getWriter();
-        
         String searchValue = request.getParameter("searchValue");
-//        out.println("Search value = " + searchValue);
-        
         CategoryDAO dao = new CategoryDAO();
-        List<Category> categoryList = new ArrayList<>();      
-        
+        List<Category> categoryList = new ArrayList<>();
+
         // check if search value is not null and its trimmed value is not empty
         if (searchValue != null && !searchValue.trim().isEmpty()) {
-            try {               
+            try {
                 int categoryId = Integer.parseInt(searchValue.trim());
-// for testing
-//                out.println("Searching by ID: " + categoryId);
-                Category category = dao.getCategoryById(categoryId);               
+                Category category = dao.getCategoryById(categoryId);
                 // check if category is not null
                 if (category != null) {
                     categoryList.add(category);
-// for testing
-//                    out.println("Found: " + category.getCategoryId() + " | " + category.getName());
                 }
-// for testing
-//                else {
-//                    out.println("No category found with ID = " + categoryId);
-//                }
             } catch (NumberFormatException e) {
-// for testing
-//                out.println("Searching by name: " + searchValue.trim());
                 categoryList = dao.getCategoryByName(searchValue.trim());
-// for testing
-//                // check if category list is empty
-//                if (categoryList.isEmpty()) {
-//                    out.println("No category found with name containing '" + searchValue + "'");
-//                } else {
-//                    // loop through all category list element
-//                    for (Category category : categoryList) {
-//                        out.println(category.getCategoryId() + " | " + category.getCode() + " | " + category.getName());
-//                    }
-//                }
-//                out.println("Found " + categoryList.size() + " categories.");
             }
         } else {
-// for testing
-//            out.println("== ALL CATEGORIES ==");
             categoryList = dao.getAllCategories();
-// for testing:
-//            //loop through all category list element
-//            for (Category category : categoryList) {
-//                 out.println(category.getCategoryId() + " | " + category.getCode() + " | " + category.getName());
-//            }
         }
-        
+
+        String successParam = request.getParameter("success");
+        if ("1".equals(successParam)) {
+            request.setAttribute("successMessage", "Category added successfully!");
+        }
+
         request.setAttribute("categoryList", categoryList);
         request.setAttribute("searchValue", searchValue);
         request.getRequestDispatcher("/warehouse-management/category-management.jsp").forward(request, response);
