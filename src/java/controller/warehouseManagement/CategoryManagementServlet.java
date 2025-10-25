@@ -8,9 +8,7 @@ import dal.CategoryDAO;
 import model.Category;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +16,6 @@ import java.util.List;
  *
  * @author DANG
  */
-@WebServlet("/category-management")
 public class CategoryManagementServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -56,6 +53,14 @@ public class CategoryManagementServlet extends HttpServlet {
         String successParam = request.getParameter("success");
         if ("1".equals(successParam)) {
             request.setAttribute("successMessage", "Category added successfully!");
+        }
+        
+        // handle delete status
+        String deletedParam = request.getParameter("deleted");
+        if ("1".equals(deletedParam)) {
+            request.setAttribute("successMessage", "Category deleted successfully.");
+        } else if ("0".equals(deletedParam)) {
+            request.setAttribute("errorMessage", "Cannot delete this category because it is already in use.");
         }
 
         request.setAttribute("categoryList", categoryList);

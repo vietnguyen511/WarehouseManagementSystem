@@ -39,6 +39,8 @@
     <servlet>
         <servlet-name>CategoryManagementServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.CategoryManagementServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>RevenueReportServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.RevenueReportServlet</servlet-class>
     </servlet>
@@ -69,6 +71,10 @@
     <servlet>
         <servlet-name>AddCategoryServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.AddCategoryServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteCategoryServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.DeleteCategoryServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
@@ -133,6 +139,8 @@
     <servlet-mapping>
         <servlet-name>CategoryManagementServlet</servlet-name>
         <url-pattern>/warehouse-management/category-management</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>RevenueReportServlet</servlet-name>
         <url-pattern>/revenue-report</url-pattern>
     </servlet-mapping>
@@ -147,5 +155,9 @@
     <servlet-mapping>
         <servlet-name>AddCategoryServlet</servlet-name>
         <url-pattern>/warehouse-management/add-category</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteCategoryServlet</servlet-name>
+        <url-pattern>/warehouse-management/delete-category</url-pattern>
     </servlet-mapping>
 </web-app>

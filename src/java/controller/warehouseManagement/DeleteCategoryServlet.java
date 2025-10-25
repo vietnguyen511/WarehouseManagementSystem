@@ -8,17 +8,15 @@ import dal.CategoryDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Category;
 
 /**
  *
  * @author DANG
  */
-public class AddCategoryServlet extends HttpServlet {
+public class DeleteCategoryServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +35,10 @@ public class AddCategoryServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AddCategory</title>");
+            out.println("<title>Servlet DeleteCategoryServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AddCategory at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteCategoryServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,7 +56,7 @@ public class AddCategoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/warehouse-management/add-category.jsp").forward(request, response);
+        request.getRequestDispatcher("/warehouse-management/delete-category.jsp").forward(request, response);
     }
 
     /**
@@ -72,38 +70,29 @@ public class AddCategoryServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
+        String idRaw = request.getParameter("id");
+        String redirectUrl = request.getContextPath() + "/warehouse-management/category-management";
 
-        String code = request.getParameter("code");
-        String name = request.getParameter("name");
-        String description = request.getParameter("description");
-        String statusStr = request.getParameter("status");
-
-        boolean status = "active".equalsIgnoreCase(statusStr);
-
-        if (code == null || code.trim().isEmpty()
-                || name == null || name.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Category code and name are required.");
-            request.getRequestDispatcher("/warehouse-management/add-category.jsp").forward(request, response);
+        if (idRaw == null || idRaw.isEmpty()) {
+            response.sendRedirect(redirectUrl + "?deleted=0");
             return;
         }
 
-        Category category = new Category();
-        category.setCode(code);
-        category.setName(name);
-        category.setDescription(description);
-        category.setStatus(status);
+        int categoryId;
+        try {
+            categoryId = Integer.parseInt(idRaw.trim());
+        } catch (NumberFormatException e) {
+            response.sendRedirect(redirectUrl + "?deleted=0");
+            return;
+        }
 
         CategoryDAO dao = new CategoryDAO();
-        boolean success = dao.insertCategory(category);
+        boolean success = dao.deleteCategoryById(categoryId);
 
-        // check if success
         if (success) {
-            response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?success=1");
+            response.sendRedirect(redirectUrl + "?deleted=1");
         } else {
-            request.setAttribute("errorMessage", "Failed to add category. Please try again.");
-            request.setAttribute("category", category);
-            request.getRequestDispatcher("/warehouse-management/add-category.jsp").forward(request, response);
+            response.sendRedirect(redirectUrl + "?deleted=0");
         }
     }
 
