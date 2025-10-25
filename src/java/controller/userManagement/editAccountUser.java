@@ -7,24 +7,20 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
-@WebServlet("/edit-user")
-public class editUser extends HttpServlet 
+@WebServlet("/edit-account-user")
+public class editAccountUser extends HttpServlet 
 {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String fullname = request.getParameter("fullname");
-            String email = request.getParameter("email");
-            String phone = request.getParameter("phone");
-            String role = request.getParameter("role");
-
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String email = request.getParameter("email");        
           //   User user = new User(id, fullname, email, phone, role);
           //   UserDAO dao = new DAOUser();
           //   dao.updateUser(user);
-
             response.sendRedirect("staff-list?success=edit");
         } catch (Exception e) {
             e.printStackTrace();

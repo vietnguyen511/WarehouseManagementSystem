@@ -6,11 +6,17 @@ public class User
     private int id;
     private String fullname,phone, role;
     private String userName, email, password;
+    private String avatar;
     private boolean status;
 
-    public User() {
+    public User()  {}
+    public User(String avatar, String fullname, String role) 
+    {
+       this.avatar = avatar;
+       this.fullname = fullname;
+       this.role = role;
     }
-
+ 
     public User(int id, String userName, String email, String password) {
         this.id = id;
         this.userName = userName;
@@ -91,6 +97,14 @@ public class User
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
   
     
