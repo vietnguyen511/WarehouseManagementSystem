@@ -89,7 +89,7 @@ public class ProductDAO extends DBContext {
     }
 
     public model.Product getProductByCode(String code) throws SQLException {
-        String sql = "SELECT TOP 1 p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+        String sql = "SELECT TOP 1 p.product_id, p.code, p.name, p.material, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
                 + "WHERE p.code = ?";
@@ -101,6 +101,7 @@ public class ProductDAO extends DBContext {
             p.setProductId(rs.getInt("product_id"));
             p.setCode(rs.getString("code"));
             p.setName(rs.getString("name"));
+            p.setMaterial(rs.getString("material"));
             p.setUnit(rs.getString("unit"));
             p.setQuantity(rs.getInt("quantity"));
             p.setImportPrice(rs.getBigDecimal("import_price"));
@@ -122,7 +123,7 @@ public class ProductDAO extends DBContext {
      */
     public List<model.Product> getAllProducts() {
         List<model.Product> list = new ArrayList<>();
-        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+        String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
                 + "WHERE p.status = 1 "
@@ -137,6 +138,7 @@ public class ProductDAO extends DBContext {
                 product.setProductId(rs.getInt("product_id"));
                 product.setCode(rs.getString("code"));
                 product.setName(rs.getString("name"));
+                product.setMaterial(rs.getString("material"));
                 product.setUnit(rs.getString("unit"));
                 product.setQuantity(rs.getInt("quantity"));
                 product.setImportPrice(rs.getBigDecimal("import_price"));
@@ -169,7 +171,7 @@ public class ProductDAO extends DBContext {
     }
 
     public model.Product getProductById(int productId) {
-        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, p.import_price, p.export_price, "
+        String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, p.import_price, p.export_price, "
                 + "p.status, p.category_id, c.name AS category_name, p.created_at, p.updated_at "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
@@ -182,6 +184,7 @@ public class ProductDAO extends DBContext {
                     product.setProductId(rs.getInt("product_id"));
                     product.setCode(rs.getString("code"));
                     product.setName(rs.getString("name"));
+                    product.setMaterial(rs.getString("material"));
                     product.setUnit(rs.getString("unit"));
                     product.setQuantity(rs.getInt("quantity"));
                     product.setImportPrice(rs.getBigDecimal("import_price"));
@@ -217,6 +220,7 @@ public class ProductDAO extends DBContext {
                     product.setProductId(rs.getInt("product_id"));
                     product.setCode(rs.getString("code"));
                     product.setName(rs.getString("name"));
+                    product.setMaterial(rs.getString("material"));
                     product.setUnit(rs.getString("unit"));
                     product.setQuantity(rs.getInt("quantity"));
                     product.setImportPrice(rs.getBigDecimal("import_price"));
