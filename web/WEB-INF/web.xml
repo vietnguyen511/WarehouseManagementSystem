@@ -72,6 +72,10 @@
         <servlet-name>AddCategoryServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.AddCategoryServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteCategoryServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.DeleteCategoryServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
         <url-pattern>/suppliers</url-pattern>
@@ -151,5 +155,9 @@
     <servlet-mapping>
         <servlet-name>AddCategoryServlet</servlet-name>
         <url-pattern>/warehouse-management/add-category</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteCategoryServlet</servlet-name>
+        <url-pattern>/warehouse-management/delete-category</url-pattern>
     </servlet-mapping>
 </web-app>

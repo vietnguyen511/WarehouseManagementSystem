@@ -119,7 +119,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form id="addCategoryForm" action="${pageContext.request.contextPath}/add-category" method="post" novalidate>
+                    <form id="addCategoryForm" action="${pageContext.request.contextPath}/warehouse-management/add-category" method="post" novalidate>
                         <div class="form-group">
                             <label for="code" class="required">Category Code</label>
                             <input type="text" id="code" name="code" value="${category.code}" required minlength="2" maxlength="20">

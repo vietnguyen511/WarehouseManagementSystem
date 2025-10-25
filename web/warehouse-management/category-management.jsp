@@ -14,7 +14,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Category Management - Warehouse Management System</title>
-        
+
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
         <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
 
@@ -160,13 +160,13 @@
                     </div>
                     <div class="action-bar">
                         <!-- search form -->
-                        <form action="${pageContext.request.contextPath}/category-management" method="get" class="search-form">
+                        <form action="${pageContext.request.contextPath}/warehouse-management/category-management" method="get" class="search-form">
                             <input type="text" name="searchValue" value="${searchValue}" placeholder="Search by ID or Name">
                             <button type="submit">Search</button>
-                            <button type="button" class="btn-reset" onclick="window.location.href='${pageContext.request.contextPath}/category-management'">Reset</button>
+                            <button type="button" class="btn-reset" onclick="window.location.href = '${pageContext.request.contextPath}/warehouse-management/category-management'">Reset</button>
                         </form>
                         <!-- add button -->
-                        <form action="${pageContext.request.contextPath}/add-category" method="get" style="display:inline;">
+                        <form action="${pageContext.request.contextPath}/warehouse-management/add-category" method="get" style="display:inline;">
                             <button type="submit" class="btn btn-success">
                                 + Add Category
                             </button>
@@ -205,7 +205,7 @@
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
                                             </form>
-                                            <form method="post" action="${pageContext.request.contextPath}/deleteCategory" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                                            <form method="post" action="${pageContext.request.contextPath}/warehouse-management/delete-category" style="display:inline;" onsubmit="return confirm('Delete this category?');">
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
@@ -222,6 +222,7 @@
                     <c:if test="${not empty successMessage}">
                         <div class="alert alert-success">${successMessage}</div>
                     </c:if>
+                        
                     <c:if test="${not empty errorMessage}">
                         <div class="alert alert-danger">${errorMessage}</div>
                     </c:if>

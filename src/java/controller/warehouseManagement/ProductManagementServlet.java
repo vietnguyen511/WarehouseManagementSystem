@@ -16,7 +16,6 @@ import dal.ProductDAO;
  *
  * @author DANG
  */
-@WebServlet("/product-management")
 public class ProductManagementServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
