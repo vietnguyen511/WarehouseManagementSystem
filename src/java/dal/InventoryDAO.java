@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.InventoryItem;
+import model.ProductVariantInventoryItem;
 
 /**
  * InventoryDAO - Data Access Object for Inventory reporting
@@ -391,6 +392,77 @@ public class InventoryDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Error in getLowStockAlerts: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (st != null) st.close();
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
+            }
+        }
+        
+        return list;
+    }
+    
+    /**
+     * Get product variants inventory for a specific product
+     * @param productId Product ID
+     * @return List of variant inventory items
+     */
+    public List<ProductVariantInventoryItem> getProductVariants(int productId) {
+        List<ProductVariantInventoryItem> list = new ArrayList<>();
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ");
+        sql.append("    pv.variant_id, ");
+        sql.append("    pv.product_id, ");
+        sql.append("    p.code AS product_code, ");
+        sql.append("    p.name AS product_name, ");
+        sql.append("    pv.size, ");
+        sql.append("    pv.color, ");
+        sql.append("    pv.quantity AS quantity_on_hand, ");
+        sql.append("    p.import_price, ");
+        sql.append("    p.export_price, ");
+        sql.append("    pv.status, ");
+        sql.append("    ISNULL(p.category_id, 0) AS category_id, ");
+        sql.append("    ISNULL(c.code, 'N/A') AS category_code, ");
+        sql.append("    ISNULL(c.name, 'Uncategorized') AS category_name ");
+        sql.append("FROM ProductVariants pv ");
+        sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
+        sql.append("LEFT JOIN Categories c ON p.category_id = c.category_id ");
+        sql.append("WHERE pv.product_id = ? AND pv.status = 1 ");
+        sql.append("ORDER BY p.code, pv.size, pv.color");
+        
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.prepareStatement(sql.toString());
+            st.setQueryTimeout(30);
+            st.setInt(1, productId);
+            
+            rs = st.executeQuery();
+            
+            while (rs.next()) {
+                ProductVariantInventoryItem item = new ProductVariantInventoryItem();
+                item.setVariantId(rs.getInt("variant_id"));
+                item.setProductId(rs.getInt("product_id"));
+                item.setProductCode(rs.getString("product_code"));
+                item.setProductName(rs.getString("product_name"));
+                item.setSize(rs.getString("size"));
+                item.setColor(rs.getString("color"));
+                item.setQuantityOnHand(rs.getInt("quantity_on_hand"));
+                item.setImportPrice(rs.getBigDecimal("import_price"));
+                item.setExportPrice(rs.getBigDecimal("export_price"));
+                item.setStatus(rs.getBoolean("status"));
+                item.setCategoryId(rs.getInt("category_id"));
+                item.setCategoryCode(rs.getString("category_code"));
+                item.setCategoryName(rs.getString("category_name"));
+                
+                list.add(item);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error getting product variants: " + e.getMessage());
             e.printStackTrace();
         } finally {
             try {
