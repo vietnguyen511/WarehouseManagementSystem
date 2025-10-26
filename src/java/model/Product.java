@@ -1,40 +1,33 @@
 package model;
 
-import java.sql.Date;
+import java.math.BigDecimal;
 
 public class Product {
-
     private int productId;
     private String code;
     private String name;
-    private int categoryId;
+    private String material;
     private String unit;
     private int quantity;
-    private double importPrice;
-    private double exportPrice;
-    private String description;
-    private String image;
+    private BigDecimal importPrice;
+    private BigDecimal exportPrice;
     private boolean status;
-    private Date createdAt;
-    private Date updatedAt;
+    private Integer categoryId;
+    private String categoryName;
 
     public Product() {
     }
 
-    public Product(int productId, String code, String name, int categoryId, String unit, int quantity, double importPrice, double exportPrice, String description, String image, boolean status, Date createdAt, Date updatedAt) {
+    public Product(int productId, String code, String name, String material, String unit, int quantity, BigDecimal importPrice, BigDecimal exportPrice, boolean status) {
         this.productId = productId;
         this.code = code;
         this.name = name;
-        this.categoryId = categoryId;
+        this.material = material;
         this.unit = unit;
         this.quantity = quantity;
         this.importPrice = importPrice;
         this.exportPrice = exportPrice;
-        this.description = description;
-        this.image = image;
         this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public int getProductId() {
@@ -61,12 +54,12 @@ public class Product {
         this.name = name;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getMaterial() {
+        return material;
     }
 
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
+    public void setMaterial(String material) {
+        this.material = material;
     }
 
     public String getUnit() {
@@ -85,36 +78,20 @@ public class Product {
         this.quantity = quantity;
     }
 
-    public double getImportPrice() {
+    public BigDecimal getImportPrice() {
         return importPrice;
     }
 
-    public void setImportPrice(double importPrice) {
+    public void setImportPrice(BigDecimal importPrice) {
         this.importPrice = importPrice;
     }
 
-    public double getExportPrice() {
+    public BigDecimal getExportPrice() {
         return exportPrice;
     }
 
-    public void setExportPrice(double exportPrice) {
+    public void setExportPrice(BigDecimal exportPrice) {
         this.exportPrice = exportPrice;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public boolean isStatus() {
@@ -125,19 +102,22 @@ public class Product {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
+    
 }
+
+

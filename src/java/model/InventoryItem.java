@@ -5,6 +5,7 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * InventoryItem Model - Represents current inventory data for reporting
@@ -20,11 +21,13 @@ public class InventoryItem {
     private String unitName;
     private BigDecimal inventoryValue;
     private int categoryId;
+    private String categoryCode;
     private String categoryName;
     private BigDecimal importPrice;
     private BigDecimal exportPrice;
     private boolean status;
     private int reorderThreshold; // For determining stock status (low/ok/out)
+    private Date updatedAt; // Last update timestamp
 
     public InventoryItem() {
         this.reorderThreshold = 20; // Default threshold
@@ -32,7 +35,7 @@ public class InventoryItem {
 
     public InventoryItem(int productId, String productCode, String productName, 
                         int quantityOnHand, String unitName, BigDecimal inventoryValue,
-                        int categoryId, String categoryName, BigDecimal importPrice, 
+                        int categoryId, String categoryCode, String categoryName, BigDecimal importPrice, 
                         BigDecimal exportPrice, boolean status) {
         this.productId = productId;
         this.productCode = productCode;
@@ -41,6 +44,7 @@ public class InventoryItem {
         this.unitName = unitName;
         this.inventoryValue = inventoryValue;
         this.categoryId = categoryId;
+        this.categoryCode = categoryCode;
         this.categoryName = categoryName;
         this.importPrice = importPrice;
         this.exportPrice = exportPrice;
@@ -103,6 +107,14 @@ public class InventoryItem {
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
+    
+    public String getCategoryCode() {
+        return categoryCode;
+    }
+    
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
+    }
 
     public String getCategoryName() {
         return categoryName;
@@ -144,6 +156,14 @@ public class InventoryItem {
         this.reorderThreshold = reorderThreshold;
     }
 
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     /**
      * Get stock status as string
      * @return "In Stock", "Low Stock", or "Out of Stock"
@@ -167,6 +187,7 @@ public class InventoryItem {
                 ", quantityOnHand=" + quantityOnHand +
                 ", unitName='" + unitName + '\'' +
                 ", inventoryValue=" + inventoryValue +
+                ", categoryCode='" + categoryCode + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", status=" + status +
                 '}';
