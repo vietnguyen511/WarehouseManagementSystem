@@ -1,5 +1,6 @@
 package dal;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -141,6 +142,33 @@ public class SupplierDAO extends DBContext {
         s.setAddress(rs.getString("address"));
         s.setStatus(rs.getBoolean("status"));
         return s;
+    }
+
+    /**
+     * Get import statistics for a supplier
+     * Returns an array: [totalReceipts, totalQuantity, totalAmount]
+     */
+    public Object[] getImportStatistics(int supplierId) throws SQLException {
+        String sql = "SELECT " +
+                    "ISNULL(COUNT(*), 0) AS total_receipts, " +
+                    "ISNULL(SUM(total_quantity), 0) AS total_quantity, " +
+                    "ISNULL(SUM(total_amount), 0) AS total_amount " +
+                    "FROM ImportReceipts " +
+                    "WHERE supplier_id = ?";
+        
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, supplierId);
+        ResultSet rs = st.executeQuery();
+        
+        if (rs.next()) {
+            int totalReceipts = rs.getInt("total_receipts");
+            int totalQuantity = rs.getInt("total_quantity");
+            BigDecimal totalAmount = rs.getBigDecimal("total_amount");
+            
+            return new Object[]{totalReceipts, totalQuantity, totalAmount};
+        }
+        
+        return new Object[]{0, 0, BigDecimal.ZERO};
     }
 }
 
