@@ -62,7 +62,7 @@
             </li>
 
             <!-- Statistics & Reports -->
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' || activePage == 'activity-logs' ? 'active' : ''}">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' || activePage == 'activity-log' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
@@ -79,7 +79,7 @@
                     <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink ${activePage == 'import-export-stats' ? 'active' : ''}">Import/Export Stats</a></li>
                     <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink ${activePage == 'revenue-report' ? 'active' : ''}">Revenue Report</a></li>
                     <li><a href="${pageContext.request.contextPath}/export-report" class="sidebar-sublink ${activePage == 'export-report' ? 'active' : ''}">Export Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/activity-logs" class="sidebar-sublink ${activePage == 'activity-logs' ? 'active' : ''}">Activity Logs</a></li>
+                    <li><a href="${pageContext.request.contextPath}/activity-log" class="sidebar-sublink ${activePage == 'activity-log' ? 'active' : ''}">Activity Logs</a></li>
                 </ul>
             </li>
 

@@ -1,5 +1,6 @@
 package controller.supplierMgt;
 
+import dal.ActivityLogHelper;
 import dal.SupplierDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -59,6 +60,10 @@ public class EditSupplierServlet extends HttpServlet {
 
             SupplierDAO dao = new SupplierDAO();
             if (dao.update(s)) {
+                // Log activity
+                ActivityLogHelper.logUpdate(request.getSession(), "Suppliers", id, 
+                    "Updated supplier: " + name);
+                
                 response.sendRedirect(request.getContextPath() + "/suppliers?updated=1");
                 return;
             }

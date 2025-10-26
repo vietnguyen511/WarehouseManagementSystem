@@ -6,6 +6,7 @@
 package controller.warehouseImportMgt;
 
 import java.io.IOException;
+import dal.ActivityLogHelper;
 import dal.ImportReceiptDAO;
 import dal.SupplierDAO;
 import java.io.PrintWriter;
@@ -184,12 +185,37 @@ public class CreateImportReceiptServlet extends HttpServlet {
             System.out.println("Detailed items: " + details.size());
             ImportReceiptDAO dao = new ImportReceiptDAO();
             System.out.println("About to create receipt with details...");
-            dao.createReceiptWithDetails(receipt);
-            System.out.println("Receipt created successfully!");
+            
+            // Create the receipt and get its ID
+            int importId = dao.createImportReceipt(receipt);
+            if (importId > 0) {
+                receipt.setImportId(importId);
+                
+                // Create details using the original method
+                dao.createReceiptWithDetails(receipt);
+            }
+            
+            System.out.println("Receipt created successfully with ID: " + importId);
 
             // Redirect back to form with success message
             HttpSession session = request.getSession(true);
             session.setAttribute("successMessage", "Import receipt created successfully.");
+            
+            // Log activity
+            SupplierDAO supplierDAO = new SupplierDAO();
+            String supplierName = "supplier_" + supplierId;
+            try {
+                model.Supplier supplier = supplierDAO.findById(supplierId);
+                if (supplier != null) {
+                    supplierName = supplier.getName();
+                }
+            } catch (Exception e) {
+                // Use default
+            }
+            
+            ActivityLogHelper.logCreate(request.getSession(), "ImportReceipts", importId,
+                "Created import receipt for supplier: " + supplierName + ", Total: " + totalAmount + ", Items: " + details.size());
+            
             System.out.println("Redirecting to success page...");
             response.sendRedirect(request.getContextPath() + "/createImportReceipt");
         } catch (Exception e) {

@@ -4,6 +4,7 @@
  */
 package controller.warehouseManagement;
 
+import dal.ActivityLogHelper;
 import dal.CategoryDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -87,9 +88,25 @@ public class DeleteCategoryServlet extends HttpServlet {
         }
 
         CategoryDAO dao = new CategoryDAO();
+        
+        // Get category info before deleting for logging
+        String categoryName = "category_" + categoryId;
+        try {
+            model.Category category = dao.getCategoryById(categoryId);
+            if (category != null) {
+                categoryName = category.getName() + " (" + category.getCode() + ")";
+            }
+        } catch (Exception e) {
+            // Use default name if cannot fetch
+        }
+        
         boolean success = dao.deleteCategoryById(categoryId);
 
         if (success) {
+            // Log activity
+            ActivityLogHelper.logDelete(request.getSession(), "Categories", categoryId, 
+                "Deleted category: " + categoryName);
+            
             response.sendRedirect(redirectUrl + "?deleted=1");
         } else {
             response.sendRedirect(redirectUrl + "?deleted=0");
