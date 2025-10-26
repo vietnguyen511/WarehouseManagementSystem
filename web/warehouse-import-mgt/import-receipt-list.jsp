@@ -287,7 +287,15 @@
                     <h1 class="card-title">Import Receipts</h1>
                     <p class="card-subtitle">History of all import receipts</p>
                 </div>
-                <div class="action-bar">
+                        <div class="action-bar">
+                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics" class="btn" style="background-color: #f97316; color: white; border-color: #f97316;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                        Statistics
+                    </a>
                     <a href="${pageContext.request.contextPath}/warehouse-import-mgt/add-import-receipt.jsp" class="btn btn-success">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
