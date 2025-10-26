@@ -18,11 +18,11 @@ public class ExportDetailDAO extends DBContext {
     }
 
     public void insertExportDetail(ExportDetail d, int exportId) throws SQLException {
-        String sql = "INSERT INTO ExportDetails (export_id, product_id, quantity, price, amount) "
+        String sql = "INSERT INTO ExportDetails (export_id, variant_id, quantity, price, amount) "
                    + "VALUES (?, ?, ?, ?, ?)";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, exportId);
-        st.setInt(2, d.getProductId());
+        st.setInt(2, d.getVariantId());
         st.setInt(3, d.getQuantity());
         st.setBigDecimal(4, d.getPrice());
         st.setBigDecimal(5, d.getAmount());

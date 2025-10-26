@@ -176,6 +176,18 @@
                 </form>
 
                 <!-- Inventory Table -->
+                <c:set var="hasLowStock" value="false" />
+                <c:if test="${lowStockOnly}">
+                    <c:set var="hasLowStock" value="true" />
+                </c:if>
+                <c:if test="${not lowStockOnly and not empty inventoryList}">
+                    <c:forEach var="checkItem" items="${inventoryList}">
+                        <c:if test="${checkItem.quantityOnHand > 0 && checkItem.quantityOnHand <= threshold}">
+                            <c:set var="hasLowStock" value="true" />
+                        </c:if>
+                    </c:forEach>
+                </c:if>
+                
                 <div class="table-wrapper">
                     <table class="table">
                         <thead>
@@ -188,7 +200,9 @@
                                 <th style="text-align: right;">Unit Price</th>
                                 <th style="text-align: right;">Total Value</th>
                                 <th style="text-align: center;">Status</th>
-                                <th style="text-align: center;">Action</th>
+                                <c:if test="${hasLowStock}">
+                                    <th style="text-align: center;">Action</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -232,25 +246,27 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td style="text-align: center;">
-                                                <c:if test="${item.quantityOnHand <= threshold}">
-                                                    <a href="${pageContext.request.contextPath}/createImportReceipt?productId=${item.productId}" 
-                                                       class="btn-restock"
-                                                       title="Restock this product">
-                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        </svg>
-                                                        Restock
-                                                    </a>
-                                                </c:if>
-                                            </td>
+                                            <c:if test="${hasLowStock}">
+                                                <td style="text-align: center;">
+                                                    <c:if test="${item.quantityOnHand <= threshold}">
+                                                        <a href="${pageContext.request.contextPath}/createImportReceipt?productId=${item.productId}" 
+                                                           class="btn-restock"
+                                                           title="Restock this product">
+                                                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                            </svg>
+                                                            Restock
+                                                        </a>
+                                                    </c:if>
+                                                </td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="9" class="table-empty">
+                                        <td colspan="${hasLowStock ? '9' : '8'}" class="table-empty">
                                             <svg width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 0.5rem;">
                                                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
                                             </svg>

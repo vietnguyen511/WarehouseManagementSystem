@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class ExportDetail {
     private int exportDetailId;
     private int exportId;
-    private int productId;
+    private int variantId;  // Changed from productId to variantId
     private int quantity;
     private BigDecimal price;
     private BigDecimal amount;
@@ -13,6 +13,8 @@ public class ExportDetail {
     // For displaying product info
     private String productCode;
     private String productName;
+    private String size;     // Added for ProductVariant
+    private String color;    // Added for ProductVariant
 
     public ExportDetail() {
     }
@@ -34,12 +36,22 @@ public class ExportDetail {
         this.exportId = exportId;
     }
 
-    public int getProductId() {
-        return productId;
+    public int getVariantId() {
+        return variantId;
     }
 
+    public void setVariantId(int variantId) {
+        this.variantId = variantId;
+    }
+    
+    // Legacy getter for backward compatibility
+    public int getProductId() {
+        return variantId; // Return variantId for backward compatibility
+    }
+
+    // Legacy setter for backward compatibility
     public void setProductId(int productId) {
-        this.productId = productId;
+        this.variantId = productId; // Set to variantId for backward compatibility
     }
 
     public int getQuantity() {
@@ -82,17 +94,35 @@ public class ExportDetail {
         this.productName = productName;
     }
 
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     @Override
     public String toString() {
         return "ExportDetail{" +
                 "exportDetailId=" + exportDetailId +
                 ", exportId=" + exportId +
-                ", productId=" + productId +
+                ", variantId=" + variantId +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", amount=" + amount +
                 ", productCode='" + productCode + '\'' +
                 ", productName='" + productName + '\'' +
+                ", size='" + size + '\'' +
+                ", color='" + color + '\'' +
                 '}';
     }
 }

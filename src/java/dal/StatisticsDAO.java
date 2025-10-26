@@ -307,7 +307,8 @@ public class StatisticsDAO extends DBContext {
         sql.append("    COUNT(DISTINCT er.export_id) AS receipt_count ");
         sql.append("FROM ExportReceipts er ");
         sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
-        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
+        sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
         sql.append("WHERE er.date >= ? AND er.date <= ? ");
         
@@ -442,7 +443,8 @@ public class StatisticsDAO extends DBContext {
         sql.append("         ELSE 0 END AS avg_order_value ");
         sql.append("FROM ExportReceipts er ");
         sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
-        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
+        sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
         sql.append("WHERE er.date >= ? AND er.date <= ? ");
         
@@ -509,7 +511,8 @@ public class StatisticsDAO extends DBContext {
         sql.append("SELECT TOP 1 ISNULL(SUM(ed.amount), 0) AS top_revenue ");
         sql.append("FROM ExportReceipts er ");
         sql.append("INNER JOIN ExportDetails ed ON er.export_id = ed.export_id ");
-        sql.append("INNER JOIN Products p ON ed.product_id = p.product_id ");
+        sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
+        sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
         sql.append("WHERE er.date >= ? AND er.date <= ? ");
         
@@ -720,28 +723,30 @@ public class StatisticsDAO extends DBContext {
                 ImportData AS (
                     SELECT
                         CAST(ir.date AS DATE) as import_date,
-                        id.product_id,
+                        pv.product_id,
                         SUM(id.quantity) as import_quantity,
-                        SUM(id.quantity * id.price) as import_value,
+                        SUM(id.amount) as import_value,
                         COUNT(DISTINCT ir.import_id) as import_receipt_count,
-                        AVG(id.quantity * id.price) as avg_import_value
+                        AVG(id.amount) as avg_import_value
                     FROM ImportReceipts ir
                     JOIN ImportDetails id ON ir.import_id = id.import_id
+                    JOIN ProductVariants pv ON id.variant_id = pv.variant_id
                     WHERE ir.date >= ? AND ir.date <= ?
-                    GROUP BY CAST(ir.date AS DATE), id.product_id
+                    GROUP BY CAST(ir.date AS DATE), pv.product_id
                 ),
                 ExportData AS (
                     SELECT
                         CAST(er.date AS DATE) as export_date,
-                        ed.product_id,
+                        pv.product_id,
                         SUM(ed.quantity) as export_quantity,
-                        SUM(ed.quantity * ed.price) as export_value,
+                        SUM(ed.amount) as export_value,
                         COUNT(DISTINCT er.export_id) as export_receipt_count,
-                        AVG(ed.quantity * ed.price) as avg_export_value
+                        AVG(ed.amount) as avg_export_value
                     FROM ExportReceipts er
                     JOIN ExportDetails ed ON er.export_id = ed.export_id
+                    JOIN ProductVariants pv ON ed.variant_id = pv.variant_id
                     WHERE er.date >= ? AND er.date <= ?
-                    GROUP BY CAST(er.date AS DATE), ed.product_id
+                    GROUP BY CAST(er.date AS DATE), pv.product_id
                 )
                 SELECT
                     ds.report_date,
