@@ -10,6 +10,7 @@ import java.util.List;
 import model.ImportDetail;
 import model.ImportReceipt;
 import model.ImportReceiptListDTO;
+import model.ProductVariant;
 
 public class ImportReceiptDAO extends DBContext {
 
@@ -51,20 +52,38 @@ public class ImportReceiptDAO extends DBContext {
             
             // Share the same connection with child DAOs for transaction consistency
             ImportDetailDAO importDetailDAO = new ImportDetailDAO(connection);
+            ProductVariantDAO variantDAO = new ProductVariantDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
             
             for (ImportDetail d : receipt.getDetails()) {
-                // Map product code to id if needed
-                if (d.getProductId() == 0 && d.getProductCode() != null) {
-                    Integer pId = productDAO.getProductIdByCode(d.getProductCode());
-                    if (pId == null) {
-                        // Create new product if not existing
-                        pId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getPrice(), d.getCategoryId());
+                // Find or create product variant
+                ProductVariant variant = variantDAO.getVariantByProductCodeSizeColor(
+                    d.getProductCode(), d.getSize(), d.getColor());
+                
+                if (variant == null) {
+                    // Create new product if not existing
+                    Integer productId = productDAO.getProductIdByCode(d.getProductCode());
+                    if (productId == null) {
+                        productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getMaterial(), d.getUnit(), d.getPrice(), d.getCategoryId());
                     }
-                    d.setProductId(pId);
+                    
+                    // Create new variant
+                    variant = new ProductVariant();
+                    variant.setProductId(productId);
+                    variant.setSize(d.getSize());
+                    variant.setColor(d.getColor());
+                    variant.setQuantity(0);
+                    variant.setStatus(true);
+                    int variantId = variantDAO.createProductVariant(variant);
+                    variant.setVariantId(variantId);
                 }
+                
+                d.setVariantId(variant.getVariantId());
                 importDetailDAO.insertImportDetail(d, importId);
-                productDAO.increaseProductStock(d.getProductId(), d.getQuantity(), d.getPrice());
+                variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
+                
+                // Update product's import_price with new price (from this import receipt)
+                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
             }
             connection.commit();
         } catch (SQLException e) {
@@ -265,6 +284,8 @@ public class ImportReceiptDAO extends DBContext {
             receipt.setTotalQuantity(rs.getInt("total_quantity"));
             receipt.setTotalAmount(rs.getBigDecimal("total_amount"));
             receipt.setNote(rs.getString("note"));
+            receipt.setSupplierName(rs.getString("supplier_name"));
+            receipt.setUserName(rs.getString("user_name"));
             return receipt;
         }
         

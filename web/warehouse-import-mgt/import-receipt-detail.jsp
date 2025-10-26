@@ -35,7 +35,7 @@
         
         .receipt-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: var(--spacing-md);
             margin-top: var(--spacing-md);
         }
@@ -96,13 +96,15 @@
         }
         
         /* Column widths */
-        .details-table th:nth-child(1), .details-table td:nth-child(1) { width: 8%; } /* STT */
-        .details-table th:nth-child(2), .details-table td:nth-child(2) { width: 18%; } /* Mã SP */
-        .details-table th:nth-child(3), .details-table td:nth-child(3) { width: 22%; } /* Tên SP */
-        .details-table th:nth-child(4), .details-table td:nth-child(4) { width: 12%; } /* Danh mục */
-        .details-table th:nth-child(5), .details-table td:nth-child(5) { width: 10%; text-align: right; } /* Số lượng */
-        .details-table th:nth-child(6), .details-table td:nth-child(6) { width: 12%; text-align: right; } /* Đơn giá */
-        .details-table th:nth-child(7), .details-table td:nth-child(7) { width: 18%; text-align: right; } /* Thành tiền */
+        .details-table th:nth-child(1), .details-table td:nth-child(1) { width: 5%; } /* STT */
+        .details-table th:nth-child(2), .details-table td:nth-child(2) { width: 12%; } /* Mã SP */
+        .details-table th:nth-child(3), .details-table td:nth-child(3) { width: 18%; } /* Tên SP */
+        .details-table th:nth-child(4), .details-table td:nth-child(4) { width: 8%; } /* Size */
+        .details-table th:nth-child(5), .details-table td:nth-child(5) { width: 10%; } /* Color */
+        .details-table th:nth-child(6), .details-table td:nth-child(6) { width: 10%; } /* Danh mục */
+        .details-table th:nth-child(7), .details-table td:nth-child(7) { width: 8%; text-align: right; } /* Số lượng */
+        .details-table th:nth-child(8), .details-table td:nth-child(8) { width: 10%; text-align: right; } /* Đơn giá */
+        .details-table th:nth-child(9), .details-table td:nth-child(9) { width: 15%; text-align: right; } /* Thành tiền */
         
         /* Summary section */
         .receipt-summary {
@@ -245,6 +247,18 @@
                                     </span>
                                 </div>
                                 <div class="meta-item">
+                                    <span class="meta-label">Supplier</span>
+                                    <span class="meta-value">
+                                        ${importReceipt.supplierName}
+                                    </span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Created By</span>
+                                    <span class="meta-value">
+                                        ${importReceipt.userName}
+                                    </span>
+                                </div>
+                                <div class="meta-item">
                                     <span class="meta-label">Total Quantity</span>
                                     <span class="meta-value">
                                         <fmt:formatNumber value="${importReceipt.totalQuantity}" type="number" />
@@ -269,6 +283,8 @@
                                                 <th>No.</th>
                                                 <th>Product Code</th>
                                                 <th>Product Name</th>
+                                                <th>Size</th>
+                                                <th>Color</th>
                                                 <th>Category</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
@@ -289,6 +305,12 @@
                                                         <c:if test="${not empty detail.unit}">
                                                             <div class="text-muted text-sm">Unit: ${detail.unit}</div>
                                                         </c:if>
+                                                    </td>
+                                                    <td>
+                                                        <span class="font-medium">${detail.size}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="font-medium">${detail.color}</span>
                                                     </td>
                                                     <td>
                                                         <c:choose>

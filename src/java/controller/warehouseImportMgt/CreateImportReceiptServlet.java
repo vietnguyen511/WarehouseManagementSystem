@@ -21,6 +21,8 @@ import java.util.List;
 import model.ImportDetail;
 import model.ImportReceipt;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -114,7 +116,8 @@ public class CreateImportReceiptServlet extends HttpServlet {
             String note = request.getParameter("note");
 
             int supplierId = Integer.parseInt(supplierIdStr);
-            Date importDate = (importDateStr == null || importDateStr.isEmpty()) ? new Date() : toSqlDateFlexible(importDateStr);
+            // Use current timestamp when creating receipt to include time information
+            Date importDate = (importDateStr == null || importDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(importDateStr);
             BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(totalAmountStr);
 
             // Build receipt model
@@ -135,6 +138,10 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 String code = request.getParameter("items[" + index + "].productCode");
                 String name = request.getParameter("items[" + index + "].productName");
                 String categoryIdStr = request.getParameter("items[" + index + "].categoryId");
+                String material = request.getParameter("items[" + index + "].material");
+                String unit = request.getParameter("items[" + index + "].unit");
+                String size = request.getParameter("items[" + index + "].size");
+                String color = request.getParameter("items[" + index + "].color");
                 String qtyStr = request.getParameter("items[" + index + "].quantity");
                 String priceStr = request.getParameter("items[" + index + "].price");
                 if (code == null && name == null && qtyStr == null && priceStr == null) {
@@ -147,6 +154,10 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 ImportDetail d = new ImportDetail();
                 d.setProductCode(code.trim());
                 d.setProductName(name != null ? name.trim() : null);
+                d.setMaterial(material != null ? material.trim() : "");
+                d.setUnit(unit != null ? unit.trim() : "");
+                d.setSize(size != null ? size.trim() : "");
+                d.setColor(color != null ? color.trim() : "");
                 
                 // Parse category ID if provided
                 if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
@@ -199,6 +210,23 @@ public class CreateImportReceiptServlet extends HttpServlet {
         }
         // Fallback to today if parsing fails
         return new java.sql.Date(System.currentTimeMillis());
+    }
+
+    private Date toSqlTimestampFlexible(String dateStr) {
+        // Accept both yyyy-MM-dd (native date input) and MM/dd/yyyy (some browsers/regional settings)
+        String[] patterns = {"yyyy-MM-dd", "MM/dd/yyyy"};
+        for (String p : patterns) {
+            try {
+                LocalDate ld = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(p));
+                // Get current time and apply it to the selected date
+                LocalTime currentTime = LocalTime.now();
+                LocalDateTime ldt = LocalDateTime.of(ld, currentTime);
+                // Convert to Timestamp
+                return java.sql.Timestamp.valueOf(ldt);
+            } catch (DateTimeParseException ignored) {}
+        }
+        // Fallback to current timestamp if parsing fails
+        return new Date();
     }
 
     /** 

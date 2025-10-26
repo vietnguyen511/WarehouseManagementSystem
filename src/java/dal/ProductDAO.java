@@ -32,9 +32,9 @@ public class ProductDAO extends DBContext {
         return null;
     }
 
-    public int createProduct(String code, String name, BigDecimal importPrice, Integer categoryId) throws SQLException {
-        String sql = "INSERT INTO Products (code, name, category_id, unit, quantity, import_price, status, created_at, updated_at) "
-                + "VALUES (?, ?, ?, 'piece', 0, ?, 1, GETDATE(), GETDATE())";
+    public int createProduct(String code, String name, String material, String unit, BigDecimal importPrice, Integer categoryId) throws SQLException {
+        String sql = "INSERT INTO Products (code, name, category_id, material, unit, quantity, import_price, status, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, 0, ?, 1, GETDATE(), GETDATE())";
         PreparedStatement st = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         st.setString(1, code);
         st.setString(2, name != null ? name : code);
@@ -43,7 +43,9 @@ public class ProductDAO extends DBContext {
         } else {
             st.setNull(3, java.sql.Types.INTEGER);
         }
-        st.setBigDecimal(4, importPrice);
+        st.setString(4, material != null ? material : "");
+        st.setString(5, unit != null ? unit : "piece");
+        st.setBigDecimal(6, importPrice);
         st.executeUpdate();
         ResultSet rs = st.getGeneratedKeys();
         if (rs.next()) {
@@ -54,7 +56,12 @@ public class ProductDAO extends DBContext {
 
     // Overloaded method for backward compatibility
     public int createProduct(String code, String name, BigDecimal importPrice) throws SQLException {
-        return createProduct(code, name, importPrice, null);
+        return createProduct(code, name, "", "piece", importPrice, null);
+    }
+
+    // Overloaded method for backward compatibility
+    public int createProduct(String code, String name, BigDecimal importPrice, Integer categoryId) throws SQLException {
+        return createProduct(code, name, "", "piece", importPrice, categoryId);
     }
 
     public void increaseProductStock(int productId, int quantity, BigDecimal newImportPrice) throws SQLException {
@@ -63,6 +70,14 @@ public class ProductDAO extends DBContext {
         st.setInt(1, quantity);
         st.setBigDecimal(2, newImportPrice);
         st.setInt(3, productId);
+        st.executeUpdate();
+    }
+
+    public void updateImportPrice(int productId, BigDecimal newImportPrice) throws SQLException {
+        String sql = "UPDATE Products SET import_price = ?, updated_at = GETDATE() WHERE product_id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setBigDecimal(1, newImportPrice);
+        st.setInt(2, productId);
         st.executeUpdate();
     }
 

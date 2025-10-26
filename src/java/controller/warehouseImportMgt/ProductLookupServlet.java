@@ -39,6 +39,16 @@ public class ProductLookupServlet extends HttpServlet {
                     json.append(",\"categoryName\":\"").append(escape(p.getCategoryName())).append("\"");
                 }
                 
+                // Add material if available
+                if (p.getMaterial() != null && !p.getMaterial().isEmpty()) {
+                    json.append(",\"material\":\"").append(escape(p.getMaterial())).append("\"");
+                }
+                
+                // Add unit if available
+                if (p.getUnit() != null && !p.getUnit().isEmpty()) {
+                    json.append(",\"unit\":\"").append(escape(p.getUnit())).append("\"");
+                }
+                
                 json.append("}");
                 out.print(json.toString());
             }
