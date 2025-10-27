@@ -195,7 +195,7 @@
             <div class="card">
                 <div class="card-header">
                     <div>
-                        <h1 class="card-title">Personal detail information</h1>
+                        <h1 class="card-title">Account detail information</h1>
                         <p class="card-subtitle"></p>
                     </div>
                   

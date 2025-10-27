@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "userPersonalDetail", urlPatterns = {"/account"})
+@WebServlet(name = "userAccountDetail", urlPatterns = {"/account"})
 public class userAccountDetail extends HttpServlet 
 {
     @Override
