@@ -56,15 +56,18 @@ public class register extends HttpServlet
                  request.getRequestDispatcher("register.jsp").forward(request, response);
                  return;
                }            
-       //     conn.xSql = "INSERT INTO Users(fullname, email, password, phone, role, status, created_at, updated_at) VALUES (?,?,?,?,?,?,NOW(),NOW())";
-            conn.xSql = "INSERT INTO Users(fullname, email,username, password, phone, role, status) VALUES (?,?,?,?,?,?,1)";
+              
+            conn.xSql = "INSERT INTO Users(fullname, email ,username, password, phone, birthday, gender, address, role, status) VALUES (?,?,?,?,?,?,?,?,?,1)";
             conn.ps = conn.con.prepareStatement(conn.xSql);
             conn.ps.setString(1, request.getParameter("firstname") + " " + request.getParameter("lastname"));
             conn.ps.setString(2, email);
             conn.ps.setString(3, username);
             conn.ps.setString(4, password);
             conn.ps.setString(5, request.getParameter("phone"));
-            conn.ps.setString(6, request.getParameter("role"));
+            conn.ps.setDate(6, java.sql.Date.valueOf(request.getParameter("birthday")));
+            conn.ps.setString(7, request.getParameter("gender"));
+            conn.ps.setString(8, request.getParameter("address"));
+            conn.ps.setString(9, request.getParameter("role"));
 
             conn.ps.executeUpdate();
             response.sendRedirect("staff-list");

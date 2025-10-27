@@ -96,21 +96,26 @@ public class UserDAO extends DBContext
     public User getUserDetailById(int userId)
     {  
        try {
-            String sql ="SELECT user_id,fullname, email, username, password, phone, role, status FROM Users WHERE user_id=?";
+          //  String sql ="SELECT user_id,fullname, email, username, password, phone, role, status FROM Users WHERE user_id=?";
+            String sql ="SELECT * FROM Users WHERE user_id=?";
             PreparedStatement ps = connection.prepareStatement(sql);  
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) 
             {                
                 return new User(
-                           rs.getInt(1),
-                       rs.getString(2), 
-                         rs.getString(3), 
-                       rs.getString(4),
-                       rs.getString(5),
-                         rs.getString(6),
-                          rs.getString(7),
-                        rs.getBoolean(8));
+                           rs.getInt("user_id"),
+                       rs.getString("fullname"), 
+                         rs.getString("phone"), 
+                       rs.getString("role"),
+                       rs.getString("username"),
+                         rs.getString("email"),
+                          rs.getString("password"),
+                          rs.getString("gender"),
+                          rs.getString("address"),
+                          rs.getDate("birthday"),
+                           rs.getString("avatar"),
+                        rs.getBoolean("status"));
             }
         } catch (SQLException e) 
         {

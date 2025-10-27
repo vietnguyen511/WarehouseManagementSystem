@@ -2,7 +2,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*, model.User" %>
-
+<c:set var="activePage" value="Userlist" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -151,11 +151,13 @@
                                 <tr>
                                       <th>ID<th>
                                       <th>Full Name </th>
+                                      <th>Gender  </th>
+                                      <th>Birthday </th>
                                       <th>Email</th>
                                       <th>Phone</th>
+                                      <th>Address</th>
                                       <th>Role</th>
-                                      <th>Status</th>
-                                      <th style="text-align:center;">Actions</th>
+                                      <th>Status</th>                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -169,8 +171,11 @@
                                <tr>
                                       <td><%= u.getId()%></td>
                                       <td> <a href="userDetail?id=<%= u.getId()%>"> <%= u.getFullname() %></a>   </td>
+                                      <td><%= u.getGender()%></td>
+                                      <td><%= u.getBirthday()%>
                                       <td><%= u.getEmail() %></td>
                                       <td><%= u.getPhone() %></td>
+                                      <td><%= u.getAddress()%></td>
                                       <td><%= u.getRole() %></td>   
                                       <td><%= u.getStatus() ? "Active" : "Inactive" %></td>
                                </tr>

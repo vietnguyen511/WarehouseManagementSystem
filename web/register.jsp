@@ -2,7 +2,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*, model.User" %>
-<c:set var="activePage" value="categories" scope="request" />
+<c:set var="activePage" value="AddUser" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -125,6 +125,16 @@
         input, select { width: 100%; padding: 10px; margin: 10px 0; }
         .btn { padding: 12px; width: 100%; border: none; background: #5a5af5; color: white; cursor: pointer; font-size: 16px; }
         .gender-group { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 14px;
+        }
         </style>
     </head>
     <body>
@@ -138,7 +148,7 @@
                 <div class="card-header">
                     <div>
                         <h1 class="card-title">Add new user account </h1>
-                        <p class="card-subtitle">preservation or future use</p>
+                        <p class="card-subtitle">preservation or future use or issued to new user</p>
                     </div>                  
                    <!--Further upgrade -->
                 </div>
@@ -146,34 +156,45 @@
                 <div class="card-body">
                     <div class="table-wrapper">
                         <form action="register" method="post">
-                           <input type="text" name="firstname" placeholder="First name" required>
-                           <input type="text" name="lastname" placeholder="Last name" required>
-                           <input type="email" name="email" placeholder="Email" required>      
+                           <input type="text" name="firstname"  placeholder="First name" required>
+                           
+                           <input type="text" name="lastname"   placeholder="Last name" required>
+                           
+                           <input type="email" name="email"     placeholder="Email" required>      
                            <!-- Error message if email fails -->
-                              <% String error =(String) request.getAttribute("error");
-                                 if (error != null) { %>
-                                        <p class="error"> <%= error %> </p>
-                              <% } %>
-                           <input type="text" name="phone" placeholder="Phone number" required>     
-                          <input type="date" name="birthday" required>
+                             
+                                        <p class="error"> ${error} </p>                       
+                              
+                           <input type="text"  name="phone"      placeholder="Phone number" required>   
+                           
+                           <input type="date"  name="birthday" required>
                    <!-- Gender side by side -->
-                        <div class="gender-group">
-                            Gender: 
-                            <label><input type="radio" name="gender" value="Male" required> Male</label>
-                            <label><input type="radio" name="gender" value="Female"> Female</label>
-                        </div>        
-                             <input type="text" name="role" placeholder="Role" required>
+                         <label for="gender">Gender:</label>
+                             <select name="gender" id="gender" required>
+                                <option value="" disabled selected>-- Select gender --</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                             </select> 
+  
+                            <input type="text" name="address"             placeholder="Address" required >
+                   
+                         <label for="role">Role:</label>
+                             <select name="role" id="role" required>
+                                <option value="" disabled selected>-- Select role --</option>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Staff</option>
+                                <option value="manager">Manager</option>
+                             </select>                   
                              
+                            <input type="text" name="username"            placeholder="Username" required>
                              
-                             <input type="text" name="username" placeholder="Username" required>
-                            <input type="password" name="password" placeholder="Password" required>
+                            <input type="password" name="password"        placeholder="Password" required>
+                            
                             <input type="password" name="confirmPassword" placeholder="Confirm password" required>
                              
-                            <% String error1 =(String) request.getAttribute("error1");
-                                  if (error1 != null) { %>
-                                     <p class="error1"> <%=error1%> you real bro</p>
-                              <% } %>
-                             <button type="submit" class="btn">Confirm</button>
+                            <p class="error"> ${error1} </p> 
+                            <button type="submit" class="btn">Confirm</button>
                         </form>
                     </div>
                     <c:if test="${not empty successMessage}">

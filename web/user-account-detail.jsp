@@ -2,7 +2,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*, model.User" %>
-<c:set var="activePage" value="categories" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -213,10 +212,16 @@
                      
                          <!--Hidden edit choice-->      
                     <form id="editMode" style="display:none;" action="edit-account-user" method="post">
-                        <input type="hidden" name="id" value="${user.id}">
-                              <p><b>Username:</b> <input type="text" name="username" value="${user.userName}" class="edit-input"></p>
-                              <p><b>Password:</b> <input type="text" name="password" value="${user.password}" class="edit-input"></p>   
-                              <p><b>Email:</b> <input type="email" name="email" value="${user.email}" class="edit-input"></p>                                                                             
+                               <input type="hidden" name="id" value="${user.id}">
+                              <p><b>Username:</b>        <input  type="text"     name="username" value="${user.userName}" class="edit-input"></p>
+                              <p> ${error2}</p>
+                              <p><b>Password:</b>        <input  type="password" name="password" value="${user.password}" class="edit-input"></p>  
+                              
+                              <p><b>Confirm password:</b><input  type="password" name="confirmPassword" required></p>  
+                              <p> ${error}</p>
+                              
+                              <p><b>Email:</b>            <input type="email"    name="email" value="${user.email}" class="edit-input"></p>
+                              <p> ${error1}</p>
                         <div class="edit-buttons">
                               <button type="submit" class="confirm-edit">✅ Confirm</button>
                               <button type="button" class="cancel-edit" onclick="cancelEdit()">❌ Cancel</button>
@@ -226,12 +231,15 @@
                       <div class="action-section" id="actionSection">
                               <div class="action-box edit" onclick="enableEdit()">✏️ Edit</div>
                      </div>    
-                    <c:if test="${not empty successMessage}">
-                        <div class="alert alert-success">${successMessage}</div>
-                    </c:if>
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger">${errorMessage}</div>
-                    </c:if>
+                        
+                    <c:if test="${editMode eq true}">
+   <script>
+     window.addEventListener("load", function() {
+       enableEdit();
+     });
+   </script>
+</c:if>
+
                 </div>
             </div>
         </div>

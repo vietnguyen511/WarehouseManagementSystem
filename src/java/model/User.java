@@ -1,11 +1,15 @@
 
 package model;
 
+import java.sql.Date;
+
 public class User 
 {
     private int id;
     private String fullname,phone, role;
     private String userName, email, password;
+    private String gender, address;
+    private java.sql.Date birthday;
     private String avatar;
     private boolean status;
 
@@ -35,6 +39,23 @@ public class User
         this.role     = role;
         this.status   = status;
     }
+
+    public User(int id, String fullname, String phone, String role, String userName, String email, String password, String gender, String address, Date birthday, String avatar, boolean status) {
+        this.id = id;
+        this.fullname = fullname;
+        this.phone = phone;
+        this.role = role;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.gender = gender;
+        this.address = address;
+        this.birthday = birthday;
+        this.avatar = avatar;
+        this.status = status;
+    }
+    
+    
     public int getId() {
         return id;
     }
@@ -106,7 +127,31 @@ public class User
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
-  
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
     
     
     @Override

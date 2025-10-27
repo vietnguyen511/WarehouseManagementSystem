@@ -2,6 +2,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*, model.User" %>
+<c:set var="activePage" value="Userlist" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -229,42 +230,71 @@
                          <div id="viewMode">
                              <p><b>ID:</b> ${user.id}</p>
                              <p><b>Full Name:</b> ${user.fullname}</p>
+                             <p><b>Gender:</b> ${user.gender}</p>
+                             <p><b>Birthday:</b> ${user.birthday}</p>
                              <p><b>Email:</b> ${user.email}</p>
                              <p><b>Phone:</b> ${user.phone}</p>
+                             <p><b>Address:</b> ${user.address}</p>
                              <p><b>Role:</b> ${user.role}</p>
                              <p><b>Status:</b> ${user.status ? "Active ✅" : "Inactive ❌"}</p>
+                             <br>
+                             <p><b>Username:</b> ${user.userName}</p>
+                             <p><b>Password:</b> ${user.password}</p>
                          </div>
                     </div>
                     <!--Hidden edit choice-->      
                     <form id="editMode" style="display:none;" action="edit-user" method="post">
-                        <input type="hidden" name="id" value="${user.id}">
+                              <input type="hidden" name="id" value="${user.id}">
                               <p><b>Full Name:</b> <input type="text" name="fullname" value="${user.fullname}" class="edit-input"></p>
-                              <p><b>Email:</b> <input type="email" name="email" value="${user.email}" class="edit-input"></p>
-                              <p><b>Phone:</b> <input type="text" name="phone" value="${user.phone}" class="edit-input"></p>
-                              <p><b>Role:</b> <input type="text" name="role" value="${user.role}" class="edit-input"></p>
-                              <p><b>Status:</b>
-                              <select name="status" class="edit-input">
-                                        <option value="true" ${user.status ? "selected" : ""}>Active</option>
-                                        <option value="false" ${!user.status ? "selected" : ""}>Inactive</option>
+                              <p>${error}</p>
+                              
+                                <p><b>Gender:</b>
+                              <select name="gender" class="edit-input">
+                                       <option value="male"   ${user.gender == 'male' ? 'selected' : ''}>Male</option>
+                                       <option value="female" ${user.gender == 'female' ? 'selected' : ''}>Female</option>
+                                       <option value="other"  ${user.gender == 'other' ? 'selected' : ''}>Other</option>
                               </select>
-                              </p>
+                             
+                              <p><b>Birthday:</b> <input type="date" name="birthday" value="${user.birthday}" class="edit-input"></p>
+                              
+                              <p><b>Email:</b> <input type="email" name="email" value="${user.email}" class="edit-input"></p>
+                              <p>${error1}</p>
+                              
+                              <p><b>Phone:</b> <input type="text" name="phone" value="${user.phone}" class="edit-input"></p>
+                              
+                              <p><b>Address:</b> <input type="text" name="address" value="${user.address}" class="edit-input"></p>
+                              
+                              <p><b>Role:</b>
+                              <select name="role" class="edit-input">
+                                        <option value="admin" ${user.role ? "selected" : ""}>Admin</option>
+                                        <option value="manager" ${!user.role? "selected" : ""}>Manager</option>
+                                        <option value="staff" ${!user.role ? "selected" : ""}>Staff</option>
+                              </select>
+                              <br>
+                              <p><b>Username:</b> <input type="text" name="username" value="${user.userName}" class="edit-input"></p>
+                              <p>${error2}</p>
+                              
+                              <p><b>Password:</b> <input type="text" name="password" value="${user.password}" class="edit-input"></p>                          
                         <div class="edit-buttons">
                               <button type="submit" class="confirm-edit">✅ Confirm</button>
                               <button type="button" class="cancel-edit" onclick="cancelEdit()">❌ Cancel</button>
                         </div>
                     </form>
                      <!--Choice bellow here -->  
+                    <c:if test="${sessionScope.linked_id != user.id}">
                     <div class="action-section" id="actionSection">
                               <div class="action-box edit" onclick="enableEdit()">✏️ Edit</div>
                               <div class="action-box delete" onclick="openDeleteModal()">🗑️ Delete</div>
                               <div class="action-box lock" onclick="openLockModal()">🔒 Lock</div>
                     </div>
-                    <c:if test="${not empty successMessage}">
-                        <div class="alert alert-success">${successMessage}</div>
                     </c:if>
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger">${errorMessage}</div>
-                    </c:if>
+                    <c:if test="${editMode eq true}">
+                        <script>
+                           window.addEventListener("load", function() {
+                          enableEdit();
+                           });
+                        </script>
+                   </c:if>
                 </div>
             </div>
         </div>

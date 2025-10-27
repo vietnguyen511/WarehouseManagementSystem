@@ -20,7 +20,7 @@ public class staffList extends HttpServlet
     
     String sort = request.getParameter("sort");
     
-    String sql = "SELECT user_id,fullname, email, phone, role, status FROM Users";
+    String sql = "SELECT * FROM Users";
     
     if (sort != null) 
     {
@@ -46,6 +46,9 @@ public class staffList extends HttpServlet
             u.setFullname(conn.rs.getString("fullname"));
             u.setEmail(conn.rs.getString("email"));
             u.setPhone(conn.rs.getString("phone"));
+            u.setBirthday(conn.rs.getDate("birthday"));
+            u.setGender(conn.rs.getString("gender"));
+            u.setAddress(conn.rs.getString("address"));
             u.setRole(conn.rs.getString("role"));
             u.setStatus(conn.rs.getBoolean("status"));
             users.add(u);
@@ -55,7 +58,6 @@ public class staffList extends HttpServlet
     }
     
     request.setAttribute("users", users);
-     request.setAttribute("testing", sql);
     RequestDispatcher dispatcher = request.getRequestDispatcher("staff-list.jsp");
     dispatcher.forward(request, response);
 }
