@@ -186,14 +186,9 @@ public class CreateImportReceiptServlet extends HttpServlet {
             ImportReceiptDAO dao = new ImportReceiptDAO();
             System.out.println("About to create receipt with details...");
             
-            // Create the receipt and get its ID
-            int importId = dao.createImportReceipt(receipt);
-            if (importId > 0) {
-                receipt.setImportId(importId);
-                
-                // Create details using the original method
-                dao.createReceiptWithDetails(receipt);
-            }
+            // Create the receipt with details in a single transactional method
+            int importId = dao.createReceiptWithDetails(receipt);
+            receipt.setImportId(importId);
             
             System.out.println("Receipt created successfully with ID: " + importId);
 

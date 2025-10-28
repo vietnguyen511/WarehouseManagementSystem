@@ -45,7 +45,7 @@ public class ImportReceiptDAO extends DBContext {
         st.executeUpdate();
     }
 
-    public void createReceiptWithDetails(ImportReceipt receipt) throws SQLException {
+    public int createReceiptWithDetails(ImportReceipt receipt) throws SQLException {
         try {
             connection.setAutoCommit(false);
             int importId = createImportReceipt(receipt);
@@ -86,6 +86,7 @@ public class ImportReceiptDAO extends DBContext {
                 productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
             }
             connection.commit();
+            return importId;
         } catch (SQLException e) {
             connection.rollback();
             throw e;
