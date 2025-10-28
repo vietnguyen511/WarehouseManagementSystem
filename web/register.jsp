@@ -1,0 +1,212 @@
+
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="java.util.*, model.User" %>
+<c:set var="activePage" value="AddUser" scope="request" />
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Category Management - Warehouse Management System</title>
+
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
+        <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
+
+        <style>
+            html, body {
+                height: auto;
+                overflow: auto;
+            }
+            .main-content-with-sidebar {
+                padding: var(--spacing-lg);
+                flex: 1;
+            }
+            .card {
+                background: #fff;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-sm);
+                overflow: hidden;
+            }
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: var(--spacing-md) var(--spacing-lg);
+                border-bottom: 1px solid var(--gray-200);
+            }
+            .card-body {
+                padding: var(--spacing-lg);
+            }
+            .table-wrapper {
+                overflow-x: auto;
+                margin-top: var(--spacing-md);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 0.75rem;
+                border-bottom: 1px solid var(--gray-200);
+                text-align: left;
+            }
+            th {
+                background: var(--gray-50);
+                font-weight: 600;
+            }
+            .action-bar {
+                display: flex;
+                gap: var(--spacing-sm);
+            }
+            .btn-danger {
+                background-color: var(--danger-600);
+                color: white;
+            }
+            .btn-danger:hover {
+                background-color: var(--danger-700);
+            }
+            .alert {
+                padding: 0.75rem 1rem;
+                border-radius: var(--radius-md);
+                margin-top: var(--spacing-md);
+            }
+            .alert-success {
+                background-color: var(--success-50);
+                color: var(--success-700);
+                border: 1px solid var(--success-200);
+            }
+            .alert-danger {
+                background-color: var(--danger-50);
+                color: var(--danger-700);
+                border: 1px solid var(--danger-200);
+            }
+            .search-form {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #f9fafb;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                padding: 6px 10px;
+                transition: all 0.2s ease-in-out;
+            }
+
+            .search-form input[type="text"] {
+                flex: 1;
+                border: none;
+                outline: none;
+                background: transparent;
+                padding: 6px;
+                font-size: 0.95rem;
+            }
+
+            .search-form button {
+                background: var(--primary-600);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                transition: background 0.2s ease-in-out;
+            }
+
+            .search-form button:hover {
+                background: var(--primary-700);
+            }
+
+            .search-form:focus-within {
+                box-shadow: 0 0 0 2px var(--primary-200);
+                background: #fff;
+            }
+            
+            
+        input, select { width: 100%; padding: 10px; margin: 10px 0; }
+        .btn { padding: 12px; width: 100%; border: none; background: #5a5af5; color: white; cursor: pointer; font-size: 16px; }
+        .gender-group { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        </style>
+    </head>
+    <body>
+        <!-- Top Header -->
+        <jsp:include page="/components/top-header.jsp" />
+        <!-- Sidebar -->
+        <jsp:include page="/components/sidebar-nav.jsp" />
+
+        <div class="main-content-with-sidebar">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h1 class="card-title">Add new user account </h1>
+                        <p class="card-subtitle">preservation or future use or issued to new user</p>
+                    </div>                  
+                   <!--Further upgrade -->
+                </div>
+
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <form action="register" method="post">
+                           <input type="text" name="firstname"  placeholder="First name" required>
+                           
+                           <input type="text" name="lastname"   placeholder="Last name" required>
+                           
+                           <input type="email" name="email"     placeholder="Email" required>      
+                           <!-- Error message if email fails -->
+                             
+                                        <p class="error"> ${error} </p>                       
+                              
+                           <input type="text"  name="phone"      placeholder="Phone number" required>   
+                           
+                           <input type="date"  name="birthday" required>
+                   <!-- Gender side by side -->
+                         <label for="gender">Gender:</label>
+                             <select name="gender" id="gender" required>
+                                <option value="" disabled selected>-- Select gender --</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                             </select> 
+  
+                            <input type="text" name="address"             placeholder="Address" required >
+                   
+                         <label for="role">Role:</label>
+                             <select name="role" id="role" required>
+                                <option value="" disabled selected>-- Select role --</option>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Staff</option>
+                                <option value="manager">Manager</option>
+                             </select>                   
+                             
+                            <input type="text" name="username"            placeholder="Username" required>
+                             
+                            <input type="password" name="password"        placeholder="Password" required>
+                            
+                            <input type="password" name="confirmPassword" placeholder="Confirm password" required>
+                             
+                            <p class="error"> ${error1} </p> 
+                            <button type="submit" class="btn">Confirm</button>
+                        </form>
+                    </div>
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${successMessage}</div>
+                    </c:if>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger">${errorMessage}</div>
+                    </c:if>
+                </div>
+            </div>
+        </div>
+
+        <jsp:include page="/components/footer.jsp" />
+    </body>
+</html

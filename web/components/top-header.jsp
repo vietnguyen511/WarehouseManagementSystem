@@ -39,8 +39,8 @@
                 </button>
             </div>
 
-            <!-- User Menu -->
-            <div class="header-action-item user-menu">
+        <!-- User Menu -->
+        <div class="header-action-item user-menu">
                 <c:choose>
                     <c:when test="${sessionScope.user != null}">
                         <button class="user-btn">
@@ -88,11 +88,11 @@
                                 Logout
                             </a></li>
                         </ul>
-                    </c:when>
-                    <c:otherwise>
+                </c:when>
+                     <c:otherwise>
                         <a href="${pageContext.request.contextPath}/login" class="btn btn-primary btn-sm">Login</a>
                     </c:otherwise>
-                </c:choose>
+            </c:choose>
             </div>
         </div>
     </div>

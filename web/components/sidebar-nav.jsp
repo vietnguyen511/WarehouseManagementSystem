@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="jakarta.servlet.http.HttpSession" %>
 
 <!--
     Warehouse Management System - Sidebar Navigation Component
@@ -23,6 +24,31 @@
             </li>
 
             <!-- Products & Categories -->
+            <%
+              if (session == null) 
+              {
+                    response.sendRedirect("index.html");
+                    return;
+              }
+             String role = (String) session.getAttribute("role");
+             if("admin".equals(role))
+              {
+           %>  
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'Userlist' || activePage == 'AddUser' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                    <span class="sidebar-text">User management</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/staff-list"   class="sidebar-sublink ${activePage == 'Userlist'? 'active' : ''}">User list</a></li>
+                    <li><a href="${pageContext.request.contextPath}/register" class="sidebar-sublink ${activePage == 'AddUser' ? 'active' : ''}">Add user</a></li>
+                </ul>
+            </li>           
             <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -40,7 +66,11 @@
                     <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Category</a></li>
                 </ul>
             </li>
-
+            <%
+               }
+              if("staff".equals(role))
+              {
+            %>
             <!-- Warehouse Operations -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'import-receipts' || activePage == 'export-receipts' || activePage == 'suppliers' || activePage == 'customers' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
@@ -60,7 +90,11 @@
                     <li><a href="${pageContext.request.contextPath}/customers" class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
                 </ul>
             </li>
-
+            <%
+              }
+             if("manager".equals(role))
+              {
+            %>
             <!-- Statistics & Reports -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' || activePage == 'activity-log' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
@@ -82,7 +116,9 @@
                     <li><a href="${pageContext.request.contextPath}/activity-log" class="sidebar-sublink ${activePage == 'activity-log' ? 'active' : ''}">Activity Logs</a></li>
                 </ul>
             </li>
-
+            <%
+              }
+            %>
             <!-- User Management (Admin only) -->
             <c:if test="${sessionScope.user != null && sessionScope.user.role == 'admin'}">
                 <li class="sidebar-item">
