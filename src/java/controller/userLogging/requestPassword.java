@@ -35,7 +35,7 @@ public class requestPassword extends HttpServlet
         User user = daoUser.getUserByEmail(email);
         if(user == null) 
         {
-            request.setAttribute("mess", "email khong ton tai");
+            request.setAttribute("mess", "email not existed");
             request.getRequestDispatcher("requestPassword.jsp").forward(request, response);
             return;
         }

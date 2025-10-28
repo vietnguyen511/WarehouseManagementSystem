@@ -35,7 +35,8 @@ public class resetService
     }
     
     
-    public boolean sendEmail(String to, String link, String name) {
+    public boolean sendEmail(String to, String link, String name) 
+    {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
