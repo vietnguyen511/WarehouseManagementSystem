@@ -1,10 +1,12 @@
 package controller.supplierMgt;
 
+import dal.ActivityLogHelper;
 import dal.SupplierDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import model.Supplier;
@@ -42,6 +44,11 @@ public class CreateSupplierServlet extends HttpServlet {
         try {
             int id = dao.create(s);
             if (id > 0) {
+                // Log activity
+                HttpSession session = request.getSession();
+                ActivityLogHelper.logCreate(session, "Suppliers", id, 
+                    "Created new supplier: " + name);
+                
                 response.sendRedirect(request.getContextPath() + "/suppliers?created=1");
                 return;
             }

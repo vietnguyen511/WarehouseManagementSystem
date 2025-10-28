@@ -200,6 +200,36 @@ public class CategoryDAO extends DBContext {
         }
     }
 
+    public int insertCategoryReturnId(Category category) {
+        if (category == null
+                || category.getCode() == null || category.getCode().trim().isEmpty()
+                || category.getName() == null || category.getName().trim().isEmpty()) {
+            return -1;
+        }
+        String sql = "INSERT INTO Categories (code, name, description, status, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, GETDATE(), GETDATE())";
+        try (PreparedStatement st = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            st.setString(1, category.getCode());
+            st.setString(2, category.getName());
+            st.setString(3, category.getDescription());
+            st.setBoolean(4, category.isStatus());
+            int result = st.executeUpdate();
+            
+            if (result > 0) {
+                try (ResultSet rs = st.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            return -1;
+        } catch (SQLException e) {
+            System.out.println("Error in insertCategoryReturnId: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public boolean deleteCategoryById(int categoryId) {
         String sql = "DELETE FROM Categories WHERE category_id = ?";
         PreparedStatement st = null;

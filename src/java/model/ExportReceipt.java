@@ -13,11 +13,11 @@ public class ExportReceipt {
     private BigDecimal totalAmount;
     private String note;
     private Date createdAt;
-    
+
     // For displaying customer/user names
     private String customerName;
     private String userName;
-    
+
     // List of export details
     private List<ExportDetail> details;
 
@@ -128,4 +128,3 @@ public class ExportReceipt {
                 '}';
     }
 }
-

@@ -176,19 +176,35 @@
                 </form>
 
                 <!-- Inventory Table -->
+                <c:set var="hasLowStock" value="false" />
+                <c:if test="${lowStockOnly}">
+                    <c:set var="hasLowStock" value="true" />
+                </c:if>
+                <c:if test="${not lowStockOnly and not empty inventoryList}">
+                    <c:forEach var="checkItem" items="${inventoryList}">
+                        <c:if test="${checkItem.quantityOnHand > 0 && checkItem.quantityOnHand <= threshold}">
+                            <c:set var="hasLowStock" value="true" />
+                        </c:if>
+                    </c:forEach>
+                </c:if>
+                
                 <div class="table-wrapper">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Product Code</th>
+                                <th style="width: 80px;">Detail</th>
+                                <th style="width: 120px;">Product Code</th>
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th style="text-align: right;">Quantity</th>
+                                <th style="text-align: center;">Variants</th>
                                 <th>Unit</th>
                                 <th style="text-align: right;">Unit Price</th>
                                 <th style="text-align: right;">Total Value</th>
                                 <th style="text-align: center;">Status</th>
-                                <th style="text-align: center;">Action</th>
+                                <c:if test="${hasLowStock}">
+                                    <th style="text-align: center;">Action</th>
+                                </c:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -196,6 +212,18 @@
                                 <c:when test="${not empty inventoryList}">
                                     <c:forEach var="item" items="${inventoryList}">
                                         <tr class="${item.quantityOnHand > 0 && item.quantityOnHand <= threshold ? 'low-stock-row' : ''}">
+                                            <td style="text-align: center;">
+                                                <button class="btn btn-sm btn-outline-primary view-variants-btn" 
+                                                        data-product-id="${item.productId}" 
+                                                        data-product-code="${item.productCode}"
+                                                        data-product-name="${item.productName}"
+                                                        title="View variants (size, color)">
+                                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                        <circle cx="12" cy="12" r="3"></circle>
+                                                    </svg>
+                                                </button>
+                                            </td>
                                             <td>
                                                 <span class="font-medium">${item.productCode}</span>
                                             </td>
@@ -207,6 +235,11 @@
                                             </td>
                                             <td style="text-align: center;">
                                                 <span class="font-semibold">${item.quantityOnHand}</span>
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <span class="badge badge-secondary" id="variant-count-${item.productId}">
+                                                    Loading...
+                                                </span>
                                             </td>
                                             <td>
                                                 ${item.unitName}
@@ -232,25 +265,27 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
-                                            <td style="text-align: center;">
-                                                <c:if test="${item.quantityOnHand <= threshold}">
-                                                    <a href="${pageContext.request.contextPath}/createImportReceipt?productId=${item.productId}" 
-                                                       class="btn-restock"
-                                                       title="Restock this product">
-                                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        </svg>
-                                                        Restock
-                                                    </a>
-                                                </c:if>
-                                            </td>
+                                            <c:if test="${hasLowStock}">
+                                                <td style="text-align: center;">
+                                                    <c:if test="${item.quantityOnHand <= threshold}">
+                                                        <a href="${pageContext.request.contextPath}/createImportReceipt?productId=${item.productId}" 
+                                                           class="btn-restock"
+                                                           title="Restock this product">
+                                                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                            </svg>
+                                                            Restock
+                                                        </a>
+                                                    </c:if>
+                                                </td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
                                     <tr>
-                                        <td colspan="9" class="table-empty">
+                                        <td colspan="${hasLowStock ? '11' : '10'}" class="table-empty">
                                             <svg width="48" height="48" fill="currentColor" viewBox="0 0 16 16" style="opacity: 0.3; margin-bottom: 0.5rem;">
                                                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
                                             </svg>
@@ -307,6 +342,116 @@
 
     <!-- Include Footer Component -->
     <jsp:include page="/components/footer.jsp" />
+    
+    <!-- Variants Modal -->
+    <div id="variantsModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 900px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 600; margin: 0;">
+                    Variants: <span id="modal-product-name"></span>
+                </h3>
+                <button id="closeModal" style="background: #f1f5f9; border: none; border-radius: 6px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="variantsContent" style="min-height: 200px;">
+                <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+                    <div class="spinner"></div>
+                    <div style="margin-top: 1rem;">Loading variants...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Fetch and display variant counts
+        document.addEventListener('DOMContentLoaded', function() {
+            const variantCounts = document.querySelectorAll('[id^="variant-count-"]');
+            
+            variantCounts.forEach(function(element) {
+                const productId = element.id.replace('variant-count-', '');
+                
+                fetch('${pageContext.request.contextPath}/api/product-variants?productId=' + productId)
+                    .then(response => response.json())
+                    .then(data => {
+                        const count = data.variants ? data.variants.length : 0;
+                        element.textContent = count + ' variants';
+                        element.className = 'badge badge-info';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching variants:', error);
+                        element.textContent = 'N/A';
+                        element.className = 'badge badge-danger';
+                    });
+            });
+            
+            // Modal handling
+            const modal = document.getElementById('variantsModal');
+            const closeBtn = document.getElementById('closeModal');
+            const viewBtns = document.querySelectorAll('.view-variants-btn');
+            
+            viewBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.dataset.productId;
+                    const productName = this.dataset.productName;
+                    
+                    document.getElementById('modal-product-name').textContent = productName;
+                    modal.style.display = 'flex';
+                    
+                    // Fetch variants
+                    document.getElementById('variantsContent').innerHTML = 
+                        '<div style="text-align: center; padding: 3rem; color: #94a3b8;"><div class="spinner"></div><div style="margin-top: 1rem;">Loading variants...</div></div>';
+                    
+                    fetch('${pageContext.request.contextPath}/api/product-variants?productId=' + productId)
+                        .then(response => response.json())
+                        .then(data => displayVariants(data.variants || []))
+                        .catch(error => {
+                            console.error('Error:', error);
+                            document.getElementById('variantsContent').innerHTML = 
+                                '<div style="text-align: center; padding: 3rem; color: #ef4444;">Error loading variants</div>';
+                        });
+                });
+            });
+            
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            function displayVariants(variants) {
+                if (variants.length === 0) {
+                    document.getElementById('variantsContent').innerHTML = 
+                        '<div style="text-align: center; padding: 3rem; color: #94a3b8;">No variants found</div>';
+                    return;
+                }
+                
+                let html = '<table class="table" style="margin: 0;">';
+                html += '<thead><tr><th>Size</th><th>Color</th><th style="text-align: right;">Quantity</th><th style="text-align: right;">Price</th></tr></thead>';
+                html += '<tbody>';
+                
+                variants.forEach(variant => {
+                    html += '<tr>';
+                    html += '<td><strong>' + (variant.size || 'N/A') + '</strong></td>';
+                    html += '<td><strong>' + (variant.color || 'N/A') + '</strong></td>';
+                    html += '<td style="text-align: right;">' + (variant.quantityOnHand || 0) + '</td>';
+                    html += '<td style="text-align: right;">$' + (variant.importPrice || 0).toFixed(2) + '</td>';
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('variantsContent').innerHTML = html;
+            }
+        });
+    </script>
 </body>
 </html>
 

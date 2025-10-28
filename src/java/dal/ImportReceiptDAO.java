@@ -10,6 +10,7 @@ import java.util.List;
 import model.ImportDetail;
 import model.ImportReceipt;
 import model.ImportReceiptListDTO;
+import model.ProductVariant;
 
 public class ImportReceiptDAO extends DBContext {
 
@@ -51,20 +52,38 @@ public class ImportReceiptDAO extends DBContext {
             
             // Share the same connection with child DAOs for transaction consistency
             ImportDetailDAO importDetailDAO = new ImportDetailDAO(connection);
+            ProductVariantDAO variantDAO = new ProductVariantDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
             
             for (ImportDetail d : receipt.getDetails()) {
-                // Map product code to id if needed
-                if (d.getProductId() == 0 && d.getProductCode() != null) {
-                    Integer pId = productDAO.getProductIdByCode(d.getProductCode());
-                    if (pId == null) {
-                        // Create new product if not existing
-                        pId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getPrice(), d.getCategoryId());
+                // Find or create product variant
+                ProductVariant variant = variantDAO.getVariantByProductCodeSizeColor(
+                    d.getProductCode(), d.getSize(), d.getColor());
+                
+                if (variant == null) {
+                    // Create new product if not existing
+                    Integer productId = productDAO.getProductIdByCode(d.getProductCode());
+                    if (productId == null) {
+                        productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getMaterial(), d.getUnit(), d.getPrice(), d.getCategoryId());
                     }
-                    d.setProductId(pId);
+                    
+                    // Create new variant
+                    variant = new ProductVariant();
+                    variant.setProductId(productId);
+                    variant.setSize(d.getSize());
+                    variant.setColor(d.getColor());
+                    variant.setQuantity(0);
+                    variant.setStatus(true);
+                    int variantId = variantDAO.createProductVariant(variant);
+                    variant.setVariantId(variantId);
                 }
+                
+                d.setVariantId(variant.getVariantId());
                 importDetailDAO.insertImportDetail(d, importId);
-                productDAO.increaseProductStock(d.getProductId(), d.getQuantity(), d.getPrice());
+                variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
+                
+                // Update product's import_price with new price (from this import receipt)
+                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
             }
             connection.commit();
         } catch (SQLException e) {
@@ -265,10 +284,94 @@ public class ImportReceiptDAO extends DBContext {
             receipt.setTotalQuantity(rs.getInt("total_quantity"));
             receipt.setTotalAmount(rs.getBigDecimal("total_amount"));
             receipt.setNote(rs.getString("note"));
+            receipt.setSupplierName(rs.getString("supplier_name"));
+            receipt.setUserName(rs.getString("user_name"));
             return receipt;
         }
         
         return null;
+    }
+    
+    /**
+     * Get import statistics grouped by day or month
+     * @param startDate Start date
+     * @param endDate End date
+     * @param groupBy "day" or "month"
+     * @return List of ImportStatDTO
+     */
+    public List<model.ImportStatDTO> getImportStatistics(java.util.Date startDate, java.util.Date endDate, String groupBy) throws SQLException {
+        List<model.ImportStatDTO> stats = new ArrayList<>();
+        
+        // Determine grouping
+        boolean isMonthly = "month".equalsIgnoreCase(groupBy);
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT ");
+        if (isMonthly) {
+            sql.append("    FORMAT(ir.date, 'yyyy-MM') AS period, ");
+        } else {
+            sql.append("    CAST(ir.date AS DATE) AS period, ");
+        }
+        sql.append("    COUNT(DISTINCT ir.import_id) AS receipt_count, ");
+        sql.append("    ISNULL(SUM(id.quantity), 0) AS total_quantity, ");
+        sql.append("    ISNULL(SUM(id.amount), 0) AS total_amount ");
+        sql.append("FROM ImportReceipts ir ");
+        sql.append("LEFT JOIN ImportDetails id ON ir.import_id = id.import_id ");
+        sql.append("WHERE ir.date >= ? AND ir.date <= ? ");
+        sql.append("GROUP BY ");
+        if (isMonthly) {
+            sql.append("    FORMAT(ir.date, 'yyyy-MM') ");
+        } else {
+            sql.append("    CAST(ir.date AS DATE) ");
+        }
+        sql.append("ORDER BY period ASC");
+        
+        PreparedStatement st = connection.prepareStatement(sql.toString());
+        st.setTimestamp(1, new java.sql.Timestamp(startDate.getTime()));
+        st.setTimestamp(2, new java.sql.Timestamp(endDate.getTime()));
+        ResultSet rs = st.executeQuery();
+        
+        while (rs.next()) {
+            model.ImportStatDTO stat = new model.ImportStatDTO();
+            stat.setPeriod(rs.getString("period"));
+            stat.setReceiptCount(rs.getInt("receipt_count"));
+            stat.setTotalQuantity(rs.getInt("total_quantity"));
+            stat.setTotalAmount(rs.getBigDecimal("total_amount"));
+            stats.add(stat);
+        }
+        
+        return stats;
+    }
+    
+    /**
+     * Get total import statistics (aggregated)
+     * Returns an array: [totalReceipts, totalQuantity, totalAmount, avgAmount]
+     */
+    public Object[] getTotalImportStatistics(java.util.Date startDate, java.util.Date endDate) throws SQLException {
+        String sql = "SELECT " +
+                    "COUNT(DISTINCT ir.import_id) AS total_receipts, " +
+                    "ISNULL(SUM(id.quantity), 0) AS total_quantity, " +
+                    "ISNULL(SUM(id.amount), 0) AS total_amount, " +
+                    "ISNULL(AVG(ir.total_amount), 0) AS avg_amount " +
+                    "FROM ImportReceipts ir " +
+                    "LEFT JOIN ImportDetails id ON ir.import_id = id.import_id " +
+                    "WHERE ir.date >= ? AND ir.date <= ?";
+        
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setTimestamp(1, new java.sql.Timestamp(startDate.getTime()));
+        st.setTimestamp(2, new java.sql.Timestamp(endDate.getTime()));
+        ResultSet rs = st.executeQuery();
+        
+        if (rs.next()) {
+            int totalReceipts = rs.getInt("total_receipts");
+            int totalQuantity = rs.getInt("total_quantity");
+            java.math.BigDecimal totalAmount = rs.getBigDecimal("total_amount");
+            java.math.BigDecimal avgAmount = rs.getBigDecimal("avg_amount");
+            
+            return new Object[]{totalReceipts, totalQuantity, totalAmount, avgAmount};
+        }
+        
+        return new Object[]{0, 0, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO};
     }
 }
 

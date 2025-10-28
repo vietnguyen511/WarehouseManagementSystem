@@ -3,12 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 
-package controller.warehouseImportMgt;
+package controller.warehouseExportMgt;
 
 import java.io.IOException;
 import dal.ActivityLogHelper;
-import dal.ImportReceiptDAO;
-import dal.SupplierDAO;
+import dal.ExportReceiptDAO;
+import dal.CustomerDAO;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import jakarta.servlet.ServletException;
@@ -19,8 +19,8 @@ import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import model.ImportDetail;
-import model.ImportReceipt;
+import model.ExportDetail;
+import model.ExportReceipt;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,7 +31,7 @@ import java.time.format.DateTimeParseException;
  *
  * @author admin
  */
-public class CreateImportReceiptServlet extends HttpServlet {
+public class CreateExportReceiptServlet extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -69,9 +69,9 @@ public class CreateImportReceiptServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         // Load suppliers for dropdown
-        SupplierDAO supplierDAO = new SupplierDAO();
-        java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
-        request.setAttribute("suppliers", suppliers);
+        CustomerDAO customerDAO = new CustomerDAO();
+        java.util.List<model.Customer> customers = customerDAO.getAllSuppliers();
+        request.setAttribute("suppliers", customers);
         
         // Load categories for dropdown
         dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
@@ -111,36 +111,36 @@ public class CreateImportReceiptServlet extends HttpServlet {
 
         try {
             // Basic receipt info
-            String supplierIdStr = request.getParameter("supplierId");
-            String importDateStr = request.getParameter("importDate");
+            String customerIdStr = request.getParameter("customerId");
+            String exportDateStr = request.getParameter("exportDate");
             String totalAmountStr = request.getParameter("totalAmount");
             String note = request.getParameter("note");
 
-            int supplierId = Integer.parseInt(supplierIdStr);
+            int customerId = Integer.parseInt(customerIdStr);
             // Use current timestamp when creating receipt to include time information
-            Date importDate = (importDateStr == null || importDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(importDateStr);
+            Date exportDate = (exportDateStr == null || exportDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(exportDateStr);
             BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(totalAmountStr);
 
             // Build receipt model
-            ImportReceipt receipt = new ImportReceipt();
-            receipt.setSupplierId(supplierId);
+            ExportReceipt receipt = new ExportReceipt();
+            receipt.getCustomerId();
             // Temporary: no login yet – hardcode staff user id = 3 (Mike Johnson)
             receipt.setUserId(3);
-            receipt.setDate(importDate);
+            receipt.setDate(exportDate);
             receipt.setTotalAmount(totalAmount);
             receipt.setNote(note);
             
-            System.out.println("Receipt created: " + receipt.getSupplierId() + " " + receipt.getDate() + " " + receipt.getTotalAmount());
+            System.out.println("Receipt created: " + receipt.getCustomerId()+ " " + receipt.getDate() + " " + receipt.getTotalAmount());
 
             // Parse item rows by scanning sequential indices until none found
-            List<ImportDetail> details = new ArrayList<>();
+            List<ExportDetail> details = new ArrayList<>();
             int index = 0;
             while (true) {
                 String code = request.getParameter("items[" + index + "].productCode");
                 String name = request.getParameter("items[" + index + "].productName");
                 String categoryIdStr = request.getParameter("items[" + index + "].categoryId");
-                String material = request.getParameter("items[" + index + "].material");
-                String unit = request.getParameter("items[" + index + "].unit");
+                //String material = request.getParameter("items[" + index + "].material");
+                //String unit = request.getParameter("items[" + index + "].unit");
                 String size = request.getParameter("items[" + index + "].size");
                 String color = request.getParameter("items[" + index + "].color");
                 String qtyStr = request.getParameter("items[" + index + "].quantity");
@@ -152,22 +152,22 @@ public class CreateImportReceiptServlet extends HttpServlet {
                     index++;
                     continue;
                 }
-                ImportDetail d = new ImportDetail();
+                ExportDetail d = new ExportDetail();
                 d.setProductCode(code.trim());
                 d.setProductName(name != null ? name.trim() : null);
-                d.setMaterial(material != null ? material.trim() : "");
-                d.setUnit(unit != null ? unit.trim() : "");
+                //d.setMaterial(material != null ? material.trim() : "");
+                //d.setUnit(unit != null ? unit.trim() : "");
                 d.setSize(size != null ? size.trim() : "");
                 d.setColor(color != null ? color.trim() : "");
                 
-                // Parse category ID if provided
-                if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
-                    try {
-                        d.setCategoryId(Integer.parseInt(categoryIdStr.trim()));
-                    } catch (NumberFormatException e) {
-                        // Ignore invalid category ID
-                    }
-                }
+//                // Parse category ID if provided
+//                if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
+//                    try {
+//                        d.setCategoryId(Integer.parseInt(categoryIdStr.trim()));
+//                    } catch (NumberFormatException e) {
+//                        // Ignore invalid category ID
+//                    }
+//                }
                 
                 d.setQuantity(Integer.parseInt(qtyStr));
                 BigDecimal price = new BigDecimal(priceStr);
@@ -177,51 +177,51 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 index++;
             }
 
-            int totalQty = details.stream().mapToInt(ImportDetail::getQuantity).sum();
+            int totalQty = details.stream().mapToInt(ExportDetail::getQuantity).sum();
             receipt.setTotalQuantity(totalQty);
             receipt.setDetails(details);
 
             // Persist within transaction and update stock
             System.out.println("Detailed items: " + details.size());
-            ImportReceiptDAO dao = new ImportReceiptDAO();
+            ExportReceiptDAO dao = new ExportReceiptDAO();
             System.out.println("About to create receipt with details...");
             
             // Create the receipt and get its ID
-            int importId = dao.createImportReceipt(receipt);
-            if (importId > 0) {
-                receipt.setImportId(importId);
+            int exportId = dao.createExportReceipt(receipt);
+            if (exportId > 0) {
+                receipt.setExportId(exportId);
                 
                 // Create details using the original method
                 dao.createReceiptWithDetails(receipt);
             }
             
-            System.out.println("Receipt created successfully with ID: " + importId);
+            System.out.println("Receipt created successfully with ID: " + exportId);
 
             // Redirect back to form with success message
             HttpSession session = request.getSession(true);
             session.setAttribute("successMessage", "Import receipt created successfully.");
             
             // Log activity
-            SupplierDAO supplierDAO = new SupplierDAO();
-            String supplierName = "supplier_" + supplierId;
+            CustomerDAO customerDAO = new CustomerDAO();
+            String customerName = "customer_" + customerId;
             try {
-                model.Supplier supplier = supplierDAO.findById(supplierId);
-                if (supplier != null) {
-                    supplierName = supplier.getName();
+                model.Customer customer = customerDAO.findById(customerId);
+                if (customer != null) {
+                    customerName = customer.getName();
                 }
             } catch (Exception e) {
                 // Use default
             }
             
-            ActivityLogHelper.logCreate(request.getSession(), "ImportReceipts", importId,
-                "Created import receipt for supplier: " + supplierName + ", Total: " + totalAmount + ", Items: " + details.size());
+            ActivityLogHelper.logCreate(request.getSession(), "ExportReceipts", exportId,
+                "Created export receipt for customer: " + customerName + ", Total: " + totalAmount + ", Items: " + details.size());
             
             System.out.println("Redirecting to success page...");
-            response.sendRedirect(request.getContextPath() + "/createImportReceipt");
+            response.sendRedirect(request.getContextPath() + "/createExportReceipt");
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Failed to save import receipt: " + e.getMessage());
-            request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+            request.setAttribute("errorMessage", "Failed to save export receipt: " + e.getMessage());
+            request.getRequestDispatcher("/warehouse-export-mgt/add-export-receipt.jsp").forward(request, response);
         }
     }
 

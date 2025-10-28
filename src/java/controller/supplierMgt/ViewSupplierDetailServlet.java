@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import model.Supplier;
 
@@ -27,6 +28,13 @@ public class ViewSupplierDetailServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/suppliers?notfound=1");
                 return;
             }
+            
+            // Get import statistics for this supplier
+            Object[] stats = dao.getImportStatistics(id);
+            request.setAttribute("totalReceipts", stats[0]);
+            request.setAttribute("totalQuantity", stats[1]);
+            request.setAttribute("totalAmount", stats[2]);
+            
             request.setAttribute("supplier", supplier);
             request.setAttribute("activePage", "suppliers");
             request.getRequestDispatcher("/supplier-mgt/supplier-detail.jsp").forward(request, response);

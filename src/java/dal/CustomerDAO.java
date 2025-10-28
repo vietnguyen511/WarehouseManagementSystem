@@ -7,23 +7,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import model.Supplier;
+import model.Customer;
 
-public class SupplierDAO extends DBContext {
+public class CustomerDAO extends DBContext {
 
     // Constructor for standalone use
-    public SupplierDAO() {
+    public CustomerDAO() {
         super();
     }
 
     // Constructor for transaction management (shares connection)
-    public SupplierDAO(Connection connection) {
+    public CustomerDAO(Connection connection) {
         super(connection);
     }
 
-    public List<Supplier> getAllSuppliers() {
-        List<Supplier> list = new ArrayList<>();
-        String sql = "SELECT supplier_id, name, phone, email, address, status FROM Suppliers WHERE status = 1 ORDER BY name";
+    public List<Customer> getAllSuppliers() {
+        List<Customer> list = new ArrayList<>();
+        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers WHERE status = 1 ORDER BY name";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -37,8 +37,8 @@ public class SupplierDAO extends DBContext {
     }
 
     // CRUD
-    public Supplier findById(int id) throws SQLException {
-        String sql = "SELECT supplier_id, name, phone, email, address, status FROM Suppliers WHERE supplier_id = ?";
+    public Customer findById(int id) throws SQLException {
+        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers WHERE customer_id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
@@ -46,14 +46,14 @@ public class SupplierDAO extends DBContext {
         return null;
     }
 
-    public int create(Supplier s) throws SQLException {
-        String sql = "INSERT INTO Suppliers(name, phone, email, address, status, created_at, updated_at) VALUES(?,?,?,?,?,GETDATE(),GETDATE())";
+    public int create(Customer c) throws SQLException {
+        String sql = "INSERT INTO Customers(name, phone, email, address, status, created_at, updated_at) VALUES(?,?,?,?,?,GETDATE(),GETDATE())";
         PreparedStatement st = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
-        st.setString(1, s.getName());
-        st.setString(2, s.getPhone());
-        st.setString(3, s.getEmail());
-        st.setString(4, s.getAddress());
-        st.setBoolean(5, s.isStatus());
+        st.setString(1, c.getName());
+        st.setString(2, c.getPhone());
+        st.setString(3, c.getEmail());
+        st.setString(4, c.getAddress());
+        st.setBoolean(5, c.isStatus());
         int affected = st.executeUpdate();
         if (affected == 0) return 0;
         ResultSet keys = st.getGeneratedKeys();
@@ -61,20 +61,20 @@ public class SupplierDAO extends DBContext {
         return 0;
     }
 
-    public boolean update(Supplier s) throws SQLException {
-        String sql = "UPDATE Suppliers SET name = ?, phone = ?, email = ?, address = ?, status = ?, updated_at = GETDATE() WHERE supplier_id = ?";
+    public boolean update(Customer c) throws SQLException {
+        String sql = "UPDATE Customers SET name = ?, phone = ?, email = ?, address = ?, status = ?, updated_at = GETDATE() WHERE customer_id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
-        st.setString(1, s.getName());
-        st.setString(2, s.getPhone());
-        st.setString(3, s.getEmail());
-        st.setString(4, s.getAddress());
-        st.setBoolean(5, s.isStatus());
-        st.setInt(6, s.getSupplierId());
+        st.setString(1, c.getName());
+        st.setString(2, c.getPhone());
+        st.setString(3, c.getEmail());
+        st.setString(4, c.getAddress());
+        st.setBoolean(5, c.isStatus());
+        st.setInt(6, c.getCustomerId());
         return st.executeUpdate() > 0;
     }
 
     public boolean delete(int id) throws SQLException {
-        String sql = "DELETE FROM Suppliers WHERE supplier_id = ?";
+        String sql = "DELETE FROM Customers WHERE customer_id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, id);
         return st.executeUpdate() > 0;
@@ -82,7 +82,7 @@ public class SupplierDAO extends DBContext {
 
     // Search, filter, pagination
     public int countAll(String searchTerm, String statusFilter) throws SQLException {
-        StringBuilder sb = new StringBuilder("SELECT COUNT(*) FROM Suppliers WHERE 1=1");
+        StringBuilder sb = new StringBuilder("SELECT COUNT(*) FROM Customers WHERE 1=1");
         List<Object> params = new ArrayList<>();
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             sb.append(" AND (name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ?) ");
@@ -100,9 +100,9 @@ public class SupplierDAO extends DBContext {
         return 0;
     }
 
-    public List<Supplier> findAll(int offset, int limit, String sortBy, String sortDir, String searchTerm, String statusFilter) throws SQLException {
+    public List<Customer> findAll(int offset, int limit, String sortBy, String sortDir, String searchTerm, String statusFilter) throws SQLException {
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT supplier_id, name, phone, email, address, status FROM Suppliers WHERE 1=1 ");
+        sb.append("SELECT customer_id, name, phone, email, address, status FROM Customers WHERE 1=1 ");
         List<Object> params = new ArrayList<>();
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             sb.append(" AND (name LIKE ? OR phone LIKE ? OR email LIKE ? OR address LIKE ?) ");
@@ -128,36 +128,36 @@ public class SupplierDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sb.toString());
         for (int i = 0; i < params.size(); i++) st.setObject(i + 1, params.get(i));
         ResultSet rs = st.executeQuery();
-        List<Supplier> list = new ArrayList<>();
+        List<Customer> list = new ArrayList<>();
         while (rs.next()) list.add(mapRow(rs));
         return list;
     }
 
-    private Supplier mapRow(ResultSet rs) throws SQLException {
-        Supplier s = new Supplier();
-        s.setSupplierId(rs.getInt("supplier_id"));
-        s.setName(rs.getString("name"));
-        s.setPhone(rs.getString("phone"));
-        s.setEmail(rs.getString("email"));
-        s.setAddress(rs.getString("address"));
-        s.setStatus(rs.getBoolean("status"));
-        return s;
+    private Customer mapRow(ResultSet rs) throws SQLException {
+        Customer c = new Customer();
+        c.setCustomerId(rs.getInt("customer_id"));
+        c.setName(rs.getString("name"));
+        c.setPhone(rs.getString("phone"));
+        c.setEmail(rs.getString("email"));
+        c.setAddress(rs.getString("address"));
+        c.setStatus(rs.getBoolean("status"));
+        return c;
     }
 
     /**
      * Get import statistics for a supplier
      * Returns an array: [totalReceipts, totalQuantity, totalAmount]
      */
-    public Object[] getImportStatistics(int supplierId) throws SQLException {
+    public Object[] getExportStatistics(int customerId) throws SQLException {
         String sql = "SELECT " +
                     "ISNULL(COUNT(*), 0) AS total_receipts, " +
                     "ISNULL(SUM(total_quantity), 0) AS total_quantity, " +
                     "ISNULL(SUM(total_amount), 0) AS total_amount " +
-                    "FROM ImportReceipts " +
-                    "WHERE supplier_id = ?";
+                    "FROM ExportReceipts " +
+                    "WHERE customer_id = ?";
         
         PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, supplierId);
+        st.setInt(1, customerId);
         ResultSet rs = st.executeQuery();
         
         if (rs.next()) {

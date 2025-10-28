@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class ImportDetail {
     private int importDetailId;
     private int importId;
-    private int productId;
+    private int variantId;  // Changed from productId to variantId
     private int quantity;
     private BigDecimal price;
     private BigDecimal amount;
@@ -14,14 +14,17 @@ public class ImportDetail {
     private String unit;
     private String categoryName;
     private Integer categoryId;
+    private String size;     // Added for ProductVariant
+    private String color;    // Added for ProductVariant
+    private String material; // Added for Product
 
     public ImportDetail() {
     }
 
-    public ImportDetail(int importDetailId, int importId, int productId, int quantity, BigDecimal price, BigDecimal amount, String productCode, String productName) {
+    public ImportDetail(int importDetailId, int importId, int variantId, int quantity, BigDecimal price, BigDecimal amount, String productCode, String productName) {
         this.importDetailId = importDetailId;
         this.importId = importId;
-        this.productId = productId;
+        this.variantId = variantId;
         this.quantity = quantity;
         this.price = price;
         this.amount = amount;
@@ -45,12 +48,12 @@ public class ImportDetail {
         this.importId = importId;
     }
 
-    public int getProductId() {
-        return productId;
+    public int getVariantId() {
+        return variantId;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setVariantId(int variantId) {
+        this.variantId = variantId;
     }
 
     public int getQuantity() {
@@ -115,6 +118,30 @@ public class ImportDetail {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
     }
     
 }

@@ -510,9 +510,9 @@
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
-                            <h3>No Import Receipts Found</h3>
-                            <p>There are no import receipts in the system yet.</p>
-                            <a href="${pageContext.request.contextPath}/warehouse-import-mgt/add-import-receipt.jsp" class="btn btn-success">
+                            <h3>No Export Receipts Found</h3>
+                            <p>There are no export receipts in the system yet.</p>
+                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/add-export-receipt.jsp" class="btn btn-success">
                                 Create First Receipt
                             </a>
                         </div>

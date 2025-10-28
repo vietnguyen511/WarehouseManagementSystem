@@ -1,14 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="activePage" value="import-receipts" scope="request" />
+<c:set var="activePage" value="export-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Import Receipt Details - Warehouse Management System</title>
+    <title>Export Receipt Details - Warehouse Management System</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
     <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
@@ -200,7 +200,7 @@
                             ${error}
                         </div>
                         <div class="action-buttons">
-                            <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">
+                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="btn btn-secondary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M19 12H5M12 19l-7-7 7-7"></path>
                                 </svg>
@@ -210,12 +210,12 @@
                     </div>
                 </div>
             </c:when>
-            <c:when test="${not empty importReceipt}">
+            <c:when test="${not empty exportReceipt}">
                 <div class="card">
                     <div class="card-header">
                         <div>
-                            <h1 class="card-title">Import Receipt Details</h1>
-                            <p class="card-subtitle">Receipt #${importReceipt.importId}</p>
+                            <h1 class="card-title">Export Receipt Details</h1>
+                            <p class="card-subtitle">Receipt #${exportReceipt.exportId}</p>
                         </div>
                         <div class="action-buttons">
                             <button type="button" onclick="window.print()" class="btn btn-secondary">
@@ -226,7 +226,7 @@
                                 </svg>
                                 Print
                             </button>
-                            <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">
+                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="btn btn-secondary">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M19 12H5M12 19l-7-7 7-7"></path>
                                 </svg>
@@ -238,36 +238,36 @@
                     <div class="card-body">
                         <!-- Receipt Header Information -->
                         <div class="receipt-header">
-                            <h2 class="receipt-title">Import Receipt #${importReceipt.importId}</h2>
+                            <h2 class="receipt-title">Export Receipt #${exportReceipt.exportId}</h2>
                             <div class="receipt-meta">
                                 <div class="meta-item">
-                                    <span class="meta-label">Import Date</span>
+                                    <span class="meta-label">Export Date</span>
                                     <span class="meta-value">
-                                        <fmt:formatDate value="${importReceipt.date}" pattern="dd/MM/yyyy HH:mm" />
+                                        <fmt:formatDate value="${exportReceipt.date}" pattern="dd/MM/yyyy HH:mm" />
                                     </span>
                                 </div>
                                 <div class="meta-item">
-                                    <span class="meta-label">Supplier</span>
+                                    <span class="meta-label">Customer</span>
                                     <span class="meta-value">
-                                        ${importReceipt.supplierName}
+                                        ${exportReceipt.customerName}
                                     </span>
                                 </div>
                                 <div class="meta-item">
                                     <span class="meta-label">Created By</span>
                                     <span class="meta-value">
-                                        ${importReceipt.userName}
+                                        ${exportReceipt.userName}
                                     </span>
                                 </div>
                                 <div class="meta-item">
                                     <span class="meta-label">Total Quantity</span>
                                     <span class="meta-value">
-                                        <fmt:formatNumber value="${importReceipt.totalQuantity}" type="number" />
+                                        <fmt:formatNumber value="${exportReceipt.totalQuantity}" type="number" />
                                     </span>
                                 </div>
                                 <div class="meta-item">
                                     <span class="meta-label">Total Amount</span>
                                     <span class="meta-value text-success">
-                                        $<fmt:formatNumber value="${importReceipt.totalAmount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                        $<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                                     </span>
                                 </div>
                             </div>
@@ -275,7 +275,7 @@
 
                         <!-- Import Details Table -->
                         <c:choose>
-                            <c:when test="${not empty importDetails}">
+                            <c:when test="${not empty exportDetails}">
                                 <div class="table-wrapper">
                                     <table class="details-table">
                                         <thead>
@@ -292,7 +292,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <c:forEach var="detail" items="${importDetails}" varStatus="status">
+                                            <c:forEach var="detail" items="${exportDetails}" varStatus="status">
                                                 <tr>
                                                     <td>
                                                         <strong>${status.index + 1}</strong>
@@ -348,13 +348,13 @@
                                     <div class="summary-row">
                                         <span class="summary-label">Number of Items:</span>
                                         <span class="summary-value">
-                                            <fmt:formatNumber value="${importReceipt.totalQuantity}" type="number" />
+                                            <fmt:formatNumber value="${exportReceipt.totalQuantity}" type="number" />
                                         </span>
                                     </div>
                                     <div class="summary-row">
                                         <span class="summary-label">Total Amount:</span>
                                         <span class="summary-value text-success">
-                                            $<fmt:formatNumber value="${importReceipt.totalAmount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                            $<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
                                         </span>
                                     </div>
                                 </div>
@@ -372,13 +372,13 @@
                         </c:choose>
 
                         <!-- Note Section -->
-                        <c:if test="${not empty importReceipt.note}">
+                        <c:if test="${not empty exportReceipt.note}">
                             <div class="card" style="margin-top: var(--spacing-lg);">
                                 <div class="card-header">
                                     <h3 class="card-title">Note</h3>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted">${importReceipt.note}</p>
+                                    <p class="text-muted">${exportReceipt.note}</p>
                                 </div>
                             </div>
                         </c:if>
@@ -393,9 +393,9 @@
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
-                            <h3>Import Receipt Not Found</h3>
-                            <p>The requested import receipt could not be found.</p>
-                            <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">
+                            <h3>Export Receipt Not Found</h3>
+                            <p>The requested export receipt could not be found.</p>
+                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/import-export-list" class="btn btn-secondary">
                                 Back to List
                             </a>
                         </div>

@@ -1,13 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="activePage" value="import-receipts" scope="request" />
+<c:set var="activePage" value="export-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Create Import Receipt - Warehouse Management System</title>
+    <title>Create Export Receipt - Warehouse Management System</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
     <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
@@ -206,26 +206,26 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <h1 class="card-title">Create Import Receipt</h1>
-                    <p class="card-subtitle">Enter receipt info and product items</p>
+                    <h1 class="card-title">Create Export Receipt</h1>
+                    <p class="card-subtitle">Enter receipt info</p>
                 </div>
                 <div class="action-bar">
-                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">Back to List</a>
+                    <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="btn btn-secondary">Back to List</a>
                 </div>
             </div>
 
             <form class="card-body" method="post" action="${pageContext.request.contextPath}/createImportReceipt" id="importForm" novalidate>
                 <div class="receipt-grid">
                     <div class="form-group">
-                        <label class="form-label" for="importDate">Import Date</label>
+                        <label class="form-label" for="importDate">Export Date</label>
                         <input type="date" id="importDate" name="importDate" class="form-input" required placeholder="yyyy-mm-dd" value="${today}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label required" for="supplierId">Supplier</label>
-                        <select id="supplierId" name="supplierId" class="form-select" required>
-                            <option value="" disabled selected hidden>Select a supplier...</option>
-                            <c:forEach var="s" items="${suppliers}">
-                                <option value="${s.supplierId}">${s.name}</option>
+                        <label class="form-label required" for="customerId">Customer</label>
+                        <select id="customerId" name="customerId" class="form-select" required>
+                            <option value="" disabled selected hidden>Select a customer...</option>
+                            <c:forEach var="s" items="${customers}">
+                                <option value="${s.customerId}">${s.name}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -312,7 +312,7 @@
                                 
                                 <!-- Import Details Section -->
                                 <div class="product-section">
-                                    <h4 class="product-section-title">Import Details</h4>
+                                    <h4 class="product-section-title">Export Details</h4>
                                     <div class="product-section-grid product-section-grid-three">
                                         <div class="form-group">
                                             <label class="form-label required" for="quantity_0">Quantity</label>
@@ -320,7 +320,7 @@
                                             <div class="field-error-slot"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label required" for="price_0">Import Price</label>
+                                            <label class="form-label required" for="price_0">Export Price</label>
                                             <input type="number" id="price_0" name="items[0].price" class="form-input price" min="0" step="0.01" value="0" placeholder="0.00" required>
                                             <div class="field-error-slot"></div>
                                         </div>
@@ -358,7 +358,7 @@
                 <div class="card-footer" style="margin-top: var(--spacing-lg);">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-success">Save</button>
-                        <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="btn btn-secondary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="btn btn-secondary">Cancel</a>
                     </div>
                 </div>
             </form>
@@ -384,7 +384,7 @@
                 const mm = String(d.getMonth()+1).padStart(2,'0');
                 const dd = String(d.getDate()).padStart(2,'0');
                 const today = `${yyyy}-${mm}-${dd}`;
-                const dateInput = document.getElementById('importDate');
+                const dateInput = document.getElementById('exportDate');
                 if (dateInput && !dateInput.value) { dateInput.value = today; }
             })();
             function recalcRow(card){ 
@@ -743,8 +743,8 @@
             }
 
             // Clear error for header fields on user input/change
-            document.getElementById('importDate').addEventListener('input', function(){ clearError(this); });
-            document.getElementById('supplierId').addEventListener('change', function(){ clearError(this); });
+            document.getElementById('exportDate').addEventListener('input', function(){ clearError(this); });
+            document.getElementById('customerId').addEventListener('change', function(){ clearError(this); });
 
             form.addEventListener('submit', function(e){
                 if (!validateForm()) {

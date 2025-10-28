@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,8 +29,8 @@
                 </c:if>
 
                 <c:if test="${not empty supplier}">
-                    <div class="d-flex gap-3" style="flex-wrap:wrap;">
-                        <div style="min-width:260px;">
+                    <div class="d-flex gap-3" style="margin-bottom: 2rem;">
+                        <div style="flex: 0 0 calc(50% - 12px);">
                             <div class="form-group">
                                 <label class="form-label">Name</label>
                                 <div class="font-medium">${supplier.name}</div>
@@ -53,6 +54,29 @@
                                         <c:when test="${supplier.status}"><span class="badge badge-success">Active</span></c:when>
                                         <c:otherwise><span class="badge badge-secondary">Inactive</span></c:otherwise>
                                     </c:choose>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Statistics Section -->
+                        <div style="flex: 0 0 calc(50% - 12px);">
+                            <h3 style="margin-bottom: 1rem; color: var(--gray-700);">Import Statistics</h3>
+                            <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Total Import Receipts</label>
+                                    <div class="font-semibold" style="font-size: 1.25rem;">${totalReceipts}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Total Quantity Imported</label>
+                                    <div class="font-semibold" style="font-size: 1.25rem; color: var(--primary-700);">
+                                        <fmt:formatNumber value="${totalQuantity}" type="number" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Total Amount</label>
+                                    <div class="font-semibold" style="font-size: 1.25rem; color: var(--success-700);">
+                                        $<fmt:formatNumber value="${totalAmount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                    </div>
                                 </div>
                             </div>
                         </div>

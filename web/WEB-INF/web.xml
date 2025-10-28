@@ -76,6 +76,14 @@
         <servlet-name>DeleteCategoryServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.DeleteCategoryServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ActivityLogServlet</servlet-name>
+        <servlet-class>controller.ActivityLogServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProductVariantsServlet</servlet-name>
+        <servlet-class>controller.statisticsAndReporting.ProductVariantsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
         <url-pattern>/suppliers</url-pattern>
@@ -159,5 +167,13 @@
     <servlet-mapping>
         <servlet-name>DeleteCategoryServlet</servlet-name>
         <url-pattern>/warehouse-management/delete-category</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ActivityLogServlet</servlet-name>
+        <url-pattern>/activity-log</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductVariantsServlet</servlet-name>
+        <url-pattern>/api/product-variants</url-pattern>
     </servlet-mapping>
 </web-app>

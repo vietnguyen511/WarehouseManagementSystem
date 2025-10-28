@@ -4,6 +4,7 @@
  */
 package controller.warehouseManagement;
 
+import dal.ActivityLogHelper;
 import dal.CategoryDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -95,10 +96,14 @@ public class AddCategoryServlet extends HttpServlet {
         category.setStatus(status);
 
         CategoryDAO dao = new CategoryDAO();
-        boolean success = dao.insertCategory(category);
+        int categoryId = dao.insertCategoryReturnId(category);
 
         // check if success
-        if (success) {
+        if (categoryId > 0) {
+            // Log activity
+            ActivityLogHelper.logCreate(request.getSession(), "Categories", categoryId, 
+                "Created new category: " + name + " (" + code + ")");
+            
             response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?success=1");
         } else {
             request.setAttribute("errorMessage", "Failed to add category. Please try again.");

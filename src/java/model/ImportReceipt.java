@@ -14,6 +14,10 @@ public class ImportReceipt {
     private BigDecimal totalAmount;
     private String note;
     private List<ImportDetail> details = new ArrayList<>();
+    
+    // Additional fields for display
+    private String supplierName;
+    private String userName;
 
     public ImportReceipt() {
     }
@@ -92,6 +96,21 @@ public class ImportReceipt {
         this.details = details;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
     
 }
 
