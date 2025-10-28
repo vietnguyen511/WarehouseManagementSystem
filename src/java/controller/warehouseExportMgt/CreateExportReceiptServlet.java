@@ -48,10 +48,10 @@ public class CreateExportReceiptServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CreateImportReceiptServlet</title>");  
+            out.println("<title>Servlet CreateExportReceiptServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet CreateImportReceiptServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet CreateExportReceiptServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -70,8 +70,8 @@ public class CreateExportReceiptServlet extends HttpServlet {
     throws ServletException, IOException {
         // Load suppliers for dropdown
         CustomerDAO customerDAO = new CustomerDAO();
-        java.util.List<model.Customer> customers = customerDAO.getAllSuppliers();
-        request.setAttribute("suppliers", customers);
+        java.util.List<model.Customer> customers = customerDAO.getAllCustomers();
+        request.setAttribute("customers", customers);
         
         // Load categories for dropdown
         dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
@@ -90,7 +90,7 @@ public class CreateExportReceiptServlet extends HttpServlet {
                 session.removeAttribute("successMessage");
             }
         }
-        request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+        request.getRequestDispatcher("/warehouse-export-mgt/add-export-receipt.jsp").forward(request, response);
     } 
 
     /** 
@@ -107,7 +107,7 @@ public class CreateExportReceiptServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         // Quick debug: log start
-        System.out.println("=== CREATE IMPORT RECEIPT POST START ===");
+        System.out.println("=== CREATE EXPORT RECEIPT POST START ===");
 
         try {
             // Basic receipt info
@@ -199,7 +199,7 @@ public class CreateExportReceiptServlet extends HttpServlet {
 
             // Redirect back to form with success message
             HttpSession session = request.getSession(true);
-            session.setAttribute("successMessage", "Import receipt created successfully.");
+            session.setAttribute("successMessage", "Export receipt created successfully.");
             
             // Log activity
             CustomerDAO customerDAO = new CustomerDAO();

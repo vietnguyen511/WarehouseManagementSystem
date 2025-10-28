@@ -21,7 +21,7 @@ public class CustomerDAO extends DBContext {
         super(connection);
     }
 
-    public List<Customer> getAllSuppliers() {
+    public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
         String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers WHERE status = 1 ORDER BY name";
         try {
@@ -31,7 +31,7 @@ public class CustomerDAO extends DBContext {
                 list.add(mapRow(rs));
             }
         } catch (SQLException e) {
-            System.out.println("Error getAllSuppliers: " + e.getMessage());
+            System.out.println("Error getAllCustomers: " + e.getMessage());
         }
         return list;
     }
