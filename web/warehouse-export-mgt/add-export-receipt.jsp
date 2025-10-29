@@ -20,7 +20,7 @@
         /* Placeholder styles to match gray tone */
         .form-input::placeholder { color: var(--gray-400); font-style: normal; font-family: var(--font-sans); font-weight: 400; }
         .form-textarea::placeholder { color: var(--gray-400); font-style: normal; font-family: var(--font-sans); font-weight: 400; }
-        /* Ensure Note (textarea) and Import Date use the same font as text inputs */
+        /* Ensure Note (textarea) and Export Date use the same font as text inputs */
         .form-textarea,
         input[type="date"].form-input {
             font-family: var(--font-sans);
@@ -214,11 +214,11 @@
                 </div>
             </div>
 
-            <form class="card-body" method="post" action="${pageContext.request.contextPath}/createImportReceipt" id="importForm" novalidate>
+            <form class="card-body" method="post" action="${pageContext.request.contextPath}/createExportReceipt" id="exportForm" novalidate>
                 <div class="receipt-grid">
                     <div class="form-group">
-                        <label class="form-label" for="importDate">Export Date</label>
-                        <input type="date" id="importDate" name="importDate" class="form-input" required placeholder="yyyy-mm-dd" value="${today}">
+                        <label class="form-label" for="exportDate">Export Date</label>
+                        <input type="date" id="exportDate" name="exportDate" class="form-input" required placeholder="yyyy-mm-dd" value="${today}">
                     </div>
                     <div class="form-group">
                         <label class="form-label required" for="customerId">Customer</label>
@@ -239,7 +239,7 @@
                 <div id="productItemsSection">
                     <div style="margin-bottom: var(--spacing-md);">
                         <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600; color: var(--gray-900);">Product Items</h3>
-                        <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--gray-600);">Add products to this import receipt. All fields marked with * are required.</p>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: var(--gray-600);">Add products to this export receipt. All fields marked with * are required.</p>
                     </div>
                     
                     <div id="productItemsContainer">
@@ -310,7 +310,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Import Details Section -->
+                                <!-- Export Details Section -->
                                 <div class="product-section">
                                     <h4 class="product-section-title">Export Details</h4>
                                     <div class="product-section-grid product-section-grid-three">
@@ -372,12 +372,12 @@
             const container = document.getElementById('productItemsContainer');
             const grandTotalEl = document.getElementById('grandTotal');
             const totalAmountInput = document.getElementById('totalAmount');
-            const form = document.getElementById('importForm');
+            const form = document.getElementById('exportForm');
             
             function format(amount){ 
                 return (window.formatCurrency ? window.formatCurrency(amount) : new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(amount)); 
             }
-            // Default import date to today
+            // Default export date to today
             (function setToday(){
                 const d = new Date();
                 const yyyy = d.getFullYear();
@@ -556,7 +556,7 @@
                             '</div>' +
                         '</div>' +
                         '<div class="product-section">' +
-                            '<h4 class="product-section-title">Import Details</h4>' +
+                            '<h4 class="product-section-title">Export Details</h4>' +
                             '<div class="product-section-grid product-section-grid-three">' +
                                 '<div class="form-group">' +
                                     '<label class="form-label required">Quantity</label>' +
@@ -564,7 +564,7 @@
                                     '<div class="field-error-slot"></div>' +
                                 '</div>' +
                                 '<div class="form-group">' +
-                                    '<label class="form-label required">Import Price</label>' +
+                                    '<label class="form-label required">Export Price</label>' +
                                     '<input type="number" name="items[' + idx + '].price" class="form-input price" min="0" step="0.01" value="0" placeholder="0.00" required>' +
                                     '<div class="field-error-slot"></div>' +
                                 '</div>' +
@@ -698,12 +698,12 @@
             function validateForm(){
                 let valid = true;
                 // Header fields
-                const importDate = document.getElementById('importDate');
-                const supplier = document.getElementById('supplierId');
-                [importDate, supplier].forEach(clearError);
+                const exportDate = document.getElementById('exportDate');
+                const supplier = document.getElementById('customerId');
+                [exportDate, supplier].forEach(clearError);
 
-                if (!importDate.value) { setError(importDate, 'Import date is required'); valid = false; }
-                if (!supplier.value) { setError(supplier, 'Please select a supplier'); valid = false; }
+                if (!exportDate.value) { setError(exportDate, 'Export date is required'); valid = false; }
+                if (!supplier.value) { setError(supplier, 'Please select a customer'); valid = false; }
 
                 // Card validations
                 Array.from(container.querySelectorAll('.product-item-card')).forEach(function(card){

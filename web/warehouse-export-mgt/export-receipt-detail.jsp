@@ -273,7 +273,7 @@
                             </div>
                         </div>
 
-                        <!-- Import Details Table -->
+                        <!-- Export Details Table -->
                         <c:choose>
                             <c:when test="${not empty exportDetails}">
                                 <div class="table-wrapper">
@@ -395,7 +395,7 @@
                             </svg>
                             <h3>Export Receipt Not Found</h3>
                             <p>The requested export receipt could not be found.</p>
-                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/import-export-list" class="btn btn-secondary">
+                            <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-export-list" class="btn btn-secondary">
                                 Back to List
                             </a>
                         </div>

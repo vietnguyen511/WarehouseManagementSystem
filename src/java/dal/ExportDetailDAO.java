@@ -58,8 +58,8 @@ public class ExportDetailDAO extends DBContext {
             detail.setAmount(rs.getBigDecimal("amount"));
             detail.setProductCode(rs.getString("product_code"));
             detail.setProductName(rs.getString("product_name"));
-//            detail.setUnit(rs.getString("unit"));
-//            detail.setCategoryName(rs.getString("category_name"));
+            detail.setUnit(rs.getString("unit"));
+            detail.setCategoryName(rs.getString("category_name"));
             detail.setSize(rs.getString("size"));
             detail.setColor(rs.getString("color"));
             details.add(detail);

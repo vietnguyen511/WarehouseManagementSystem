@@ -67,7 +67,7 @@ public class ExportStatisticsServlet extends HttpServlet {
             // Get statistics
             ExportReceiptDAO dao = new ExportReceiptDAO();
             List<ExportStatDTO> allStatistics = dao.getExportStatistics(startDate, endDate, groupBy);
-            Object[] totalStats = dao.getTotalImportStatistics(startDate, endDate);
+            Object[] totalStats = dao.getTotalExportStatistics(startDate, endDate);
             
             // Pagination logic
             int totalRecords = allStatistics.size();

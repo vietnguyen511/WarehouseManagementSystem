@@ -6,7 +6,7 @@
 <c:set var="searchParam" value="${not empty searchTerm ? '&search=' : ''}${searchTerm}" />
 <c:set var="dateParam" value="${not empty dateFilter ? '&dateFilter=' : ''}${dateFilter}" />
 <c:set var="fullParams" value="${searchParam}${dateParam}" />
-<c:set var="activePage" value="import-receipts" scope="request" />
+<c:set var="activePage" value="export-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,13 +25,13 @@
         .app-footer { position: static; }
         
         /* Table styling */
-        .import-receipts-table {
+        .export-receipts-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: var(--spacing-md);
         }
         
-        .import-receipts-table th {
+        .export-receipts-table th {
             background-color: var(--gray-50);
             color: var(--gray-700);
             font-weight: 600;
@@ -41,32 +41,32 @@
             font-size: 0.875rem;
         }
         
-        .import-receipts-table td {
+        .export-receipts-table td {
             padding: var(--spacing-md);
             border-bottom: 1px solid var(--gray-200);
             vertical-align: middle;
         }
         
-        .import-receipts-table tbody tr:hover {
+        .export-receipts-table tbody tr:hover {
             background-color: var(--gray-50);
         }
         
-        .import-receipts-table tbody tr:nth-child(even) {
+        .export-receipts-table tbody tr:nth-child(even) {
             background-color: var(--gray-25);
         }
         
-        .import-receipts-table tbody tr:nth-child(even):hover {
+        .export-receipts-table tbody tr:nth-child(even):hover {
             background-color: var(--gray-100);
         }
         
         /* Column widths */
-        .import-receipts-table th:nth-child(1), .import-receipts-table td:nth-child(1) { width: 12%; } /* Mã phiếu */
-        .import-receipts-table th:nth-child(2), .import-receipts-table td:nth-child(2) { width: 15%; } /* Ngày nhập */
-        .import-receipts-table th:nth-child(3), .import-receipts-table td:nth-child(3) { width: 20%; } /* Nhà cung cấp */
-        .import-receipts-table th:nth-child(4), .import-receipts-table td:nth-child(4) { width: 12%; text-align: right; } /* Tổng số lượng */
-        .import-receipts-table th:nth-child(5), .import-receipts-table td:nth-child(5) { width: 18%; text-align: right; } /* Tổng giá trị */
-        .import-receipts-table th:nth-child(6), .import-receipts-table td:nth-child(6) { width: 15%; } /* Người nhập */
-        .import-receipts-table th:nth-child(7), .import-receipts-table td:nth-child(7) { width: 8%; text-align: center; } /* Actions */
+        .export-receipts-table th:nth-child(1), .export-receipts-table td:nth-child(1) { width: 12%; } /* Mã phiếu */
+        .export-receipts-table th:nth-child(2), .export-receipts-table td:nth-child(2) { width: 15%; } /* Ngày nhập */
+        .export-receipts-table th:nth-child(3), .export-receipts-table td:nth-child(3) { width: 20%; } /* Nhà cung cấp */
+        .export-receipts-table th:nth-child(4), .export-receipts-table td:nth-child(4) { width: 12%; text-align: right; } /* Tổng số lượng */
+        .export-receipts-table th:nth-child(5), .export-receipts-table td:nth-child(5) { width: 18%; text-align: right; } /* Tổng giá trị */
+        .export-receipts-table th:nth-child(6), .export-receipts-table td:nth-child(6) { width: 15%; } /* Người nhập */
+        .export-receipts-table th:nth-child(7), .export-receipts-table td:nth-child(7) { width: 8%; text-align: center; } /* Actions */
         
         /* Status badges */
         .status-badge {
@@ -236,12 +236,12 @@
         
         /* Responsive design */
         @media (max-width: 768px) {
-            .import-receipts-table {
+            .export-receipts-table {
                 font-size: 0.875rem;
             }
             
-            .import-receipts-table th,
-            .import-receipts-table td {
+            .export-receipts-table th,
+            .export-receipts-table td {
                 padding: var(--spacing-sm);
             }
             
@@ -284,11 +284,11 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <h1 class="card-title">Import Receipts</h1>
-                    <p class="card-subtitle">History of all import receipts</p>
+                    <h1 class="card-title">Export Receipts</h1>
+                    <p class="card-subtitle">History of all export receipts</p>
                 </div>
                         <div class="action-bar">
-                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics" class="btn" style="background-color: #f97316; color: white; border-color: #f97316;">
+                    <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-statistics" class="btn" style="background-color: #f97316; color: white; border-color: #f97316;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="20" x2="18" y2="10"></line>
                             <line x1="12" y1="20" x2="12" y2="4"></line>
@@ -296,7 +296,7 @@
                         </svg>
                         Statistics
                     </a>
-                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/add-import-receipt.jsp" class="btn btn-success">
+                    <a href="${pageContext.request.contextPath}/warehouse-export-mgt/add-export-receipt.jsp" class="btn btn-success">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -312,7 +312,7 @@
                     <div class="search-filter-bar">
                         <div class="search-input">
                             <input type="text" id="searchInput" name="search" class="form-input" 
-                                   placeholder="Search by receipt ID, supplier, or user..." 
+                                   placeholder="Search by receipt ID, customer, or user..." 
                                    value="${searchTerm}">
                         </div>
                         <div class="filter-select">
@@ -329,16 +329,16 @@
                     </div>
                 </form>
 
-                <!-- Import Receipts Table -->
+                <!-- Export Receipts Table -->
                 <c:choose>
-                    <c:when test="${not empty importReceipts}">
+                    <c:when test="${not empty exportReceipts}">
                         <div class="table-wrapper">
-                            <table class="import-receipts-table" id="importReceiptsTable">
+                            <table class="export-receipts-table" id="exportReceiptsTable">
                                 <thead>
                                     <tr>
                                         <th>Receipt ID</th>
-                                        <th>Import Date</th>
-                                        <th>Supplier</th>
+                                        <th>Export Date</th>
+                                        <th>Customer</th>
                                         <th>Quantity</th>
                                         <th>Total Amount</th>
                                         <th>Created By</th>
@@ -346,16 +346,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="receipt" items="${importReceipts}">
+                                    <c:forEach var="receipt" items="${exportReceipts}">
                                         <tr>
                                             <td>
-                                                <strong>#${receipt.importId}</strong>
+                                                <strong>#${receipt.exportId}</strong>
                                             </td>
                                             <td>
                                                 <fmt:formatDate value="${receipt.date}" pattern="dd/MM/yyyy HH:mm" />
                                             </td>
                                             <td>
-                                                <div class="font-medium">${receipt.supplierName}</div>
+                                                <div class="font-medium">${receipt.customerName}</div>
                                             </td>
                                             <td>
                                                 <span class="font-semibold">
@@ -372,7 +372,7 @@
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-detail?importId=${receipt.importId}" 
+                                                    <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-detail?exportId=${receipt.exportId}" 
                                                        class="btn-detail" title="View Details">
                                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

@@ -33,6 +33,18 @@
         <servlet-class>controller.warehouseImportMgt.ImportReceiptListServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CreateExportReceiptServlet</servlet-name>
+        <servlet-class>controller.warehouseExportMgt.CreateExportReceiptServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportReceiptListServlet</servlet-name>
+        <servlet-class>controller.warehouseExportMgt.ExportReceiptListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportReceiptDetailServlet</servlet-name>
+        <servlet-class>controller.warehouseExportMgt.ExportReceiptDetailServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ImportReceiptDetailServlet</servlet-name>
         <servlet-class>controller.warehouseImportMgt.ImportReceiptDetailServlet</servlet-class>
     </servlet>
@@ -143,6 +155,18 @@
     <servlet-mapping>
         <servlet-name>ImportReceiptDetailServlet</servlet-name>
         <url-pattern>/warehouse-import-mgt/import-receipt-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportReceiptListServlet</servlet-name>
+        <url-pattern>/warehouse-export-mgt/export-receipt-list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportReceiptDetailServlet</servlet-name>
+        <url-pattern>/warehouse-export-mgt/export-receipt-detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateExportReceiptServlet</servlet-name>
+        <url-pattern>/createExportReceipt</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CategoryManagementServlet</servlet-name>
