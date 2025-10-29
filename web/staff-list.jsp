@@ -149,7 +149,7 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                      <th>ID<th>
+                                      <th>ID</th>
                                       <th>Full Name </th>
                                       <th>Gender  </th>
                                       <th>Birthday </th>
