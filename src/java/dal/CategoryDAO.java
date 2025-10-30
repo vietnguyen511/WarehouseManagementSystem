@@ -214,7 +214,7 @@ public class CategoryDAO extends DBContext {
             st.setString(3, category.getDescription());
             st.setBoolean(4, category.isStatus());
             int result = st.executeUpdate();
-            
+
             if (result > 0) {
                 try (ResultSet rs = st.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -231,24 +231,32 @@ public class CategoryDAO extends DBContext {
     }
 
     public boolean deleteCategoryById(int categoryId) {
-        String sql = "DELETE FROM Categories WHERE category_id = ?";
-        PreparedStatement st = null;
-        try {
-            st = connection.prepareStatement(sql);
-            st.setInt(1, categoryId);
-            int rows = st.executeUpdate();
-            return rows > 0;
+        String checkSql = "SELECT COUNT(*) FROM Products WHERE category_id = ?";
+        String deleteSql = "DELETE FROM Categories WHERE category_id = ?";
+
+        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+
+            // Kiểm tra xem còn sản phẩm trong Category không
+            psCheck.setInt(1, categoryId);
+            try (ResultSet rs = psCheck.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Vẫn còn product trong category này -> KHÔNG xóa
+                    System.out.println("❌ Cannot delete: Category still has products.");
+                    return false;
+                }
+            }
+
+            // Không có sản phẩm -> cho phép xóa cứng
+            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+                psDelete.setInt(1, categoryId);
+                int rows = psDelete.executeUpdate();
+                return rows > 0; // true nếu xóa thành công
+            }
+
         } catch (SQLException e) {
             System.out.println("Error in deleteCategoryById: " + e.getMessage());
             e.printStackTrace();
             return false;
-        } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                    /* ignore */ }
-            }
         }
     }
 

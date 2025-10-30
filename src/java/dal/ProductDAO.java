@@ -338,4 +338,58 @@ public class ProductDAO extends DBContext {
         }
     }
 
+    public boolean deleteProductById(int productId) {
+        // SQL kiểm tra quan hệ phụ thuộc
+        String checkVariants = "SELECT COUNT(*) FROM ProductVariants WHERE product_id = ?";
+        String checkImports = "SELECT COUNT(*) FROM ImportDetails "
+                + "WHERE variant_id IN (SELECT variant_id FROM ProductVariants WHERE product_id = ?)";
+        String checkExports = "SELECT COUNT(*) FROM ExportDetails "
+                + "WHERE variant_id IN (SELECT variant_id FROM ProductVariants WHERE product_id = ?)";
+        String deleteSql = "DELETE FROM Products WHERE product_id = ?";
+
+        try (Connection conn = dal.DBContext.getConnection()) {
+
+            // Kiểm tra xem sản phẩm có variant không
+            try (PreparedStatement ps = conn.prepareStatement(checkVariants)) {
+                ps.setInt(1, productId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        System.out.println("❌ Cannot delete: product still has variants.");
+                        return false;
+                    }
+                }
+            }
+
+            // Kiểm tra xem variant có nằm trong phiếu nhập/xuất không
+            try (PreparedStatement ps1 = conn.prepareStatement(checkImports); PreparedStatement ps2 = conn.prepareStatement(checkExports)) {
+
+                ps1.setInt(1, productId);
+                ps2.setInt(1, productId);
+
+                try (ResultSet rs1 = ps1.executeQuery(); ResultSet rs2 = ps2.executeQuery()) {
+
+                    boolean hasImport = rs1.next() && rs1.getInt(1) > 0;
+                    boolean hasExport = rs2.next() && rs2.getInt(1) > 0;
+
+                    if (hasImport || hasExport) {
+                        System.out.println("❌ Cannot delete: product used in import/export details.");
+                        return false;
+                    }
+                }
+            }
+
+            // Nếu mọi thứ đều OK → xóa sản phẩm
+            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+                psDelete.setInt(1, productId);
+                int rows = psDelete.executeUpdate();
+                return rows > 0;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error in deleteProductById: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

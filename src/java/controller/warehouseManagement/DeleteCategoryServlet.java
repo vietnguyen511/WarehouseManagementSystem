@@ -71,11 +71,12 @@ public class DeleteCategoryServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String idRaw = request.getParameter("id");
         String redirectUrl = request.getContextPath() + "/warehouse-management/category-management";
 
         if (idRaw == null || idRaw.isEmpty()) {
-            response.sendRedirect(redirectUrl + "?deleted=0");
+            response.sendRedirect(redirectUrl + "?msg=invalid");
             return;
         }
 
@@ -83,13 +84,13 @@ public class DeleteCategoryServlet extends HttpServlet {
         try {
             categoryId = Integer.parseInt(idRaw.trim());
         } catch (NumberFormatException e) {
-            response.sendRedirect(redirectUrl + "?deleted=0");
+            response.sendRedirect(redirectUrl + "?msg=invalid");
             return;
         }
 
         CategoryDAO dao = new CategoryDAO();
-        
-        // Get category info before deleting for logging
+
+        // Lấy thông tin Category trước khi xóa để ghi log
         String categoryName = "category_" + categoryId;
         try {
             model.Category category = dao.getCategoryById(categoryId);
@@ -97,19 +98,19 @@ public class DeleteCategoryServlet extends HttpServlet {
                 categoryName = category.getName() + " (" + category.getCode() + ")";
             }
         } catch (Exception e) {
-            // Use default name if cannot fetch
+            // ignore
         }
-        
+
         boolean success = dao.deleteCategoryById(categoryId);
 
         if (success) {
-            // Log activity
-            ActivityLogHelper.logDelete(request.getSession(), "Categories", categoryId, 
-                "Deleted category: " + categoryName);
-            
-            response.sendRedirect(redirectUrl + "?deleted=1");
+            // Ghi log khi xóa thành công
+            ActivityLogHelper.logDelete(request.getSession(), "Categories", categoryId,
+                    "Deleted category: " + categoryName);
+            response.sendRedirect(redirectUrl + "?msg=deleted");
         } else {
-            response.sendRedirect(redirectUrl + "?deleted=0");
+            // Nếu không xóa được thì kiểm tra nguyên nhân (thường là do có Product)
+            response.sendRedirect(redirectUrl + "?msg=hasProducts");
         }
     }
 

@@ -100,6 +100,10 @@
         <servlet-name>AddProductServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.AddProductServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteProductServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.DeleteProductServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
         <url-pattern>/suppliers</url-pattern>
@@ -207,5 +211,9 @@
     <servlet-mapping>
         <servlet-name>AddProductServlet</servlet-name>
         <url-pattern>/warehouse-management/add-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteProductServlet</servlet-name>
+        <url-pattern>/warehouse-management/delete-product</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -307,6 +307,24 @@
                         </form>
                     </div>
                 </div>
+                            
+                <c:if test="${param.msg == 'deleted'}">
+                    <div class="alert alert-success">Product deleted successfully.</div>
+                </c:if>
+
+                <c:if test="${param.msg == 'hasRelations'}">
+                    <div class="alert alert-danger">
+                        Cannot delete this product because it has variants or related import/export records.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'invalid'}">
+                    <div class="alert alert-danger">Invalid product ID.</div>
+                </c:if>
+
+                <c:if test="${param.msg == 'error'}">
+                    <div class="alert alert-danger">An unexpected error occurred while deleting the product.</div>
+                </c:if>
 
                 <!-- ========== CARD BODY / TABLE ========== -->
                 <div class="card-body">
@@ -369,12 +387,12 @@
                                                 <button type="submit" class="btn-secondary">Edit</button>
                                             </form>
 
-                                            <form method="post"
-                                                  action="${pageContext.request.contextPath}/delete-product"
+                                            <form method="post" 
+                                                  action="${pageContext.request.contextPath}/warehouse-management/delete-product"
                                                   style="display:inline;"
                                                   onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                 <input type="hidden" name="id" value="${product.productId}">
-                                                <button type="submit" class="btn-danger">Delete</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td>
                                     </tr>

@@ -174,6 +174,30 @@
                     </div>
                 </div>
 
+                <c:if test="${param.msg == 'deleted'}">
+                    <div class="alert alert-success">
+                        Category deleted successfully.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'hasProducts'}">
+                    <div class="alert alert-danger">
+                        Cannot delete this category because there are still products assigned to it.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'invalid'}">
+                    <div class="alert alert-danger">
+                        Invalid category ID.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'error'}">
+                    <div class="alert alert-danger">
+                        An unexpected error occurred while deleting the category.
+                    </div>
+                </c:if>
+
                 <div class="card-body">
                     <div class="table-wrapper">
                         <table class="table">
@@ -222,7 +246,7 @@
                     <c:if test="${not empty successMessage}">
                         <div class="alert alert-success">${successMessage}</div>
                     </c:if>
-                        
+
                     <c:if test="${not empty errorMessage}">
                         <div class="alert alert-danger">${errorMessage}</div>
                     </c:if>
