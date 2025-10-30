@@ -225,7 +225,7 @@
                                         <td>${category.updatedAt}</td>
 
                                         <td style="text-align:center;">
-                                            <form method="get" action="${pageContext.request.contextPath}/editCategory" style="display:inline;">
+                                            <form method="get" action="${pageContext.request.contextPath}/warehouse-management/edit-category" style="display:inline;">
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
                                             </form>

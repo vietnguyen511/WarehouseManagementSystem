@@ -271,14 +271,40 @@
                                 Product created successfully.
                             </div>
                         </c:if>
-                        <c:if test="${param.msg == 'updated'}">
+                        <c:if test="${param.msg == 'delSuccess'}">
+                            <div class="alert alert-success" style="margin-top:0.75rem;">
+                                Product deleted successfully.
+                            </div>
+                        </c:if>
+                        <c:if test="${param.msg == 'delBlocked'}">
+                            <div class="alert alert-danger" style="margin-top:0.75rem;">
+                                Cannot delete this product because it has related data (variants / import / export).
+                            </div>
+                        </c:if>
+                        <c:if test="${param.msg == 'delInvalid'}">
+                            <div class="alert alert-danger" style="margin-top:0.75rem;">
+                                Invalid product ID.
+                            </div>
+                        </c:if>
+                        <c:if test="${param.msg == 'delError'}">
+                            <div class="alert alert-danger" style="margin-top:0.75rem;">
+                                An unexpected error occurred while deleting the product.
+                            </div>
+                        </c:if>
+                        <c:if test="${param.msg == 'editSuccess'}">
                             <div class="alert alert-success" style="margin-top:0.75rem;">
                                 Product updated successfully.
                             </div>
                         </c:if>
-                        <c:if test="${param.msg == 'deleted'}">
-                            <div class="alert alert-success" style="margin-top:0.75rem;">
-                                Product deleted successfully.
+
+                        <c:if test="${param.msg == 'editError'}">
+                            <div class="alert alert-danger" style="margin-top:0.75rem;">
+                                Failed to open Edit Product screen.
+                            </div>
+                        </c:if>
+                        <c:if test="${param.msg == 'editFail'}">
+                            <div class="alert alert-danger" style="margin-top:0.75rem;">
+                                Failed to update product. Please try again.
                             </div>
                         </c:if>
                     </div>
@@ -307,24 +333,6 @@
                         </form>
                     </div>
                 </div>
-                            
-                <c:if test="${param.msg == 'deleted'}">
-                    <div class="alert alert-success">Product deleted successfully.</div>
-                </c:if>
-
-                <c:if test="${param.msg == 'hasRelations'}">
-                    <div class="alert alert-danger">
-                        Cannot delete this product because it has variants or related import/export records.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'invalid'}">
-                    <div class="alert alert-danger">Invalid product ID.</div>
-                </c:if>
-
-                <c:if test="${param.msg == 'error'}">
-                    <div class="alert alert-danger">An unexpected error occurred while deleting the product.</div>
-                </c:if>
 
                 <!-- ========== CARD BODY / TABLE ========== -->
                 <div class="card-body">
@@ -374,14 +382,14 @@
 
                                         <td>
                                             <form method="get"
-                                                  action="${pageContext.request.contextPath}/view-product-details"
+                                                  action="${pageContext.request.contextPath}/warehouse-management/view-product-details"
                                                   style="display:inline;">
                                                 <input type="hidden" name="id" value="${product.productId}">
                                                 <button type="submit" class="btn-secondary">View</button>
                                             </form>
 
                                             <form method="get"
-                                                  action="${pageContext.request.contextPath}/edit-product"
+                                                  action="${pageContext.request.contextPath}/warehouse-management/edit-product"
                                                   style="display:inline;">
                                                 <input type="hidden" name="id" value="${product.productId}">
                                                 <button type="submit" class="btn-secondary">Edit</button>

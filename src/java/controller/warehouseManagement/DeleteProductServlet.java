@@ -49,7 +49,7 @@ public class DeleteProductServlet extends HttpServlet {
         String redirectUrl = request.getContextPath() + "/warehouse-management/product-management";
 
         if (idRaw == null || idRaw.trim().isEmpty()) {
-            response.sendRedirect(redirectUrl + "?msg=invalid");
+            response.sendRedirect(redirectUrl + "?msg=delInvalid");
             return;
         }
 
@@ -57,7 +57,7 @@ public class DeleteProductServlet extends HttpServlet {
         try {
             productId = Integer.parseInt(idRaw.trim());
         } catch (NumberFormatException e) {
-            response.sendRedirect(redirectUrl + "?msg=invalid");
+            response.sendRedirect(redirectUrl + "?msg=delInvalid");
             return;
         }
 
@@ -74,17 +74,30 @@ public class DeleteProductServlet extends HttpServlet {
             // ignore lỗi fetch
         }
 
-        boolean success = dao.deleteProductById(productId);
+        try {
+            // gọi DAO xóa
+            boolean success = dao.deleteProductById(productId);
 
-        if (success) {
-            // Ghi log khi xóa thành công
-            ActivityLogHelper.logDelete(request.getSession(),
-                    "Products", productId, "Deleted product: " + productName);
+            if (success) {
+                // ghi log khi xóa ok
+                ActivityLogHelper.logDelete(
+                        request.getSession(),
+                        "Products",
+                        productId,
+                        "Deleted product: " + productName
+                );
 
-            response.sendRedirect(redirectUrl + "?msg=deleted");
-        } else {
-            // Không xóa được vì có variant / import / export liên quan
-            response.sendRedirect(redirectUrl + "?msg=hasRelations");
+                // trả về msg=delSuccess
+                response.sendRedirect(redirectUrl + "?msg=delSuccess");
+            } else {
+                // DAO báo không xóa được do còn ràng buộc (variant / import / export)
+                response.sendRedirect(redirectUrl + "?msg=delBlocked");
+            }
+
+        } catch (Exception ex) {
+            // trường hợp lỗi SQL bất ngờ
+            ex.printStackTrace();
+            response.sendRedirect(redirectUrl + "?msg=delError");
         }
     }
 

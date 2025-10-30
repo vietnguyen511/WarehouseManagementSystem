@@ -188,8 +188,10 @@ public class ProductDAO extends DBContext {
     }
 
     public model.Product getProductById(int productId) {
-        String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, p.import_price, p.export_price, "
-                + "p.status, p.category_id, c.name AS category_name, p.created_at, p.updated_at "
+        String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, "
+                + "       p.import_price, p.export_price, p.status, p.category_id, "
+                + "       c.name AS category_name, p.description, p.image, "
+                + "       p.created_at, p.updated_at "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
                 + "WHERE p.product_id = ?";
@@ -210,6 +212,8 @@ public class ProductDAO extends DBContext {
                     int categoryId = rs.getInt("category_id");
                     product.setCategoryId(rs.wasNull() ? null : categoryId);
                     product.setCategoryName(rs.getString("category_name"));
+                    product.setDescription(rs.getString("description"));
+                    product.setImage(rs.getString("image"));
                     return product;
                 }
             }
@@ -263,7 +267,7 @@ public class ProductDAO extends DBContext {
         return list;
     }
 
-    public boolean insertProduct(Product product, String description, String image) {
+    public boolean insertProduct(Product product) {
         String sql = "INSERT INTO Products "
                 + " (code, name, category_id, material, unit, quantity, "
                 + "  import_price, export_price, description, image, status, "
@@ -272,58 +276,41 @@ public class ProductDAO extends DBContext {
 
         try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // 1. code
             ps.setString(1, product.getCode());
-
-            // 2. name
             ps.setString(2, product.getName());
-
-            // 3. category_id
             ps.setInt(3, product.getCategoryId());
-
-            // 4. material (nullable)
             if (product.getMaterial() == null || product.getMaterial().trim().isEmpty()) {
                 ps.setNull(4, Types.NVARCHAR);
             } else {
                 ps.setString(4, product.getMaterial().trim());
             }
-
-            // 5. unit (nullable)
             if (product.getUnit() == null || product.getUnit().trim().isEmpty()) {
                 ps.setNull(5, Types.NVARCHAR);
             } else {
                 ps.setString(5, product.getUnit().trim());
             }
-
-            // 6. quantity
             ps.setInt(6, product.getQuantity());
-
-            // 7. import_price (nullable)
             if (product.getImportPrice() == null) {
                 ps.setNull(7, Types.DECIMAL);
             } else {
                 ps.setBigDecimal(7, product.getImportPrice());
             }
-
-            // 8. export_price (nullable)
             if (product.getExportPrice() == null) {
                 ps.setNull(8, Types.DECIMAL);
             } else {
                 ps.setBigDecimal(8, product.getExportPrice());
             }
-
-            // 9. description (nullable)
-            if (description == null || description.trim().isEmpty()) {
+            if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
                 ps.setNull(9, Types.NVARCHAR);
             } else {
-                ps.setString(9, description.trim());
+                ps.setString(9, product.getDescription().trim());
             }
 
             // 10. image (nullable)
-            if (image == null || image.trim().isEmpty()) {
+            if (product.getImage() == null || product.getImage().trim().isEmpty()) {
                 ps.setNull(10, Types.NVARCHAR);
             } else {
-                ps.setString(10, image.trim());
+                ps.setString(10, product.getImage().trim());
             }
 
             // 11. status (bit)
@@ -354,7 +341,7 @@ public class ProductDAO extends DBContext {
                 ps.setInt(1, productId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
-                        System.out.println("❌ Cannot delete: product still has variants.");
+                        System.out.println("Cannot delete: product still has variants.");
                         return false;
                     }
                 }
@@ -372,7 +359,7 @@ public class ProductDAO extends DBContext {
                     boolean hasExport = rs2.next() && rs2.getInt(1) > 0;
 
                     if (hasImport || hasExport) {
-                        System.out.println("❌ Cannot delete: product used in import/export details.");
+                        System.out.println("Cannot delete: product used in import/export details.");
                         return false;
                     }
                 }
@@ -387,6 +374,37 @@ public class ProductDAO extends DBContext {
 
         } catch (SQLException e) {
             System.out.println("Error in deleteProductById: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateProduct(Product product) {
+        String sql = "UPDATE Products SET "
+                + "code = ?, name = ?, category_id = ?, material = ?, unit = ?, "
+                + "import_price = ?, export_price = ?, description = ?, image = ?, status = ?, "
+                + "updated_at = GETDATE() "
+                + "WHERE product_id = ?";
+
+        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, product.getCode());
+            ps.setString(2, product.getName());
+            ps.setInt(3, product.getCategoryId());
+            ps.setString(4, product.getMaterial());
+            ps.setString(5, product.getUnit());
+            ps.setBigDecimal(6, product.getImportPrice());
+            ps.setBigDecimal(7, product.getExportPrice());
+            ps.setString(8, product.getDescription());
+            ps.setString(9, product.getImage());
+            ps.setBoolean(10, product.isStatus());
+            ps.setInt(11, product.getProductId());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error in updateProduct: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

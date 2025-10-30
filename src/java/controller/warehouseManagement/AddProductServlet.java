@@ -151,7 +151,7 @@ public class AddProductServlet extends HttpServlet {
             p.setExportPrice(exportPrice);
             p.setStatus(status);
 
-            boolean ok = productDAO.insertProduct(p, description, image);
+            boolean ok = productDAO.insertProduct(p);
 
             if (ok) {
                 response.sendRedirect(

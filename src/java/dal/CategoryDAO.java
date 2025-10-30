@@ -241,7 +241,7 @@ public class CategoryDAO extends DBContext {
             try (ResultSet rs = psCheck.executeQuery()) {
                 if (rs.next() && rs.getInt(1) > 0) {
                     // Vẫn còn product trong category này -> KHÔNG xóa
-                    System.out.println("❌ Cannot delete: Category still has products.");
+                    System.out.println("Cannot delete: Category still has products.");
                     return false;
                 }
             }
@@ -255,6 +255,28 @@ public class CategoryDAO extends DBContext {
 
         } catch (SQLException e) {
             System.out.println("Error in deleteCategoryById: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateCategory(model.Category category) {
+        String sql = "UPDATE Categories "
+                + "SET code = ?, name = ?, description = ?, status = ?, updated_at = GETDATE() "
+                + "WHERE category_id = ?";
+
+        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, category.getCode().trim());
+            ps.setString(2, category.getName().trim());
+            ps.setString(3, category.getDescription());
+            ps.setBoolean(4, category.isStatus());
+            ps.setInt(5, category.getCategoryId());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error in updateCategory: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
