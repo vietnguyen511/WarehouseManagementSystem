@@ -112,26 +112,48 @@
                     <li><a href="${pageContext.request.contextPath}/suppliers/new" class="sidebar-sublink ${(activePage == 'add-supplier') ? 'active' : ''}">Add Supplier</a></li>
                 </ul>
             </li>           
-            <% 
+            <%
                }
               if("staff".equals(role))
               {
             %>
-            <!-- Warehouse Operations -->
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'import-receipts' || activePage == 'export-receipts'  ? 'active' : ''}">
+            <!-- Manage Import Receipt -->
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'import-receipt-list' || activePage == 'add-import-receipt' || activePage == 'import-receipt-detail' || activePage == 'import-statistics' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    <span class="sidebar-text">Warehouse</span>
+                    <span class="sidebar-text">Manage Import Receipt</span>
                     <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="sidebar-sublink ${activePage == 'import-receipts' ? 'active' : ''}">Import Receipts</a></li>
-                    <li><a href="${pageContext.request.contextPath}/export" class="sidebar-sublink ${activePage == 'export-receipts' ? 'active' : ''}">Export Receipts</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="sidebar-sublink ${activePage == 'import-receipt-list' ? 'active' : ''}">Import Receipt List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/createImportReceipt" class="sidebar-sublink ${activePage == 'add-import-receipt' ? 'active' : ''}">Add Import Receipt</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics" class="sidebar-sublink ${activePage == 'import-statistics' ? 'active' : ''}">Import Statistics</a></li>
+                </ul>
+            </li>
+
+            <!-- Manage Export Receipt -->
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'export-receipt-list' || activePage == 'add-export-receipt' || activePage == 'export-receipt-detail' || activePage == 'export-statistics' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span class="sidebar-text">Manage Export Receipt</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="sidebar-sublink ${activePage == 'export-receipt-list' ? 'active' : ''}">Export Receipt List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/createExportReceipt" class="sidebar-sublink ${activePage == 'add-export-receipt' ? 'active' : ''}">Add Export Receipt</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-statistics" class="sidebar-sublink ${activePage == 'export-statistics' ? 'active' : ''}">Export Statistics</a></li>
                 </ul>
             </li>
             <%

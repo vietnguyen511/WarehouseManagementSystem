@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <title>Manager Dashboard</title>
+    <title>Staff Dashboard</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
 </head>
 <body>
@@ -15,13 +15,14 @@
         <main class="main-content-with-sidebar">
             <div class="card">
                 <div class="card-header">
-                    <span class="card-title">Welcome Manager!</span>
+                    <span class="card-title">Welcome Staff!</span>
                 </div>
                 <div class="card-body">
-                    This is the Manager Dashboard. Select a report or function from the sidebar to begin.
+                    This is the Staff Dashboard. Select an operation from the sidebar to begin managing warehouse receipts.
                 </div>
             </div>
         </main>
     </div>
+    <script src="${pageContext.request.contextPath}/js/warehouse-app.js"></script>
 </body>
 </html>
