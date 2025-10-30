@@ -57,7 +57,7 @@ public class CreateSupplierServlet extends HttpServlet {
             request.setAttribute("error", "Error creating supplier: " + e.getMessage());
         }
         request.setAttribute("supplier", s);
-        request.setAttribute("activePage", "suppliers");
+        request.setAttribute("activePage", "add-supplier");
         request.setAttribute("mode", "create");
         request.getRequestDispatcher("/supplier-mgt/supplier-form.jsp").forward(request, response);
     }

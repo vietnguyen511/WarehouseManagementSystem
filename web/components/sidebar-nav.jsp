@@ -12,7 +12,7 @@
         <ul class="sidebar-menu">
             <!-- Dashboard -->
             <li class="sidebar-item">
-                <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/adminDashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -34,41 +34,75 @@
              if("admin".equals(role))
               {
            %>  
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'Userlist' || activePage == 'AddUser' || activePage == 'suppliers' || activePage == 'customers' ? 'active' : ''}">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'users' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    <span class="sidebar-text">User management</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <span class="sidebar-text">User</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/staff-list"   class="sidebar-sublink ${activePage == 'Userlist'? 'active' : ''}">User list</a></li>
-                    <li><a href="${pageContext.request.contextPath}/register"     class="sidebar-sublink ${activePage == 'AddUser' ? 'active' : ''}">Add user</a></li>
-                    <li><a href="${pageContext.request.contextPath}/suppliers"    class="sidebar-sublink ${activePage == 'suppliers' ? 'active' : ''}">Suppliers</a></li>
-                    <li><a href="${pageContext.request.contextPath}/customers"    class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
-                </ul>
-            </li>           
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' ? 'active' : ''}">
-                <a href="#" class="sidebar-link sidebar-toggle">
-                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    </svg>
-                    <span class="sidebar-text">Products and Categories</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </a>
-                <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Product Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-product" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Product</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Category Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Category</a></li>
+                    <li><a href="${pageContext.request.contextPath}/staff-list" class="sidebar-sublink">User list</a></li>
+                    <li><a href="${pageContext.request.contextPath}/register" class="sidebar-sublink">Add User</a></li>
                 </ul>
             </li>
-            <%
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'products' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span class="sidebar-text">Product</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink">Product List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-product" class="sidebar-sublink">Add Product</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'customers' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="10" r="3"></circle>
+                        <path d="M6 18c0-2 4-3 6-3s6 1 6 3"></path>
+                    </svg>
+                    <span class="sidebar-text">Customer</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/customers" class="sidebar-sublink">Customer List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/customer-add" class="sidebar-sublink">Add Customer</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'categories' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+                    <span class="sidebar-text">Category</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink">Category List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink">Add Category</a></li>
+                </ul>
+            </li>
+            <li class="sidebar-item sidebar-dropdown ${(activePage == 'suppliers' || activePage == 'add-supplier') ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/suppliers" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+                        <path d="M16 3v4"></path>
+                        <path d="M8 3v4"></path>
+                    </svg>
+                    <span class="sidebar-text">Supplier</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/suppliers" class="sidebar-sublink ${(activePage == 'suppliers') ? 'active' : ''}">Supplier List</a></li>
+                    <li><a href="${pageContext.request.contextPath}/suppliers/new" class="sidebar-sublink ${(activePage == 'add-supplier') ? 'active' : ''}">Add Supplier</a></li>
+                </ul>
+            </li>           
+            <% 
                }
               if("staff".equals(role))
               {

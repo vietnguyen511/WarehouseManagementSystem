@@ -45,7 +45,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 // Redirect based on role
                 if (role.equals("admin")) 
                 {
-                    response.sendRedirect("admin.jsp");
+                    response.sendRedirect("adminDashboard");
                 } 
                 else if (role.equals("staff")) 
                 {
