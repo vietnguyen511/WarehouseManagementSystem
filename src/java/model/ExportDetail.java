@@ -9,7 +9,8 @@ public class ExportDetail {
     private int quantity;
     private BigDecimal price;
     private BigDecimal amount;
-    
+    private String unit;
+    private String categoryName;
     // For displaying product info
     private String productCode;
     private String productName;
@@ -110,6 +111,23 @@ public class ExportDetail {
         this.color = color;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    
     @Override
     public String toString() {
         return "ExportDetail{" +

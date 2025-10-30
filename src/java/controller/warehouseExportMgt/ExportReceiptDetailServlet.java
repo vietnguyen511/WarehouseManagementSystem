@@ -20,7 +20,7 @@ public class ExportReceiptDetailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            String exportIdParam = request.getParameter("importId");
+            String exportIdParam = request.getParameter("exportId");
             
             if (exportIdParam == null || exportIdParam.trim().isEmpty()) {
                 request.setAttribute("error", "Export receipt ID is required");
@@ -40,16 +40,16 @@ public class ExportReceiptDetailServlet extends HttpServlet {
             ExportReceiptDAO exportReceiptDAO = new ExportReceiptDAO();
             ExportDetailDAO exportDetailDAO = new ExportDetailDAO();
             
-            // Get import receipt information
+            // Get export receipt information
             ExportReceipt exportReceipt = exportReceiptDAO.getExportReceiptById(exportId);
             
             if (exportReceipt == null) {
-                request.setAttribute("error", "Import receipt not found");
-                request.getRequestDispatcher("/warehouse-import-mgt/import-receipt-detail.jsp").forward(request, response);
+                request.setAttribute("error", "Export receipt not found");
+                request.getRequestDispatcher("/warehouse-export-mgt/export-receipt-detail.jsp").forward(request, response);
                 return;
             }
             
-            // Get import details
+            // Get export details
             List<ExportDetail> exportDetails = exportDetailDAO.getExportDetailsByExportId(exportId);
             
             request.setAttribute("exportReceipt", exportReceipt);

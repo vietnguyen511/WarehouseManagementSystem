@@ -1,14 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="activePage" value="import-receipts" scope="request" />
+<c:set var="activePage" value="export-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Import Statistics - Warehouse Management System</title>
+    <title>Export Statistics - Warehouse Management System</title>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
     <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
@@ -196,15 +196,15 @@
 
                 <!-- Chart -->
                 <div class="chart-container">
-                    <div class="chart-title">Import Amount Trend</div>
+                    <div class="chart-title">Export Amount Trend</div>
                     <div class="chart-wrapper">
-                        <canvas id="importChart"></canvas>
+                        <canvas id="exportChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Data Table -->
                 <div class="chart-container">
-                    <div class="chart-title">Import Statistics Details</div>
+                    <div class="chart-title">Export Statistics Details</div>
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -237,7 +237,7 @@
                                 <c:otherwise>
                                     <tr>
                                         <td colspan="4" style="text-align: center; padding: 2rem; color: var(--gray-500);">
-                                            No import statistics found for the selected period.
+                                            No export statistics found for the selected period.
                                         </td>
                                     </tr>
                                 </c:otherwise>
@@ -323,7 +323,7 @@
 
     <script>
         // Chart.js configuration
-        const ctx = document.getElementById('importChart');
+        const ctx = document.getElementById('exportChart');
         const statistics = [
             <c:forEach var="stat" items="${allStatistics}" varStatus="loop">
             {
@@ -361,7 +361,7 @@
             data: {
                 labels: formattedPeriods,
                 datasets: [{
-                    label: 'Import Amount ($)',
+                    label: 'Export Amount ($)',
                     data: amounts,
                     backgroundColor: 'rgba(34, 197, 94, 0.7)',
                     borderColor: 'rgba(34, 197, 94, 1)',

@@ -266,9 +266,9 @@ public class ExportReceiptDAO extends DBContext {
                     "er.total_quantity, er.total_amount, er.note, " +
                     "c.name as customer_name, u.fullname as user_name " +
                     "FROM ExportReceipts er " +
-                    "INNER JOIN Customers s ON er.customer_id = c.customer_id " +
+                    "INNER JOIN Customers c ON er.customer_id = c.customer_id " +
                     "INNER JOIN Users u ON er.user_id = u.user_id " +
-                    "WHERE er.export_ed = ?";
+                    "WHERE er.export_id = ?";
         
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, exportId);
@@ -346,7 +346,7 @@ public class ExportReceiptDAO extends DBContext {
      * Get total import statistics (aggregated)
      * Returns an array: [totalReceipts, totalQuantity, totalAmount, avgAmount]
      */
-    public Object[] getTotalImportStatistics(java.util.Date startDate, java.util.Date endDate) throws SQLException {
+    public Object[] getTotalExportStatistics(java.util.Date startDate, java.util.Date endDate) throws SQLException {
         String sql = "SELECT " +
                     "COUNT(DISTINCT er.export_id) AS total_receipts, " +
                     "ISNULL(SUM(ed.quantity), 0) AS total_quantity, " +
