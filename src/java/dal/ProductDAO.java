@@ -253,4 +253,15 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
+
+    /**
+     * Cập nhật quantity của sản phẩm = tổng quantity tất cả biến thể theo product_id
+     */
+    public void updateQuantityAsSumOfVariants(int productId) throws SQLException {
+        String sql = "UPDATE Products SET quantity = (SELECT ISNULL(SUM(quantity),0) FROM ProductVariants WHERE product_id = ?) WHERE product_id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, productId);
+        st.setInt(2, productId);
+        st.executeUpdate();
+    }
 }
