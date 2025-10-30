@@ -71,8 +71,8 @@
             width: 100%;
         }
         
-        /* Add extra padding for Supplier field */
-        #supplierId {
+        /* Add extra padding for Customer field */
+        #customerId {
             padding: 0.575rem 1rem;
         }
         
@@ -224,8 +224,8 @@
                         <label class="form-label required" for="customerId">Customer</label>
                         <select id="customerId" name="customerId" class="form-select" required>
                             <option value="" disabled selected hidden>Select a customer...</option>
-                            <c:forEach var="s" items="${customers}">
-                                <option value="${s.customerId}">${s.name}</option>
+                            <c:forEach var="c" items="${customers}">
+                                <option value="${c.customerId}">${c.name}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -699,11 +699,11 @@
                 let valid = true;
                 // Header fields
                 const exportDate = document.getElementById('exportDate');
-                const supplier = document.getElementById('customerId');
-                [exportDate, supplier].forEach(clearError);
+                const customer = document.getElementById('customerId');
+                [exportDate, customer].forEach(clearError);
 
                 if (!exportDate.value) { setError(exportDate, 'Export date is required'); valid = false; }
-                if (!supplier.value) { setError(supplier, 'Please select a customer'); valid = false; }
+                if (!customer.value) { setError(customer, 'Please select a customer'); valid = false; }
 
                 // Card validations
                 Array.from(container.querySelectorAll('.product-item-card')).forEach(function(card){

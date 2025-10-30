@@ -68,7 +68,7 @@ public class CreateExportReceiptServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        // Load suppliers for dropdown
+        // Load customer for dropdown
         CustomerDAO customerDAO = new CustomerDAO();
         java.util.List<model.Customer> customers = customerDAO.getAllCustomers();
         request.setAttribute("customers", customers);
@@ -123,14 +123,14 @@ public class CreateExportReceiptServlet extends HttpServlet {
 
             // Build receipt model
             ExportReceipt receipt = new ExportReceipt();
-            receipt.getCustomerId();
+            receipt.setCustomerId(customerId);
             // Temporary: no login yet – hardcode staff user id = 3 (Mike Johnson)
             receipt.setUserId(3);
             receipt.setDate(exportDate);
             receipt.setTotalAmount(totalAmount);
             receipt.setNote(note);
             
-            System.out.println("Receipt created: " + receipt.getCustomerId()+ " " + receipt.getDate() + " " + receipt.getTotalAmount());
+            System.out.println("Receipt created: " + receipt.getCustomerId() + " " + receipt.getDate() + " " + receipt.getTotalAmount());
 
             // Parse item rows by scanning sequential indices until none found
             List<ExportDetail> details = new ArrayList<>();
@@ -139,8 +139,8 @@ public class CreateExportReceiptServlet extends HttpServlet {
                 String code = request.getParameter("items[" + index + "].productCode");
                 String name = request.getParameter("items[" + index + "].productName");
                 String categoryIdStr = request.getParameter("items[" + index + "].categoryId");
-                //String material = request.getParameter("items[" + index + "].material");
-                //String unit = request.getParameter("items[" + index + "].unit");
+                
+                String unit = request.getParameter("items[" + index + "].unit");
                 String size = request.getParameter("items[" + index + "].size");
                 String color = request.getParameter("items[" + index + "].color");
                 String qtyStr = request.getParameter("items[" + index + "].quantity");
@@ -155,19 +155,19 @@ public class CreateExportReceiptServlet extends HttpServlet {
                 ExportDetail d = new ExportDetail();
                 d.setProductCode(code.trim());
                 d.setProductName(name != null ? name.trim() : null);
-                //d.setMaterial(material != null ? material.trim() : "");
-                //d.setUnit(unit != null ? unit.trim() : "");
+                
+                d.setUnit(unit != null ? unit.trim() : "");
                 d.setSize(size != null ? size.trim() : "");
                 d.setColor(color != null ? color.trim() : "");
                 
-//                // Parse category ID if provided
-//                if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
-//                    try {
-//                        d.setCategoryId(Integer.parseInt(categoryIdStr.trim()));
-//                    } catch (NumberFormatException e) {
-//                        // Ignore invalid category ID
-//                    }
-//                }
+                // Parse category ID if provided
+                if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
+                    try {
+                        d.setCategoryId(Integer.parseInt(categoryIdStr.trim()));
+                    } catch (NumberFormatException e) {
+                        // Ignore invalid category ID
+                    }
+                }
                 
                 d.setQuantity(Integer.parseInt(qtyStr));
                 BigDecimal price = new BigDecimal(priceStr);
@@ -186,14 +186,9 @@ public class CreateExportReceiptServlet extends HttpServlet {
             ExportReceiptDAO dao = new ExportReceiptDAO();
             System.out.println("About to create receipt with details...");
             
-            // Create the receipt and get its ID
-            int exportId = dao.createExportReceipt(receipt);
-            if (exportId > 0) {
-                receipt.setExportId(exportId);
-                
-                // Create details using the original method
-                dao.createReceiptWithDetails(receipt);
-            }
+            // Create the receipt with details in a single transactional method
+            int exportId = dao.createReceiptWithDetails(receipt);
+            receipt.setExportId(exportId);
             
             System.out.println("Receipt created successfully with ID: " + exportId);
 

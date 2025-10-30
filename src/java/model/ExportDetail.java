@@ -11,6 +11,7 @@ public class ExportDetail {
     private BigDecimal amount;
     private String unit;
     private String categoryName;
+    private Integer categoryId;
     // For displaying product info
     private String productCode;
     private String productName;
@@ -127,6 +128,13 @@ public class ExportDetail {
         this.unit = unit;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
     
     @Override
     public String toString() {

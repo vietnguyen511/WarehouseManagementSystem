@@ -23,7 +23,7 @@ public class CustomerDAO extends DBContext {
 
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers WHERE status = 1 ORDER BY name";
+        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers ORDER BY name";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
@@ -144,10 +144,7 @@ public class CustomerDAO extends DBContext {
         return c;
     }
 
-    /**
-     * Get import statistics for a supplier
-     * Returns an array: [totalReceipts, totalQuantity, totalAmount]
-     */
+    
     public Object[] getExportStatistics(int customerId) throws SQLException {
         String sql = "SELECT " +
                     "ISNULL(COUNT(*), 0) AS total_receipts, " +
