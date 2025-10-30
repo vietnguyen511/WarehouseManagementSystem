@@ -10,9 +10,25 @@
 <aside class="sidebar-nav">
     <nav class="sidebar-nav-content">
         <ul class="sidebar-menu">
+            <%
+              if(session==null)
+              {
+                    response.sendRedirect("index.html");
+                    return;
+              }
+             String role = (String) session.getAttribute("role");
+            %>
             <!-- Dashboard -->
             <li class="sidebar-item">
-                <a href="${pageContext.request.contextPath}/adminDashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/<%
+                    if("admin".equals(role)) {
+                        out.print("adminDashboard");
+                    } else if("manager".equals(role)) {
+                        out.print("managerDashboard");
+                    } else if("staff".equals(role)) {
+                        out.print("staffDashboard");
+                    }
+                %>" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="7"></rect>
                         <rect x="14" y="3" width="7" height="7"></rect>
@@ -25,12 +41,6 @@
 
             <!-- Products & Categories -->
             <%
-              if(session==null) 
-              {
-                    response.sendRedirect("index.html");
-                    return;
-              }
-             String role = (String) session.getAttribute("role");
              if("admin".equals(role))
               {
            %>  
@@ -129,26 +139,65 @@
              if("manager".equals(role))
               {
             %>
-            <!-- Statistics & Reports -->
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' || activePage == 'activity-log' ? 'active' : ''}">
-                <a href="#" class="sidebar-link sidebar-toggle">
+            <!-- Current Inventory -->
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-link ${activePage == 'current-inventory' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <span class="sidebar-text">Current Inventory</span>
+                </a>
+            </li>
+
+            <!-- Import/Export Stats -->
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-link ${activePage == 'import-export-stats' ? 'active' : ''}">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
                         <line x1="18" y1="20" x2="18" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="16"></line>
                     </svg>
-                    <span class="sidebar-text">Reports</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <span class="sidebar-text">Import/Export Stats</span>
                 </a>
-                <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink ${activePage == 'current-inventory' ? 'active' : ''}">Current Inventory</a></li>
-                    <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink ${activePage == 'import-export-stats' ? 'active' : ''}">Import/Export Stats</a></li>
-                    <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink ${activePage == 'revenue-report' ? 'active' : ''}">Revenue Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/export-report" class="sidebar-sublink ${activePage == 'export-report' ? 'active' : ''}">Export Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/activity-log" class="sidebar-sublink ${activePage == 'activity-log' ? 'active' : ''}">Activity Logs</a></li>
-                </ul>
+            </li>
+
+            <!-- Revenue Report -->
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-link ${activePage == 'revenue-report' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span class="sidebar-text">Revenue Report</span>
+                </a>
+            </li>
+
+            <!-- Export Report -->
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/export-report" class="sidebar-link ${activePage == 'export-report' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span class="sidebar-text">Export Report</span>
+                </a>
+            </li>
+
+            <!-- Activity Logs -->
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/activity-log" class="sidebar-link ${activePage == 'activity-log' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span class="sidebar-text">Activity Logs</span>
+                </a>
             </li>
             <%
               }

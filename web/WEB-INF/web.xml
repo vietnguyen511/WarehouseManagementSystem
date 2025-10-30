@@ -100,6 +100,10 @@
         <servlet-name>AdminDashboardServlet</servlet-name>
         <servlet-class>controller.dashboard.AdminDashboardServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerDashboardServlet</servlet-name>
+        <servlet-class>controller.dashboard.ManagerDashboardServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
         <url-pattern>/suppliers</url-pattern>
@@ -207,5 +211,9 @@
     <servlet-mapping>
         <servlet-name>AdminDashboardServlet</servlet-name>
         <url-pattern>/adminDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerDashboardServlet</servlet-name>
+        <url-pattern>/managerDashboard</url-pattern>
     </servlet-mapping>
 </web-app>

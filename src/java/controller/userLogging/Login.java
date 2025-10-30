@@ -51,7 +51,7 @@ public class Login extends HttpServlet
                 } 
                 else if (role.equals("manager")) 
                 {
-                    response.sendRedirect("manager.jsp");
+                    response.sendRedirect("managerDashboard");
                 } 
             } else {
                 response.getWriter().println("Login failed: Account not found or wrong password.");
