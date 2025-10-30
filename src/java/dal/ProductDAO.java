@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Types;
+import model.Product;
 
 public class ProductDAO extends DBContext {
 
@@ -142,7 +144,7 @@ public class ProductDAO extends DBContext {
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
                 + "WHERE p.status = 1 "
-                + "ORDER BY p.name ASC";
+                + "ORDER BY p.product_id ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
@@ -220,15 +222,19 @@ public class ProductDAO extends DBContext {
 
     public List<model.Product> getProductByName(String name) {
         List<model.Product> list = new ArrayList<>();
-        String sql = "SELECT p.product_id, p.code, p.name, p.unit, p.quantity, "
-                + "p.import_price, p.export_price, p.status, p.category_id, c.name AS category_name "
+        String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, "
+                + "p.import_price, p.export_price, p.status, p.category_id, "
+                + "c.name AS category_name "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
-                + "WHERE p.name LIKE ? "
+                + "WHERE p.name LIKE ? OR p.code LIKE ? "
                 + "ORDER BY p.name ASC";
 
         try (PreparedStatement st = connection.prepareStatement(sql)) {
-            st.setString(1, "%" + name + "%"); // tìm các sản phẩm có tên chứa từ khóa
+            String keyword = "%" + name + "%";
+            st.setString(1, keyword);
+            st.setString(2, keyword);
+
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
                     model.Product product = new model.Product();
@@ -241,9 +247,11 @@ public class ProductDAO extends DBContext {
                     product.setImportPrice(rs.getBigDecimal("import_price"));
                     product.setExportPrice(rs.getBigDecimal("export_price"));
                     product.setStatus(rs.getBoolean("status"));
+
                     int categoryId = rs.getInt("category_id");
                     product.setCategoryId(rs.wasNull() ? null : categoryId);
                     product.setCategoryName(rs.getString("category_name"));
+
                     list.add(product);
                 }
             }
@@ -251,6 +259,83 @@ public class ProductDAO extends DBContext {
             System.out.println("Error in getProductByName: " + e.getMessage());
             e.printStackTrace();
         }
+
         return list;
     }
+
+    public boolean insertProduct(Product product, String description, String image) {
+        String sql = "INSERT INTO Products "
+                + " (code, name, category_id, material, unit, quantity, "
+                + "  import_price, export_price, description, image, status, "
+                + "  created_at, updated_at) "
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+
+        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // 1. code
+            ps.setString(1, product.getCode());
+
+            // 2. name
+            ps.setString(2, product.getName());
+
+            // 3. category_id
+            ps.setInt(3, product.getCategoryId());
+
+            // 4. material (nullable)
+            if (product.getMaterial() == null || product.getMaterial().trim().isEmpty()) {
+                ps.setNull(4, Types.NVARCHAR);
+            } else {
+                ps.setString(4, product.getMaterial().trim());
+            }
+
+            // 5. unit (nullable)
+            if (product.getUnit() == null || product.getUnit().trim().isEmpty()) {
+                ps.setNull(5, Types.NVARCHAR);
+            } else {
+                ps.setString(5, product.getUnit().trim());
+            }
+
+            // 6. quantity
+            ps.setInt(6, product.getQuantity());
+
+            // 7. import_price (nullable)
+            if (product.getImportPrice() == null) {
+                ps.setNull(7, Types.DECIMAL);
+            } else {
+                ps.setBigDecimal(7, product.getImportPrice());
+            }
+
+            // 8. export_price (nullable)
+            if (product.getExportPrice() == null) {
+                ps.setNull(8, Types.DECIMAL);
+            } else {
+                ps.setBigDecimal(8, product.getExportPrice());
+            }
+
+            // 9. description (nullable)
+            if (description == null || description.trim().isEmpty()) {
+                ps.setNull(9, Types.NVARCHAR);
+            } else {
+                ps.setString(9, description.trim());
+            }
+
+            // 10. image (nullable)
+            if (image == null || image.trim().isEmpty()) {
+                ps.setNull(10, Types.NVARCHAR);
+            } else {
+                ps.setString(10, image.trim());
+            }
+
+            // 11. status (bit)
+            ps.setBoolean(11, product.isStatus());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            System.out.println("Error in insertProduct: " + e.getMessage());
+            return false;
+        }
+    }
+
 }
