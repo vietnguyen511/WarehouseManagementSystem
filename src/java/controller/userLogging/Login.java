@@ -10,6 +10,11 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(name ="Login",urlPatterns = {"/login"})
 public class Login extends HttpServlet 
 {
+   protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException 
+    {
+                    response.sendRedirect("index.html");             
+    } 
    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException 
     {
@@ -38,7 +43,7 @@ public class Login extends HttpServlet
                 // Redirect based on role
                 if (role.equals("admin")) 
                 {
-                    response.sendRedirect("admin.jsp");
+                    response.sendRedirect("adminDashboard");
                 } 
                 else if (role.equals("staff")) 
                 {
@@ -46,7 +51,7 @@ public class Login extends HttpServlet
                 } 
                 else if (role.equals("manager")) 
                 {
-                    response.sendRedirect("manager.jsp");
+                    response.sendRedirect("managerDashboard");
                 } 
             } else {
                 response.getWriter().println("Login failed: Account not found or wrong password.");

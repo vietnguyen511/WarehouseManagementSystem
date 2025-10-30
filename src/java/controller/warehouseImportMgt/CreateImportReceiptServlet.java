@@ -90,6 +90,10 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 session.removeAttribute("successMessage");
             }
         }
+
+        // Set active page for sidebar navigation
+        request.setAttribute("activePage", "add-import-receipt");
+
         request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
     } 
 

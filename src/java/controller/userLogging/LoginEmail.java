@@ -45,7 +45,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 // Redirect based on role
                 if (role.equals("admin")) 
                 {
-                    response.sendRedirect("admin.jsp");
+                    response.sendRedirect("adminDashboard");
                 } 
                 else if (role.equals("staff")) 
                 {
@@ -53,7 +53,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 } 
                 else if (role.equals("manager")) 
                 {
-                    response.sendRedirect("manager.jsp");
+                    response.sendRedirect("managerDashboard");
                 } 
             } else {
                 response.getWriter().println("Login failed: Account not found or wrong password.");

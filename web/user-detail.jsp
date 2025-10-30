@@ -226,7 +226,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="table-wrapper">
+                    
                          <div id="viewMode">
                              <p><b>ID:</b> ${user.id}</p>
                              <p><b>Full Name:</b> ${user.fullname}</p>
@@ -241,7 +241,7 @@
                              <p><b>Username:</b> ${user.userName}</p>
                              <p><b>Password:</b> ${user.password}</p>
                          </div>
-                    </div>
+                    
                     <!--Hidden edit choice-->      
                     <form id="editMode" style="display:none;" action="edit-user" method="post">
                               <input type="hidden" name="id" value="${user.id}">
