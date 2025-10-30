@@ -10,6 +10,11 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet(name ="Login",urlPatterns = {"/login"})
 public class Login extends HttpServlet 
 {
+   protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException 
+    {
+                    response.sendRedirect("index.html");             
+    } 
    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException 
     {
