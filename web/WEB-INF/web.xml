@@ -224,7 +224,6 @@
         <servlet-name>EditCategoryServlet</servlet-name>
         <url-pattern>/warehouse-management/edit-category</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>EditProductServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.EditProductServlet</servlet-class>
@@ -232,5 +231,13 @@
     <servlet-mapping>
         <servlet-name>EditProductServlet</servlet-name>
         <url-pattern>/warehouse-management/edit-product</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ViewProductDetailsServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.ViewProductDetailsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewProductDetailsServlet</servlet-name>
+        <url-pattern>/warehouse-management/view-product-details</url-pattern>
     </servlet-mapping>
 </web-app>

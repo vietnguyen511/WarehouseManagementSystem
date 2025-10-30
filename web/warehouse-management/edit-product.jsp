@@ -413,7 +413,7 @@
                                     <c:when test="${not empty previewUrl}">
                                         <div class="image-preview-box"
                                              id="previewBox"
-                                             style="background-image:url('${previewUrl}');color:transparent;">
+                                             style="background-image:url('${pageContext.request.contextPath}/${previewUrl}')";color:transparent;">
                                         </div>
                                     </c:when>
                                     <c:otherwise>

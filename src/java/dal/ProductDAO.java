@@ -390,13 +390,50 @@ public class ProductDAO extends DBContext {
 
             ps.setString(1, product.getCode());
             ps.setString(2, product.getName());
-            ps.setInt(3, product.getCategoryId());
-            ps.setString(4, product.getMaterial());
-            ps.setString(5, product.getUnit());
-            ps.setBigDecimal(6, product.getImportPrice());
-            ps.setBigDecimal(7, product.getExportPrice());
-            ps.setString(8, product.getDescription());
-            ps.setString(9, product.getImage());
+
+            if (product.getCategoryId() == null) {
+                ps.setNull(3, Types.INTEGER);
+            } else {
+                ps.setInt(3, product.getCategoryId());
+            }
+
+            if (product.getMaterial() == null || product.getMaterial().trim().isEmpty()) {
+                ps.setNull(4, Types.NVARCHAR);
+            } else {
+                ps.setString(4, product.getMaterial().trim());
+            }
+
+            if (product.getUnit() == null || product.getUnit().trim().isEmpty()) {
+                ps.setNull(5, Types.NVARCHAR);
+            } else {
+                ps.setString(5, product.getUnit().trim());
+            }
+
+            // ✅ Fix lỗi chính
+            if (product.getImportPrice() == null) {
+                ps.setNull(6, Types.DECIMAL);
+            } else {
+                ps.setBigDecimal(6, product.getImportPrice());
+            }
+
+            if (product.getExportPrice() == null) {
+                ps.setNull(7, Types.DECIMAL);
+            } else {
+                ps.setBigDecimal(7, product.getExportPrice());
+            }
+
+            if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
+                ps.setNull(8, Types.NVARCHAR);
+            } else {
+                ps.setString(8, product.getDescription().trim());
+            }
+
+            if (product.getImage() == null || product.getImage().trim().isEmpty()) {
+                ps.setNull(9, Types.NVARCHAR);
+            } else {
+                ps.setString(9, product.getImage().trim());
+            }
+
             ps.setBoolean(10, product.isStatus());
             ps.setInt(11, product.getProductId());
 

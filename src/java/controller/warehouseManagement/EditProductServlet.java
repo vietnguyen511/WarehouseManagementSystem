@@ -8,9 +8,12 @@ import dal.ActivityLogHelper;
 import dal.ProductDAO;
 import dal.CategoryDAO;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Paths;
 import java.util.List;
 import model.Product;
 import model.Category;
@@ -19,6 +22,7 @@ import model.Category;
  *
  * @author DANG
  */
+@MultipartConfig
 public class EditProductServlet extends HttpServlet {
 
     private ProductDAO productDAO = new ProductDAO();
@@ -83,9 +87,23 @@ public class EditProductServlet extends HttpServlet {
         String importPriceStr = request.getParameter("import_price");
         String exportPriceStr = request.getParameter("export_price");
         String description = request.getParameter("description");
-        String image = request.getParameter("image");
         String categoryIdStr = request.getParameter("category_id");
         String statusStr = request.getParameter("status");
+        String image = request.getParameter("image");
+
+        Part imagePart = request.getPart("imageFile");
+        if (imagePart != null && imagePart.getSize() > 0) {
+            String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
+            String uploadDir = getServletContext().getRealPath("/") + "uploaded-images";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            File uploadedFile = new File(dir, fileName);
+            imagePart.write(uploadedFile.getAbsolutePath());
+
+            image = "uploaded-images/" + fileName;
+        }
 
         String redirectUrl = request.getContextPath() + "/warehouse-management/product-management";
 
@@ -108,7 +126,7 @@ public class EditProductServlet extends HttpServlet {
             p.setStatus(status);
             p.setDescription(description);
             p.setImage(image);
-            
+
             boolean success = productDAO.updateProduct(p);
 
             if (success) {
