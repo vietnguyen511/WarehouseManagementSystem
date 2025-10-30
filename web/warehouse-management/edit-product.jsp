@@ -1,6 +1,6 @@
 <%-- 
-    Document   : add-product
-    Created on : Oct 29, 2025, 9:05:30 PM
+    Document   : edit-product
+    Created on : Oct 20, 2025, 11:35:31 AM
     Author     : DANG
 --%>
 
@@ -12,7 +12,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Add Product - Warehouse Management System</title>
+        <title>Edit Product - Warehouse Management System</title>
 
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
         <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
@@ -218,6 +218,7 @@
                 align-items: flex-start;
                 gap: 1rem;
             }
+
             .image-preview-box {
                 width: 80px;
                 height: 80px;
@@ -234,7 +235,6 @@
                 justify-content: center;
                 text-align: center;
             }
-
             @media (max-width: 768px) {
                 .form-grid-2 {
                     grid-template-columns: 1fr;
@@ -251,8 +251,8 @@
         <!-- Page header bar -->
         <div class="page-header-bar">
             <div class="page-header-left">
-                <h2>Add New Product</h2>
-                <p>Fill in product info and save it to warehouse database</p>
+                <h2>Edit Product</h2>
+                <p>Update product info, pricing, status, and image</p>
             </div>
             <div class="page-header-right">
                 <button type="button" class="btn-secondary" onclick="goBack()">← Back</button>
@@ -263,26 +263,32 @@
         <div class="main-content-with-sidebar">
             <div class="card">
                 <div class="card-header">
-                    <h1>Add Product</h1>
-                    <p class="card-subtitle">Basic info, pricing, status, and product image</p>
+                    <h1>Edit Product</h1>
+                    <p class="card-subtitle">
+                        Product ID #
+                        <c:out value="${product.productId}" />
+                    </p>
                 </div>
 
                 <div class="card-body">
 
                     <!-- server messages -->
-                    <c:if test="${not empty error}">
-                        <div class="alert alert-danger">${error}</div>
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger">${errorMessage}</div>
                     </c:if>
-                    <c:if test="${not empty success}">
-                        <div class="alert alert-success">${success}</div>
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${successMessage}</div>
                     </c:if>
 
                     <!-- IMPORTANT: multipart for file upload -->
-                    <form id="addProductForm"
-                          action="${pageContext.request.contextPath}/warehouse-management/add-product"
+                    <form id="editProductForm"
+                          action="${pageContext.request.contextPath}/warehouse-management/edit-product"
                           method="post"
                           enctype="multipart/form-data"
                           novalidate>
+
+                        <!-- keep id hidden -->
+                        <input type="hidden" name="id" value="${product.productId}"/>
 
                         <!-- SECTION: Basic Info -->
                         <div class="section-title">Basic Information</div>
@@ -294,7 +300,7 @@
                                 <input type="text"
                                        id="code"
                                        name="code"
-                                       value="${old_code}"
+                                       value="<c:out value='${not empty old_code ? old_code : product.code}'/>"
                                        required
                                        minlength="2"
                                        maxlength="20"
@@ -307,7 +313,7 @@
                                 <input type="text"
                                        id="name"
                                        name="name"
-                                       value="${old_name}"
+                                       value="<c:out value='${not empty old_name ? old_name : product.name}'/>"
                                        required
                                        minlength="2"
                                        maxlength="100"
@@ -320,10 +326,13 @@
                             <label for="category_id" class="required">Category</label>
                             <select id="category_id" name="category_id" required>
                                 <option value="">-- Select Category --</option>
-                                <c:forEach var="c" items="${categories}">
-                                    <option value="${c.categoryId}"
-                                            <c:if test="${old_category_id == c.categoryId}">selected</c:if>>
-                                        ${c.name}
+
+                                <c:forEach var="cItem" items="${categories}">
+                                    <c:set var="selectedCatId"
+                                           value="${not empty old_category_id ? old_category_id : product.categoryId}" />
+                                    <option value="${cItem.categoryId}"
+                                            <c:if test="${selectedCatId == cItem.categoryId}">selected</c:if>>
+                                        ${cItem.name}
                                     </option>
                                 </c:forEach>
                             </select>
@@ -338,7 +347,7 @@
                                 <input type="text"
                                        id="material"
                                        name="material"
-                                       value="${old_material}"
+                                       value="<c:out value='${not empty old_material ? old_material : product.material}'/>"
                                        maxlength="50"
                                        placeholder="Cotton, Denim, etc.">
                             </div>
@@ -348,7 +357,7 @@
                                 <input type="text"
                                        id="unit"
                                        name="unit"
-                                       value="${old_unit}"
+                                       value="<c:out value='${not empty old_unit ? old_unit : product.unit}'/>"
                                        maxlength="20"
                                        placeholder="cái, bộ...">
                             </div>
@@ -360,7 +369,7 @@
                                 <input type="number"
                                        id="import_price"
                                        name="import_price"
-                                       value="${old_import_price}"
+                                       value="<c:out value='${not empty old_import_price ? old_import_price : product.importPrice}'/>"
                                        min="0"
                                        step="0.01"
                                        placeholder="80000">
@@ -371,7 +380,7 @@
                                 <input type="number"
                                        id="export_price"
                                        name="export_price"
-                                       value="${old_export_price}"
+                                       value="<c:out value='${not empty old_export_price ? old_export_price : product.exportPrice}'/>"
                                        min="0"
                                        step="0.01"
                                        placeholder="150000">
@@ -384,7 +393,7 @@
                                       name="description"
                                       rows="3"
                                       maxlength="255"
-                                      placeholder="Short description of the product...">${old_description}</textarea>
+                                      placeholder="Short description of the product..."><c:out value='${not empty old_description ? old_description : product.description}'/></textarea>
                         </div>
 
                         <!-- SECTION: Image -->
@@ -394,13 +403,23 @@
                             <label class="required">Main Image</label>
 
                             <div class="image-preview-wrapper">
-                                <div class="image-preview-box"
-                                     id="previewBox"
-                                     style="<c:if test='${not empty old_image_preview_url}'>background-image:url('${old_image_preview_url}');color:transparent;</c:if>">
-                                    <c:if test="${empty old_image_preview_url}">
-                                        Preview
-                                    </c:if>
-                                </div>
+
+                                <!-- quyết định previewUrl -->
+                                <c:set var="previewUrl"
+                                       value="${not empty old_image ? old_image : product.image}" />
+
+                                <!-- an toàn cho JSP: dùng choose để render 2 div khác nhau -->
+                                <c:choose>
+                                    <c:when test="${not empty previewUrl}">
+                                        <div class="image-preview-box"
+                                             id="previewBox"
+                                             style="background-image:url('${pageContext.request.contextPath}/${previewUrl}')";color:transparent;">
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="image-preview-box" id="previewBox">Preview</div>
+                                    </c:otherwise>
+                                </c:choose>
 
                                 <div style="flex:1;">
                                     <input type="file"
@@ -408,16 +427,16 @@
                                            name="imageFile"
                                            accept="image/*">
                                     <small style="color:var(--gray-500); font-size:.8rem;">
-                                        Upload product photo (JPG/PNG). Max ~2MB (tùy bạn validate server).
+                                        Upload product photo (JPG/PNG). Max ~2MB
                                     </small>
 
-                                    <!-- fallback: optional manual URL (in case you still want text path) -->
+                                    <!-- fallback: optional manual URL / path -->
                                     <div class="form-group" style="margin-top:.75rem;">
                                         <label for="imagePath">or Image Path / URL</label>
                                         <input type="text"
                                                id="imagePath"
                                                name="image"
-                                               value="${old_image}"
+                                               value="<c:out value='${previewUrl}'/>"
                                                placeholder="images/ao_thun_nam.jpg">
                                     </div>
                                 </div>
@@ -430,14 +449,22 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select id="status" name="status">
-                                <option value="1" <c:if test="${empty old_status || old_status == '1'}">selected</c:if>>Active</option>
-                                <option value="0" <c:if test="${old_status == '0'}">selected</c:if>>Inactive</option>
+                                <c:set var="currentStatus"
+                                       value="${not empty old_status ? old_status : (product.status ? '1' : '0')}" />
+                                <option value="1"
+                                        <c:if test="${currentStatus == '1'}">selected</c:if>>
+                                            Active
+                                        </option>
+                                        <option value="0"
+                                        <c:if test="${currentStatus == '0'}">selected</c:if>>
+                                            Inactive
+                                        </option>
                                 </select>
                             </div>
 
                             <!-- ACTION BUTTONS -->
                             <div class="btn-bar">
-                                <button type="submit" class="btn-primary">Save Product</button>
+                                <button type="submit" class="btn-primary">Save Changes</button>
                                 <button type="button" class="btn-secondary" onclick="goBack()">Back</button>
                             </div>
                         </form>
@@ -463,11 +490,13 @@
                 }
             }
 
-            // preview image when selecting file
-            const fileInput = document.getElementById('imageFile');
-            const previewBox = document.getElementById('previewBox');
+            // live preview for newly selected image file
+            (function () {
+                const fileInput = document.getElementById('imageFile');
+                const previewBox = document.getElementById('previewBox');
+                if (!fileInput || !previewBox)
+                    return;
 
-            if (fileInput && previewBox) {
                 fileInput.addEventListener('change', function () {
                     const file = this.files && this.files[0];
                     if (!file) {
@@ -484,20 +513,22 @@
                     };
                     reader.readAsDataURL(file);
                 });
-            }
+            })();
 
             // basic front-end check
-            const form = document.getElementById('addProductForm');
-            form.addEventListener('submit', function (e) {
-                const code = document.getElementById('code').value.trim();
-                const name = document.getElementById('name').value.trim();
-                const cat = document.getElementById('category_id').value.trim();
+            (function () {
+                const form = document.getElementById('editProductForm');
+                form.addEventListener('submit', function (e) {
+                    const code = document.getElementById('code').value.trim();
+                    const name = document.getElementById('name').value.trim();
+                    const cat = document.getElementById('category_id').value.trim();
 
-                if (code.length < 2 || name.length < 2 || cat === "") {
-                    alert("Please fill Product Code, Product Name, and Category (min length 2).");
-                    e.preventDefault();
-                }
-            });
+                    if (code.length < 2 || name.length < 2 || cat === "") {
+                        alert("Please fill Product Code, Product Name, and Category (min length 2).");
+                        e.preventDefault();
+                    }
+                });
+            })();
         </script>
     </body>
 </html>

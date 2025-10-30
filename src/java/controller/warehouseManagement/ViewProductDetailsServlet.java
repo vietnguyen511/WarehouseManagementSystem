@@ -4,20 +4,23 @@
  */
 package controller.warehouseManagement;
 
-import jakarta.servlet.*;
+import dal.ProductDAO;
+import dal.CategoryDAO;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
 import model.Product;
-import dal.ProductDAO;
+import model.Category;
 
 /**
  *
  * @author DANG
  */
-public class ProductManagementServlet extends HttpServlet {
+public class ViewProductDetailsServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
+    private final ProductDAO productDAO = new ProductDAO();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -31,35 +34,34 @@ public class ProductManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String searchValue = request.getParameter("searchValue");
-        ProductDAO dao = new ProductDAO();
-        List<Product> products = new ArrayList<>();
-
-        try {
-            // check if search value is null or its trimmed is empty
-            if (searchValue == null || searchValue.trim().isEmpty()) {               
-                products = dao.getAllProducts();
-            } else {
-                searchValue = searchValue.trim();
-                try {
-                    int id = Integer.parseInt(searchValue);
-                    Product product = dao.getProductById(id);
-                    // check if product is not null
-                    if (product != null) {
-                        products.add(product);
-                    }
-                } catch (NumberFormatException e) {
-                    products = dao.getProductByName(searchValue);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "An error orrured when retrieving data: " + e.getMessage());
+        String idRaw = request.getParameter("id");
+        if (idRaw == null || idRaw.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath()
+                    + "/warehouse-management/product-management?msg=invalid");
+            return;
         }
 
-        request.setAttribute("products", products);
-        request.setAttribute("searchValue", searchValue);
-        request.getRequestDispatcher("/warehouse-management/product-management.jsp").forward(request, response);
+        try {
+            int id = Integer.parseInt(idRaw.trim());
+            Product product = productDAO.getProductById(id);
+            List<Category> categories = categoryDAO.getAllCategories();
+
+            if (product == null) {
+                response.sendRedirect(request.getContextPath()
+                        + "/warehouse-management/product-management?msg=notfound");
+                return;
+            }
+
+            request.setAttribute("product", product);
+            request.setAttribute("categories", categories);
+            request.getRequestDispatcher("/warehouse-management/view-product-details.jsp")
+                    .forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath()
+                    + "/warehouse-management/product-management?msg=error");
+        }
     }
 
     /**
@@ -73,7 +75,7 @@ public class ProductManagementServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        
     }
 
     /**
@@ -83,7 +85,7 @@ public class ProductManagementServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "View product details (read-only)";
     }// </editor-fold>
 
 }
