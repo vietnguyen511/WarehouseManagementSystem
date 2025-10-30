@@ -174,7 +174,7 @@
         <script>
             function goBack() {
                 if (confirm("Unsaved data will be lost. Go back?")) {
-                    window.location.href = "${pageContext.request.contextPath}/category-management";
+                    window.location.href = "${pageContext.request.contextPath}/warehouse-management/category-management";
                 }
             }
 
