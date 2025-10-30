@@ -202,13 +202,13 @@
                 </div>
                 
                 <div class="card-body">
-                    <div class="table-wrapper">
+                   
                          <div id="viewMode">
                              <p><b>Username:</b> ${user.userName}</p>
                              <p><b>Password:</b> ${user.password}</p>
                              <p><b>Email:</b> ${user.email}</p>
                          </div>
-                    </div>
+                   
                      
                          <!--Hidden edit choice-->      
                     <form id="editMode" style="display:none;" action="edit-account-user" method="post">
