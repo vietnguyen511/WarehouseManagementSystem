@@ -75,7 +75,27 @@
     <servlet>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
         <servlet-class>controller.supplierMgt.ViewSupplierDetailServlet</servlet-class>
+    </servlet>    
+    <servlet>
+        <servlet-name>ViewCustomersListServlet</servlet-name>
+        <servlet-class>controller.customerMgt.ViewCustomersListServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CreateCustomerServlet</servlet-name>
+        <servlet-class>controller.customerMgt.CreateCustomerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditCustomerServlet</servlet-name>
+        <servlet-class>controller.customerMgt.EditCustomerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteCustomerServlet</servlet-name>
+        <servlet-class>controller.customerMgt.DeleteCustomerServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewCustomerDetailServlet</servlet-name>
+        <servlet-class>controller.customerMgt.ViewCustomerDetailServlet</servlet-class>
+    </servlet>    
     <servlet>
         <servlet-name>ProductManagementServlet</servlet-name>
         <servlet-class>controller.warehouseManagement.ProductManagementServlet</servlet-class>
@@ -155,7 +175,27 @@
     <servlet-mapping>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
         <url-pattern>/suppliers/view</url-pattern>
+    </servlet-mapping>   
+    <servlet-mapping>
+        <servlet-name>ViewCustomersListServlet</servlet-name>
+        <url-pattern>/customers</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CreateCustomerServlet</servlet-name>
+        <url-pattern>/customers/new</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditCustomerServlet</servlet-name>
+        <url-pattern>/customers/edit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteCustomerServlet</servlet-name>
+        <url-pattern>/customers/delete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewCustomerDetailServlet</servlet-name>
+        <url-pattern>/customers/view</url-pattern>
+    </servlet-mapping>    
     <servlet>
         <servlet-name>ExportReportServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.ExportReportServlet</servlet-class>

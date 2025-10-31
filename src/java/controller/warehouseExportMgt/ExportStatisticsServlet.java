@@ -101,10 +101,7 @@ public class ExportStatisticsServlet extends HttpServlet {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             request.setAttribute("startDateDisplay", sdf.format(startDate));
             request.setAttribute("endDateDisplay", sdf.format(endDate));
-
-            // Set active page for sidebar navigation
-            request.setAttribute("activePage", "export-statistics");
-
+            
             request.getRequestDispatcher("/warehouse-export-mgt/export-statistics.jsp").forward(request, response);
             
         } catch (SQLException | ParseException e) {
