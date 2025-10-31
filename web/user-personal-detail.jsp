@@ -202,7 +202,7 @@
                 </div>
                 
                 <div class="card-body">
-                    <div class="table-wrapper">
+                    
                          <div id="viewMode">
                             <p><b>ID:</b> ${user.id}</p>
                              <p><b>Full Name:</b> ${user.fullname}</p>
@@ -212,9 +212,9 @@
                              <p><b>Address:</b> ${user.address}</p>
                              <p><b>Role:</b> ${user.role}</p>
                              <p><b>Status:</b> ${user.status ? "Active ✅" : "Inactive ❌"}</p>
-                             <br>
+                             
                          </div>
-                    </div>
+                    
                      
                     <!--Hidden edit choice-->      
                     <form id="editMode" style="display:none;" action="edit-personal-user" method="post">

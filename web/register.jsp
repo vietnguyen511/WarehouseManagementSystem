@@ -154,7 +154,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="table-wrapper">
+               
                         <form action="register" method="post">
                            <input type="text" name="firstname"  placeholder="First name" required>
                            
@@ -196,7 +196,6 @@
                             <p class="error"> ${error1} </p> 
                             <button type="submit" class="btn">Confirm</button>
                         </form>
-                    </div>
                     <c:if test="${not empty successMessage}">
                         <div class="alert alert-success">${successMessage}</div>
                     </c:if>

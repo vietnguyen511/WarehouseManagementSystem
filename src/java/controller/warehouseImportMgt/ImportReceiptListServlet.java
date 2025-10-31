@@ -68,10 +68,13 @@ public class ImportReceiptListServlet extends HttpServlet {
             request.setAttribute("recordsPerPage", recordsPerPage);
             request.setAttribute("startRecord", startRecord);
             request.setAttribute("endRecord", endRecord);
-            
+
             // Set search and filter attributes for form persistence
             request.setAttribute("searchTerm", searchTerm != null ? searchTerm : "");
             request.setAttribute("dateFilter", dateFilter != null ? dateFilter : "");
+
+            // Set active page for sidebar navigation
+            request.setAttribute("activePage", "import-receipt-list");
             
             request.getRequestDispatcher("/warehouse-import-mgt/import-receipt-list.jsp").forward(request, response);
             

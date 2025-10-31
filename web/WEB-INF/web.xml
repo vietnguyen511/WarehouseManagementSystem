@@ -109,12 +109,52 @@
         <servlet-class>controller.warehouseManagement.DeleteCategoryServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>AddProductServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.AddProductServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditCategoryServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.EditCategoryServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EditProductServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.EditProductServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewProductDetailsServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.ViewProductDetailsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteProductServlet</servlet-name>
+        <servlet-class>controller.warehouseManagement.DeleteProductServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ActivityLogServlet</servlet-name>
         <servlet-class>controller.ActivityLogServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProductVariantsServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.ProductVariantsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <servlet-class>controller.dashboard.AdminDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerDashboardServlet</servlet-name>
+        <servlet-class>controller.dashboard.ManagerDashboardServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ImportStatisticsServlet</servlet-name>
+        <servlet-class>controller.warehouseImportMgt.ImportStatisticsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExportStatisticsServlet</servlet-name>
+        <servlet-class>controller.warehouseExportMgt.ExportStatisticsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffDashboardServlet</servlet-name>
+        <servlet-class>controller.dashboard.StaffDashboardServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
@@ -239,5 +279,45 @@
     <servlet-mapping>
         <servlet-name>ProductVariantsServlet</servlet-name>
         <url-pattern>/api/product-variants</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardServlet</servlet-name>
+        <url-pattern>/adminDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerDashboardServlet</servlet-name>
+        <url-pattern>/managerDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImportStatisticsServlet</servlet-name>
+        <url-pattern>/warehouse-import-mgt/import-statistics</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExportStatisticsServlet</servlet-name>
+        <url-pattern>/warehouse-export-mgt/export-statistics</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffDashboardServlet</servlet-name>
+        <url-pattern>/staffDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddProductServlet</servlet-name>
+        <url-pattern>/warehouse-management/add-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditCategoryServlet</servlet-name>
+        <url-pattern>/warehouse-management/edit-category</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EditProductServlet</servlet-name>
+        <url-pattern>/warehouse-management/edit-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteProductServlet</servlet-name>
+        <url-pattern>/warehouse-management/delete-product</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewProductDetailsServlet</servlet-name>
+        <url-pattern>/warehouse-management/view-product-details</url-pattern>
     </servlet-mapping>
 </web-app>
