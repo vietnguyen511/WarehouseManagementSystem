@@ -43,7 +43,7 @@ public class Login extends HttpServlet
                 // Redirect based on role
                 if (role.equals("admin")) 
                 {
-                    response.sendRedirect("adminDashboard");
+                    response.sendRedirect("admin.jsp");
                 } 
                 else if (role.equals("staff")) 
                 {
@@ -51,7 +51,7 @@ public class Login extends HttpServlet
                 } 
                 else if (role.equals("manager")) 
                 {
-                    response.sendRedirect("managerDashboard");
+                    response.sendRedirect("manager.jsp");
                 } 
             } else {
                 response.getWriter().println("Login failed: Account not found or wrong password.");
