@@ -10,7 +10,7 @@
 <aside class="sidebar-nav">
     <nav class="sidebar-nav-content">
         <ul class="sidebar-menu">
-            <!-- Dashboard -->
+            <!-- Dashboard 
             <li class="sidebar-item">
                 <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -21,7 +21,7 @@
                     </svg>
                     <span class="sidebar-text">Dashboard</span>
                 </a>
-            </li>
+            </li>  -->
 
             <!-- Products & Categories -->
             <%
@@ -117,7 +117,7 @@
             <%
               }
             %>
-            <!-- User Management (Admin only) -->
+            <!-- User Management (Admin only)
             <c:if test="${sessionScope.user != null && sessionScope.user.role == 'admin'}">
                 <li class="sidebar-item">
                     <a href="${pageContext.request.contextPath}/users" class="sidebar-link ${activePage == 'users' ? 'active' : ''}">
@@ -130,7 +130,7 @@
                         <span class="sidebar-text">Users</span>
                     </a>
                 </li>
-            </c:if>
+            </c:if> -->
         </ul>
     </nav>
 </aside>
