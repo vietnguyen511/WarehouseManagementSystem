@@ -23,7 +23,6 @@
                 </a>
             </li>  -->
 
-            <!-- Products & Categories -->
             <%
               if(session==null) 
               {
@@ -34,7 +33,7 @@
              if("admin".equals(role))
               {
            %>  
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'Userlist' || activePage == 'AddUser' || activePage == 'suppliers' || activePage == 'customers' ? 'active' : ''}">
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'Userlist' || activePage == 'AddUser' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -47,27 +46,10 @@
                 <ul class="sidebar-submenu">
                     <li><a href="${pageContext.request.contextPath}/staff-list"   class="sidebar-sublink ${activePage == 'Userlist'? 'active' : ''}">User list</a></li>
                     <li><a href="${pageContext.request.contextPath}/register"     class="sidebar-sublink ${activePage == 'AddUser' ? 'active' : ''}">Add user</a></li>
-                    <li><a href="${pageContext.request.contextPath}/suppliers"    class="sidebar-sublink ${activePage == 'suppliers' ? 'active' : ''}">Suppliers</a></li>
-                    <li><a href="${pageContext.request.contextPath}/customers"    class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
+                   
                 </ul>
             </li>           
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' ? 'active' : ''}">
-                <a href="#" class="sidebar-link sidebar-toggle">
-                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    </svg>
-                    <span class="sidebar-text">Products and Categories</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </a>
-                <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Product Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-product" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Product</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Category Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Category</a></li>
-                </ul>
-            </li>
+            
             <%
                }
               if("staff".equals(role))
@@ -95,6 +77,26 @@
              if("manager".equals(role))
               {
             %>
+           <!-- Products & Categories -->
+            <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' || activePage == 'suppliers' || activePage == 'customers' ? 'active' : ''}">
+                <a href="#" class="sidebar-link sidebar-toggle">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                    <span class="sidebar-text">Products and Categories</span>
+                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Product Management</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-product" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Product</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Category Management</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Category</a></li>
+                    <li><a href="${pageContext.request.contextPath}/suppliers"    class="sidebar-sublink ${activePage == 'suppliers' ? 'active' : ''}">Suppliers</a></li>
+                    <li><a href="${pageContext.request.contextPath}/customers"    class="sidebar-sublink ${activePage == 'customers' ? 'active' : ''}">Customers</a></li>
+                </ul>
+            </li>
             <!-- Statistics & Reports -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' || activePage == 'activity-log' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
