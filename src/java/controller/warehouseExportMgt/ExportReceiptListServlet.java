@@ -72,7 +72,10 @@ public class ExportReceiptListServlet extends HttpServlet {
             // Set search and filter attributes for form persistence
             request.setAttribute("searchTerm", searchTerm != null ? searchTerm : "");
             request.setAttribute("dateFilter", dateFilter != null ? dateFilter : "");
-            
+
+            // Set active page for sidebar navigation
+            request.setAttribute("activePage", "export-receipt-list");
+
             request.getRequestDispatcher("/warehouse-export-mgt/export-receipt-list.jsp").forward(request, response);
             
         } catch (SQLException e) {

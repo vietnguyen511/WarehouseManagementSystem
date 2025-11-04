@@ -6,7 +6,6 @@
 <c:set var="searchParam" value="${not empty searchTerm ? '&search=' : ''}${searchTerm}" />
 <c:set var="dateParam" value="${not empty dateFilter ? '&dateFilter=' : ''}${dateFilter}" />
 <c:set var="fullParams" value="${searchParam}${dateParam}" />
-<c:set var="activePage" value="import-receipts" scope="request" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
