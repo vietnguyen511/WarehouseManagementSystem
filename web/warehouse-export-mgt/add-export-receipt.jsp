@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,6 +199,14 @@
     </style>
 </head>
 <body>
+    <%-- Guard: if servlet/controller didn't set customers, redirect to controller mapping so it can populate data --%>
+    <%
+        if (request.getAttribute("customers") == null) {
+            response.sendRedirect(request.getContextPath() + "/createExportReceipt");
+            return;
+        }
+    %>
+
     <jsp:include page="/components/top-header.jsp" />
     <jsp:include page="/components/sidebar-nav.jsp" />
 
@@ -206,7 +215,7 @@
             <div class="card-header">
                 <div>
                     <h1 class="card-title">Create Export Receipt</h1>
-                    <p class="card-subtitle">Enter receipt info</p>
+                    <p class="card-subtitle">Enter receipt info and product items</p>
                 </div>
                 <div class="action-bar">
                     <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="btn btn-secondary">Back to List</a>
@@ -221,10 +230,22 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label required" for="customerId">Customer</label>
+
+                        <%-- determine effectiveCustomerId: prefer selectedCustomerId attribute (forward), else param (redirect case) --%>
+                        <c:choose>
+                            <c:when test="${not empty selectedCustomerId}">
+                                <c:set var="effectiveCustomerId" value="${selectedCustomerId}" />
+                            </c:when>
+                            <c:otherwise>
+                                <c:set var="effectiveCustomerId" value="${param.customerId}" />
+                            </c:otherwise>
+                        </c:choose>
+                        <c:set var="hasSelected" value="${not empty effectiveCustomerId}" />
+
                         <select id="customerId" name="customerId" class="form-select" required>
-                            <option value="" disabled selected hidden>Select a customer...</option>
+                            <option value="" disabled hidden <c:if test="${not hasSelected}">selected</c:if>>Select a customer...</option>
                             <c:forEach var="c" items="${customers}">
-                                <option value="${c.customerId}">${c.name}</option>
+                                <option value="${c.customerId}" <c:if test="${c.customerId eq effectiveCustomerId}">selected</c:if>>${c.name}</option>
                             </c:forEach>
                         </select>
                     </div>
@@ -756,6 +777,3 @@
     </script>
 </body>
 </html>
-
-
-

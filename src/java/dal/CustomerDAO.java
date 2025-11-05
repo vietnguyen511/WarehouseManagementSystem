@@ -23,13 +23,15 @@ public class CustomerDAO extends DBContext {
 
     public List<Customer> getAllCustomers() {
         List<Customer> list = new ArrayList<>();
-        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers ORDER BY name";
+        String sql = "SELECT customer_id, name, phone, email, address, status FROM Customers WHERE status = 1 ORDER BY name";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
+            rs.close();
+            st.close();
         } catch (SQLException e) {
             System.out.println("Error getAllCustomers: " + e.getMessage());
         }
@@ -42,8 +44,11 @@ public class CustomerDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, id);
         ResultSet rs = st.executeQuery();
-        if (rs.next()) return mapRow(rs);
-        return null;
+        Customer c = null;
+        if (rs.next()) c = mapRow(rs);
+        rs.close();
+        st.close();
+        return c;
     }
 
     public int create(Customer c) throws SQLException {
@@ -55,10 +60,14 @@ public class CustomerDAO extends DBContext {
         st.setString(4, c.getAddress());
         st.setBoolean(5, c.isStatus());
         int affected = st.executeUpdate();
-        if (affected == 0) return 0;
-        ResultSet keys = st.getGeneratedKeys();
-        if (keys.next()) return keys.getInt(1);
-        return 0;
+        int id = 0;
+        if (affected != 0) {
+            ResultSet keys = st.getGeneratedKeys();
+            if (keys.next()) id = keys.getInt(1);
+            keys.close();
+        }
+        st.close();
+        return id;
     }
 
     public boolean update(Customer c) throws SQLException {
@@ -70,14 +79,18 @@ public class CustomerDAO extends DBContext {
         st.setString(4, c.getAddress());
         st.setBoolean(5, c.isStatus());
         st.setInt(6, c.getCustomerId());
-        return st.executeUpdate() > 0;
+        int affected = st.executeUpdate();
+        st.close();
+        return affected > 0;
     }
 
     public boolean delete(int id) throws SQLException {
         String sql = "DELETE FROM Customers WHERE customer_id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, id);
-        return st.executeUpdate() > 0;
+        int affected = st.executeUpdate();
+        st.close();
+        return affected > 0;
     }
 
     // Search, filter, pagination
@@ -96,8 +109,11 @@ public class CustomerDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sb.toString());
         for (int i = 0; i < params.size(); i++) st.setObject(i + 1, params.get(i));
         ResultSet rs = st.executeQuery();
-        if (rs.next()) return rs.getInt(1);
-        return 0;
+        int count = 0;
+        if (rs.next()) count = rs.getInt(1);
+        rs.close();
+        st.close();
+        return count;
     }
 
     public List<Customer> findAll(int offset, int limit, String sortBy, String sortDir, String searchTerm, String statusFilter) throws SQLException {
@@ -130,6 +146,8 @@ public class CustomerDAO extends DBContext {
         ResultSet rs = st.executeQuery();
         List<Customer> list = new ArrayList<>();
         while (rs.next()) list.add(mapRow(rs));
+        rs.close();
+        st.close();
         return list;
     }
 
@@ -144,7 +162,10 @@ public class CustomerDAO extends DBContext {
         return c;
     }
 
-    
+    /**
+     * Get export statistics for a customer
+     * Returns an array: [totalReceipts, totalQuantity, totalAmount]
+     */
     public Object[] getExportStatistics(int customerId) throws SQLException {
         String sql = "SELECT " +
                     "ISNULL(COUNT(*), 0) AS total_receipts, " +
@@ -152,21 +173,22 @@ public class CustomerDAO extends DBContext {
                     "ISNULL(SUM(total_amount), 0) AS total_amount " +
                     "FROM ExportReceipts " +
                     "WHERE customer_id = ?";
-        
+
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, customerId);
         ResultSet rs = st.executeQuery();
-        
+
         if (rs.next()) {
             int totalReceipts = rs.getInt("total_receipts");
             int totalQuantity = rs.getInt("total_quantity");
             BigDecimal totalAmount = rs.getBigDecimal("total_amount");
-            
+            rs.close();
+            st.close();
             return new Object[]{totalReceipts, totalQuantity, totalAmount};
         }
-        
+
+        rs.close();
+        st.close();
         return new Object[]{0, 0, BigDecimal.ZERO};
     }
 }
-
-
