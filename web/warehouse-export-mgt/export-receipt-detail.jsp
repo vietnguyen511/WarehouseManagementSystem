@@ -109,7 +109,7 @@
                             <div class="meta-item">
                                 <span class="meta-label">Total Amount</span>
                                 <span class="meta-value text-success">
-                                    ₫<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
+                                    $<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
                                 </span>
                             </div>
                         </div>
@@ -158,10 +158,10 @@
                                                 <fmt:formatNumber value="${detail.quantity}" type="number" />
                                             </td>
                                             <td style="text-align:right;">
-                                                ₫<fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="0" />
+                                                $<fmt:formatNumber value="${detail.price}" type="number" minFractionDigits="0" maxFractionDigits="0" />
                                             </td>
                                             <td style="text-align:right;" class="text-success">
-                                                ₫<fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
+                                                $<fmt:formatNumber value="${detail.amount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -178,7 +178,7 @@
                                 <div class="summary-row">
                                     <span class="summary-label">Total Amount:</span>
                                     <span class="summary-value text-success">
-                                        ₫<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
+                                        $<fmt:formatNumber value="${exportReceipt.totalAmount}" type="number" minFractionDigits="0" maxFractionDigits="0" />
                                     </span>
                                 </div>
                             </div>
