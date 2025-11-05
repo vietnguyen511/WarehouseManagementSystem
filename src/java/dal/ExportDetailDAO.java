@@ -33,39 +33,45 @@ public class ExportDetailDAO extends DBContext {
     }
     
     public List<ExportDetail> getExportDetailsByExportId(int exportId) throws SQLException {
-        List<ExportDetail> details = new ArrayList<>();
-        String sql = "SELECT ed.export_detail_id, ed.export_id, ed.variant_id, ed.quantity, " +
-                    "ed.price, ed.amount, p.code as product_code, p.name as product_name, " +
-                    "p.unit, c.name as category_name, pv.size, pv.color " +
-                    "FROM ExportDetails ed " +
-                    "INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id " +
-                    "INNER JOIN Products p ON pv.product_id = p.product_id " +
-                    "LEFT JOIN Categories c ON p.category_id = c.category_id " +
-                    "WHERE ed.export_id = ? " +
-                    "ORDER BY ed.export_detail_id";
-        
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, exportId);
-        ResultSet rs = st.executeQuery();
-        
-        while (rs.next()) {
-            ExportDetail detail = new ExportDetail();
-            detail.setExportDetailId(rs.getInt("export_detail_id"));
-            detail.setExportId(rs.getInt("export_id"));
-            detail.setVariantId(rs.getInt("variant_id"));
-            detail.setQuantity(rs.getInt("quantity"));
-            detail.setPrice(rs.getBigDecimal("price"));
-            detail.setAmount(rs.getBigDecimal("amount"));
-            detail.setProductCode(rs.getString("product_code"));
-            detail.setProductName(rs.getString("product_name"));
-            detail.setUnit(rs.getString("unit"));
-            detail.setCategoryName(rs.getString("category_name"));
-            detail.setSize(rs.getString("size"));
-            detail.setColor(rs.getString("color"));
-            details.add(detail);
-        }
-        
-        return details;
+    List<ExportDetail> details = new ArrayList<>();
+    String sql = "SELECT ed.export_detail_id, ed.export_id, ed.variant_id, ed.quantity, " +
+                "ed.price, ed.amount, p.code as product_code, p.name as product_name, " +
+                "p.unit, c.name as category_name, pv.size, pv.color " +
+                "FROM ExportDetails ed " +
+                "LEFT JOIN ProductVariants pv ON ed.variant_id = pv.variant_id " +   // LEFT JOIN here
+                "LEFT JOIN Products p ON pv.product_id = p.product_id " +            // LEFT JOIN here
+                "LEFT JOIN Categories c ON p.category_id = c.category_id " +
+                "WHERE ed.export_id = ? " +
+                "ORDER BY ed.export_detail_id";
+
+    PreparedStatement st = connection.prepareStatement(sql);
+    st.setInt(1, exportId);
+    ResultSet rs = st.executeQuery();
+
+    while (rs.next()) {
+        ExportDetail detail = new ExportDetail();
+        detail.setExportDetailId(rs.getInt("export_detail_id"));
+        detail.setExportId(rs.getInt("export_id"));
+        detail.setVariantId(rs.getInt("variant_id"));
+        detail.setQuantity(rs.getInt("quantity"));
+        detail.setPrice(rs.getBigDecimal("price"));
+        detail.setAmount(rs.getBigDecimal("amount"));
+
+        // Product/variant fields may be null — handle safely
+        detail.setProductCode(rs.getString("product_code"));    // may be null
+        detail.setProductName(rs.getString("product_name"));    // may be null
+        detail.setUnit(rs.getString("unit"));                   // may be null
+        detail.setCategoryName(rs.getString("category_name"));  // may be null
+        detail.setSize(rs.getString("size"));                   // may be null
+        detail.setColor(rs.getString("color"));                 // may be null
+
+        details.add(detail);
     }
+
+    rs.close();
+    st.close();
+    return details;
+}
+
 }
 
