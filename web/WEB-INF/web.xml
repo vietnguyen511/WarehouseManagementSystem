@@ -17,6 +17,10 @@
         <servlet-class>controller.warehouseImportMgt.CreateImportReceiptServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CreateExportReceiptServlet</servlet-name>
+        <servlet-class>controller.warehouseExportMgt.CreateExportReceiptServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ProductLookupServlet</servlet-name>
         <servlet-class>controller.warehouseImportMgt.ProductLookupServlet</servlet-class>
     </servlet>
@@ -31,10 +35,6 @@
     <servlet>
         <servlet-name>ImportReceiptListServlet</servlet-name>
         <servlet-class>controller.warehouseImportMgt.ImportReceiptListServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>CreateExportReceiptServlet</servlet-name>
-        <servlet-class>controller.warehouseExportMgt.CreateExportReceiptServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExportReceiptListServlet</servlet-name>
@@ -217,6 +217,10 @@
         <url-pattern>/createImportReceipt</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>CreateExportReceiptServlet</servlet-name>
+        <url-pattern>/createExportReceipt</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ProductLookupServlet</servlet-name>
         <url-pattern>/api/product-lookup</url-pattern>
     </servlet-mapping>
@@ -243,10 +247,6 @@
     <servlet-mapping>
         <servlet-name>ExportReceiptDetailServlet</servlet-name>
         <url-pattern>/warehouse-export-mgt/export-receipt-detail</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>CreateExportReceiptServlet</servlet-name>
-        <url-pattern>/createExportReceipt</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CategoryManagementServlet</servlet-name>

@@ -1,6 +1,7 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,19 +13,25 @@ public class ExportReceipt {
     private int totalQuantity;
     private BigDecimal totalAmount;
     private String note;
-    private Date createdAt;
-
-    // For displaying customer/user names
+    private List<ExportDetail> details = new ArrayList<>();
+    
+    // Additional fields for display
     private String customerName;
     private String userName;
-
-    // List of export details
-    private List<ExportDetail> details;
 
     public ExportReceipt() {
     }
 
-    // Getters and Setters
+    public ExportReceipt(int exportId, int customerId, int userId, Date date, int totalQuantity, BigDecimal totalAmount, String note) {
+        this.exportId = exportId;
+        this.customerId = customerId;
+        this.userId = userId;
+        this.date = date;
+        this.totalQuantity = totalQuantity;
+        this.totalAmount = totalAmount;
+        this.note = note;
+    }
+
     public int getExportId() {
         return exportId;
     }
@@ -81,12 +88,12 @@ public class ExportReceipt {
         this.note = note;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public List<ExportDetail> getDetails() {
+        return details;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setDetails(List<ExportDetail> details) {
+        this.details = details;
     }
 
     public String getCustomerName() {
@@ -104,27 +111,7 @@ public class ExportReceipt {
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
-    public List<ExportDetail> getDetails() {
-        return details;
-    }
-
-    public void setDetails(List<ExportDetail> details) {
-        this.details = details;
-    }
-
-    @Override
-    public String toString() {
-        return "ExportReceipt{" +
-                "exportId=" + exportId +
-                ", customerId=" + customerId +
-                ", userId=" + userId +
-                ", date=" + date +
-                ", totalQuantity=" + totalQuantity +
-                ", totalAmount=" + totalAmount +
-                ", note='" + note + '\'' +
-                ", customerName='" + customerName + '\'' +
-                ", userName='" + userName + '\'' +
-                '}';
-    }
+    
 }
+
+
