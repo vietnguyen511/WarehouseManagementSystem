@@ -43,7 +43,7 @@ public class DBContext {
         try {
             String url = "jdbc:sqlserver://localhost:1433;databaseName=WarehouseDB;encrypt=true;trustServerCertificate=true;";
             String username = "sa";
-            String password = "sa";
+            String password = "123456";
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             conn = DriverManager.getConnection(url, username, password);
         } catch (Exception ex) {
