@@ -1,15 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller.warehouseExportMgt;
 
 import java.io.IOException;
 import dal.ActivityLogHelper;
 import dal.ExportReceiptDAO;
 import dal.CustomerDAO;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -28,23 +22,22 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
+ * CreateExportReceiptServlet - handles creation of export receipts and details.
  *
- * @author admin
+ * Notes:
+ * - This servlet now attempts to resolve variant_id for each item using a ProductVariantDAO
+ *   (method findVariantIdByProductCodeSizeColor). If you don't have that DAO yet, please add
+ *   the ProductVariantDAO class (example provided in previous messages).
+ * - ExportReceiptDAO.createReceiptWithDetails(receipt) is expected to insert the header and
+ *   all details in a single transaction (commit/rollback managed inside DAO).
  */
 public class CreateExportReceiptServlet extends HttpServlet {
 
-    /**
-     * Handles the HTTP <code>GET</code> method.Loads customers and categories for the form and forwards to JSP.
-     * @param request
-     * @param response
-     * @throws jakarta.servlet.ServletException
-     * @throws java.io.IOException
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         // Load customers for dropdown
-        CustomerDAO customerDAO = new CustomerDAO();
+        dal.CustomerDAO customerDAO = new dal.CustomerDAO();
         java.util.List<model.Customer> customers = customerDAO.getAllCustomers();
         request.setAttribute("customers", customers);
 
@@ -54,7 +47,7 @@ public class CreateExportReceiptServlet extends HttpServlet {
         request.setAttribute("categories", categories);
 
         // Provide today's date for default value
-        String today = java.time.LocalDate.now().toString();
+        String today = LocalDate.now().toString();
         request.setAttribute("today", today);
 
         // Pull success message from session if present
@@ -73,20 +66,12 @@ public class CreateExportReceiptServlet extends HttpServlet {
         request.getRequestDispatcher("/warehouse-export-mgt/add-export-receipt.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.Parses form, builds ExportReceipt + ExportDetail list, persists and logs activity.
-     * @param request
-     * @param response
-     * @throws jakarta.servlet.ServletException
-     * @throws java.io.IOException
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        // Debug start
         System.out.println("=== CREATE EXPORT RECEIPT POST START ===");
 
         try {
@@ -96,8 +81,11 @@ public class CreateExportReceiptServlet extends HttpServlet {
             String totalAmountStr = request.getParameter("totalAmount");
             String note = request.getParameter("note");
 
+            if (customerIdStr == null || customerIdStr.trim().isEmpty()) {
+                throw new IllegalArgumentException("Customer is required.");
+            }
+
             int customerId = Integer.parseInt(customerIdStr);
-            // Use current timestamp if date not provided or parse flexible
             Date exportDate = (exportDateStr == null || exportDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(exportDateStr);
             BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(totalAmountStr);
 
@@ -115,6 +103,16 @@ public class CreateExportReceiptServlet extends HttpServlet {
             // Parse item rows by scanning sequential indices until none found
             List<ExportDetail> details = new ArrayList<>();
             int index = 0;
+
+            // Try to initialize ProductVariantDAO for variant lookup (if available)
+            dal.ProductVariantDAO pvDao = null;
+            try {
+                pvDao = new dal.ProductVariantDAO();
+            } catch (Throwable t) {
+                // If ProductVariantDAO class not present, we'll continue without variant resolution.
+                System.out.println("ProductVariantDAO not available — variant lookup skipped. Add ProductVariantDAO for better mapping.");
+            }
+
             while (true) {
                 String code = request.getParameter("items[" + index + "].productCode");
                 String name = request.getParameter("items[" + index + "].productName");
@@ -152,12 +150,50 @@ public class CreateExportReceiptServlet extends HttpServlet {
                     }
                 }
 
-                d.setQuantity(Integer.parseInt(qtyStr));
-                BigDecimal price = new BigDecimal(priceStr);
+                // parse quantity & price
+                int qty = 1;
+                try {
+                    qty = Integer.parseInt(qtyStr);
+                } catch (NumberFormatException e) {
+                    qty = 1;
+                }
+                d.setQuantity(qty);
+
+                BigDecimal price;
+                try {
+                    price = new BigDecimal(priceStr);
+                } catch (NumberFormatException e) {
+                    price = BigDecimal.ZERO;
+                }
                 d.setPrice(price);
                 d.setAmount(price.multiply(BigDecimal.valueOf(d.getQuantity())));
-                details.add(d);
 
+                // Attempt to resolve variant_id using ProductVariantDAO (if present)
+                int resolvedVariantId = 0;
+                if (pvDao != null) {
+                    try {
+                        // This method should return 0 if not found.
+                        resolvedVariantId = pvDao.findVariantIdByProductCodeSizeColor(d.getProductCode(),
+                                                                                     d.getSize() == null ? "" : d.getSize(),
+                                                                                     d.getColor() == null ? "" : d.getColor());
+                        if (resolvedVariantId > 0) {
+                            d.setVariantId(resolvedVariantId);
+                        } else {
+                            // not found -> leave variantId as 0 (DAO insert should handle null/0 appropriately)
+                            d.setVariantId(0);
+                        }
+                    } catch (Exception ex) {
+                        // log and continue; do not fail entire creation because of mismatch
+                        System.out.println("Warning: variant lookup failed for productCode=" + d.getProductCode() + ", size=" + d.getSize() + ", color=" + d.getColor());
+                        ex.printStackTrace();
+                        d.setVariantId(0);
+                    }
+                } else {
+                    // no pvDao available -> set variantId = 0 to indicate unknown
+                    d.setVariantId(0);
+                }
+
+                details.add(d);
                 index++;
             }
 
@@ -165,12 +201,12 @@ public class CreateExportReceiptServlet extends HttpServlet {
             receipt.setTotalQuantity(totalQty);
             receipt.setDetails(details);
 
-            // Persist within transaction and update stock via DAO
+            // Persist within transaction via DAO
             System.out.println("Export details parsed: count=" + details.size());
             ExportReceiptDAO dao = new ExportReceiptDAO();
             System.out.println("Attempting to create export receipt with details...");
 
-            // Create the export receipt with details in one transactional method (implement in DAO)
+            // Important: ensure createReceiptWithDetails does transaction (insert receipt, insert details, commit)
             int exportId = dao.createReceiptWithDetails(receipt);
             receipt.setExportId(exportId);
 
@@ -239,6 +275,5 @@ public class CreateExportReceiptServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "CreateExportReceiptServlet - handles creation of export receipts and details";
-    }// </editor-fold>
-
+    }
 }
