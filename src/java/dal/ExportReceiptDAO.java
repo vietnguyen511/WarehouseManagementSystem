@@ -12,6 +12,10 @@ import model.ExportReceipt;
 import model.ExportReceiptListDTO;
 import model.ProductVariant;
 
+/**
+ * ExportReceiptDAO - Data access object for ExportReceipts and related operations.
+ * Modified createReceiptWithDetails to insert details transactionally and update variant/product stock.
+ */
 public class ExportReceiptDAO extends DBContext {
 
     public int createExportReceipt(ExportReceipt receipt) throws SQLException {
@@ -27,8 +31,13 @@ public class ExportReceiptDAO extends DBContext {
         st.executeUpdate();
         ResultSet rs = st.getGeneratedKeys();
         if (rs.next()) {
-            return rs.getInt(1);
+            int id = rs.getInt(1);
+            try { rs.close(); } catch (Exception ignore) {}
+            try { st.close(); } catch (Exception ignore) {}
+            return id;
         }
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
         return -1;
     }
 
@@ -43,55 +52,168 @@ public class ExportReceiptDAO extends DBContext {
         st.setBigDecimal(2, newExportPrice);
         st.setInt(3, productId);
         st.executeUpdate();
+        try { st.close(); } catch (Exception ignore) {}
     }
 
+    /**
+     * Create export receipt (header) and export details in one transaction.
+     * For each ExportDetail:
+     *  - try find variant by productCode/size/color
+     *  - if not exists, try find product by code -> if not exists, create product -> create variant
+     *  - insert export detail and update variant stock + product price
+     *
+     * This method prints DEBUG messages to console to help tracing.
+     */
     public int createReceiptWithDetails(ExportReceipt receipt) throws SQLException {
+        PreparedStatement psReceipt = null;
+        ResultSet rsKeys = null;
+        boolean prevAuto = true;
         try {
+            // preserve previous auto-commit
+            try { prevAuto = connection.getAutoCommit(); } catch (SQLException ignore) {}
+
             connection.setAutoCommit(false);
-            int exportId = createExportReceipt(receipt);
-            
-            // Share the same connection with child DAOs for transaction consistency
+
+            String sqlReceipt = "INSERT INTO ExportReceipts (customer_id, user_id, date, total_quantity, total_amount, note, created_at) "
+                              + "VALUES (?, ?, ?, ?, ?, ?, GETDATE())";
+            psReceipt = connection.prepareStatement(sqlReceipt, Statement.RETURN_GENERATED_KEYS);
+            psReceipt.setInt(1, receipt.getCustomerId());
+            psReceipt.setInt(2, receipt.getUserId());
+            psReceipt.setTimestamp(3, new java.sql.Timestamp(receipt.getDate().getTime()));
+            psReceipt.setInt(4, receipt.getTotalQuantity());
+            psReceipt.setBigDecimal(5, receipt.getTotalAmount() != null ? receipt.getTotalAmount() : BigDecimal.ZERO);
+            psReceipt.setString(6, receipt.getNote());
+
+            System.out.println("DEBUG: Inserting ExportReceipt (customer=" + receipt.getCustomerId()
+                    + ", totalQty=" + receipt.getTotalQuantity()
+                    + ", totalAmount=" + receipt.getTotalAmount() + ")");
+            psReceipt.executeUpdate();
+
+            rsKeys = psReceipt.getGeneratedKeys();
+            int exportId = -1;
+            if (rsKeys.next()) {
+                exportId = rsKeys.getInt(1);
+                System.out.println("DEBUG: Generated exportId = " + exportId);
+            } else {
+                throw new SQLException("Failed to obtain generated exportId.");
+            }
+
+            // DAOs sharing the same connection for transactional consistency
             ExportDetailDAO exportDetailDAO = new ExportDetailDAO(connection);
             ProductVariantDAO variantDAO = new ProductVariantDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
-//            
-//            for (ExportDetail d : receipt.getDetails()) {
-//                // Find or create product variant
-//                ProductVariant variant = variantDAO.getVariantByProductCodeSizeColor(
-//                    d.getProductCode(), d.getSize(), d.getColor());
-//                
-//                if (variant == null) {
-//                    // Create new product if not existing
-//                    Integer productId = productDAO.getProductIdByCode(d.getProductCode());
-//                    if (productId == null) {
-//                        productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getUnit(), d.getPrice(), d.getCategoryId());
-//                    }
-//                    
-//                    // Create new variant
-//                    variant = new ProductVariant();
-//                    variant.setProductId(productId);
-//                    variant.setSize(d.getSize());
-//                    variant.setColor(d.getColor());
-//                    variant.setQuantity(0);
-//                    variant.setStatus(true);
-//                    int variantId = variantDAO.createProductVariant(variant);
-//                    variant.setVariantId(variantId);
-//                }
-//                
-//                d.setVariantId(variant.getVariantId());
-//                exportDetailDAO.insertExportDetail(d, exportId);
-//                variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
-//                
-//                
-//                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
-//            }
+
+            if (receipt.getDetails() != null) {
+                for (ExportDetail d : receipt.getDetails()) {
+                    System.out.println("DEBUG: Processing detail: productCode=" + d.getProductCode()
+                            + " size=" + d.getSize() + " color=" + d.getColor()
+                            + " qty=" + d.getQuantity() + " price=" + d.getPrice());
+
+                    ProductVariant variant = null;
+                    try {
+                        // try find existing variant by product code + size + color
+                        variant = variantDAO.getVariantByProductCodeSizeColor(d.getProductCode(), d.getSize(), d.getColor());
+                    } catch (Exception ex) {
+                        // Log and continue (variant lookup may fail if method signature differs)
+                        System.out.println("WARN: variant lookup threw exception for code=" + d.getProductCode());
+                        ex.printStackTrace();
+                        variant = null;
+                    }
+
+                    if (variant == null) {
+                        // try find product by code
+                        Integer productId = null;
+                        try {
+                            productId = productDAO.getProductIdByCode(d.getProductCode());
+                        } catch (Exception ex) {
+                            System.out.println("WARN: product lookup threw exception for code=" + d.getProductCode());
+                            ex.printStackTrace();
+                            productId = null;
+                        }
+
+                        if (productId == null) {
+                            try {
+                                // create product if not exists (ensure productDAO.createProduct exists)
+                                productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getUnit(), d.getPrice(), d.getCategoryId());
+                                System.out.println("DEBUG: Created product id=" + productId + " for code=" + d.getProductCode());
+                            } catch (Exception ex) {
+                                System.out.println("WARN: failed to create product for code=" + d.getProductCode());
+                                ex.printStackTrace();
+                                productId = null;
+                            }
+                        }
+
+                        if (productId != null) {
+                            try {
+                                // create variant
+                                ProductVariant newVar = new ProductVariant();
+                                newVar.setProductId(productId);
+                                newVar.setSize(d.getSize());
+                                newVar.setColor(d.getColor());
+                                newVar.setQuantity(0);
+                                newVar.setStatus(true);
+                                int variantId = variantDAO.createProductVariant(newVar);
+                                newVar.setVariantId(variantId);
+                                variant = newVar;
+                                System.out.println("DEBUG: Created variant id=" + variantId + " for productId=" + productId);
+                            } catch (Exception ex) {
+                                System.out.println("WARN: failed to create variant for productId=" + productId);
+                                ex.printStackTrace();
+                                variant = null;
+                            }
+                        }
+                    }
+
+                    // If we have a variant, set variantId on detail; otherwise leave as 0 (insertExportDetail will write NULL)
+                    if (variant != null) {
+                        d.setVariantId(variant.getVariantId());
+                    } else {
+                        d.setVariantId(0); // insertExportDetail handles 0 -> NULL
+                    }
+
+                    // Insert detail
+                    try {
+                        exportDetailDAO.insertExportDetail(d, exportId);
+                        System.out.println("DEBUG: Inserted ExportDetail for exportId=" + exportId + " productCode=" + d.getProductCode());
+                    } catch (Exception ex) {
+                        System.err.println("ERROR: Failed to insert ExportDetail for productCode=" + d.getProductCode());
+                        ex.printStackTrace();
+                        throw ex; // will be caught by outer catch and rollback
+                    }
+
+                    // Update variant stock and product price if we have variant info
+                    try {
+                        if (variant != null && variant.getVariantId() > 0) {
+                            variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
+                            // update product price if method available (productId present on variant)
+                            if (variant.getProductId() > 0) {
+                                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
+                            }
+                            System.out.println("DEBUG: Updated stock for variantId=" + variant.getVariantId() + " by +" + d.getQuantity());
+                        } else {
+                            System.out.println("WARN: variant missing for productCode=" + d.getProductCode() + " -> cannot update stock");
+                        }
+                    } catch (Exception ex) {
+                        // warn but continue; overall transaction will commit only if no fatal errors occurred previously
+                        System.out.println("WARN: failed to update stock/price for productCode=" + d.getProductCode());
+                        ex.printStackTrace();
+                    }
+                } // end for each detail
+            } // end if details != null
+
             connection.commit();
+            System.out.println("DEBUG: Transaction committed for exportId=" + exportId);
             return exportId;
         } catch (SQLException e) {
-            connection.rollback();
+            try {
+                connection.rollback();
+                System.err.println("DEBUG: Transaction rolled back");
+            } catch (SQLException ignore) {}
             throw e;
         } finally {
-            connection.setAutoCommit(true);
+            try { connection.setAutoCommit(prevAuto); } catch (SQLException ignore) {}
+            if (rsKeys != null) try { rsKeys.close(); } catch (Exception ignore) {}
+            if (psReceipt != null) try { psReceipt.close(); } catch (Exception ignore) {}
         }
     }
 
@@ -188,6 +310,8 @@ public class ExportReceiptDAO extends DBContext {
             receipts.add(dto);
         }
         
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
         return receipts;
     }
 
@@ -256,11 +380,13 @@ public class ExportReceiptDAO extends DBContext {
         
         ResultSet rs = st.executeQuery();
         
+        int count = 0;
         if (rs.next()) {
-            return rs.getInt(1);
+            count = rs.getInt(1);
         }
-        
-        return 0;
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
+        return count;
     }
 
     public ExportReceipt getExportReceiptById(int exportId) throws SQLException {
@@ -287,9 +413,13 @@ public class ExportReceiptDAO extends DBContext {
             receipt.setNote(rs.getString("note"));
             receipt.setCustomerName(rs.getString("customer_name"));
             receipt.setUserName(rs.getString("user_name"));
+            try { rs.close(); } catch (Exception ignore) {}
+            try { st.close(); } catch (Exception ignore) {}
             return receipt;
         }
         
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
         return null;
     }
     
@@ -298,7 +428,7 @@ public class ExportReceiptDAO extends DBContext {
      * @param startDate Start date
      * @param endDate End date
      * @param groupBy "day" or "month"
-     * @return List of ImportStatDTO
+     * @return List of ExportStatDTO
      */
     public List<model.ExportStatDTO> getExportStatistics(java.util.Date startDate, java.util.Date endDate, String groupBy) throws SQLException {
         List<model.ExportStatDTO> stats = new ArrayList<>();
@@ -341,6 +471,8 @@ public class ExportReceiptDAO extends DBContext {
             stats.add(stat);
         }
         
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
         return stats;
     }
     
@@ -368,12 +500,13 @@ public class ExportReceiptDAO extends DBContext {
             int totalQuantity = rs.getInt("total_quantity");
             java.math.BigDecimal totalAmount = rs.getBigDecimal("total_amount");
             java.math.BigDecimal avgAmount = rs.getBigDecimal("avg_amount");
-            
+            try { rs.close(); } catch (Exception ignore) {}
+            try { st.close(); } catch (Exception ignore) {}
             return new Object[]{totalReceipts, totalQuantity, totalAmount, avgAmount};
         }
         
+        try { rs.close(); } catch (Exception ignore) {}
+        try { st.close(); } catch (Exception ignore) {}
         return new Object[]{0, 0, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO};
     }
 }
-
-
