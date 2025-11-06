@@ -102,7 +102,7 @@ public class ExportStatisticsServlet extends HttpServlet {
             request.setAttribute("startDateDisplay", sdf.format(startDate));
             request.setAttribute("endDateDisplay", sdf.format(endDate));
             
-            request.getRequestDispatcher("/warehouse-import-mgt/import-statistics.jsp").forward(request, response);
+            request.getRequestDispatcher("/warehouse-export-mgt/export-statistics.jsp").forward(request, response);
             
         } catch (SQLException | ParseException e) {
             e.printStackTrace();

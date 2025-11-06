@@ -101,7 +101,10 @@ public class ImportStatisticsServlet extends HttpServlet {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             request.setAttribute("startDateDisplay", sdf.format(startDate));
             request.setAttribute("endDateDisplay", sdf.format(endDate));
-            
+
+            // Set active page for sidebar navigation
+            request.setAttribute("activePage", "import-statistics");
+
             request.getRequestDispatcher("/warehouse-import-mgt/import-statistics.jsp").forward(request, response);
             
         } catch (SQLException | ParseException e) {

@@ -1,7 +1,7 @@
-package controller.supplierMgt;
+package controller.customerMgt;
 
 import dal.ActivityLogHelper;
-import dal.SupplierDAO;
+import dal.CustomerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,16 +9,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
-import model.Supplier;
+import model.Customer;
 
-public class CreateSupplierServlet extends HttpServlet {
+public class CreateCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setAttribute("activePage", "suppliers");
+        request.setAttribute("activePage", "customers");
         request.setAttribute("mode", "create");
-        request.getRequestDispatcher("/supplier-mgt/supplier-form.jsp").forward(request, response);
+        request.getRequestDispatcher("/customer-mgt/customer-form.jsp").forward(request, response);
     }
 
     @Override
@@ -33,33 +33,33 @@ public class CreateSupplierServlet extends HttpServlet {
         String statusParam = request.getParameter("status");
         boolean status = "1".equals(statusParam) || "on".equalsIgnoreCase(statusParam) || "true".equalsIgnoreCase(statusParam);
 
-        Supplier s = new Supplier();
+        Customer s = new Customer();
         s.setName(name);
         s.setPhone(phone);
         s.setEmail(email);
         s.setAddress(address);
         s.setStatus(status);
 
-        SupplierDAO dao = new SupplierDAO();
+        CustomerDAO dao = new CustomerDAO();
         try {
             int id = dao.create(s);
             if (id > 0) {
                 // Log activity
                 HttpSession session = request.getSession();
-                ActivityLogHelper.logCreate(session, "Suppliers", id, 
-                    "Created new supplier: " + name);
+                ActivityLogHelper.logCreate(session, "Customers", id, 
+                    "Created new customer: " + name);
                 
-                response.sendRedirect(request.getContextPath() + "/suppliers?created=1");
+                response.sendRedirect(request.getContextPath() + "/customers?created=1");
                 return;
             }
-            request.setAttribute("error", "Failed to create supplier");
+            request.setAttribute("error", "Failed to create customer");
         } catch (SQLException e) {
-            request.setAttribute("error", "Error creating supplier: " + e.getMessage());
+            request.setAttribute("error", "Error creating customer: " + e.getMessage());
         }
-        request.setAttribute("supplier", s);
-        request.setAttribute("activePage", "add-supplier");
+        request.setAttribute("customer", s);
+        request.setAttribute("activePage", "customers");
         request.setAttribute("mode", "create");
-        request.getRequestDispatcher("/supplier-mgt/supplier-form.jsp").forward(request, response);
+        request.getRequestDispatcher("/customer-mgt/customer-form.jsp").forward(request, response);
     }
 }
 

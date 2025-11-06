@@ -7,6 +7,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%
+    request.setAttribute("activePage", "categories");
+%>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -174,6 +178,30 @@
                     </div>
                 </div>
 
+                <c:if test="${param.msg == 'deleted'}">
+                    <div class="alert alert-success">
+                        Category deleted successfully.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'hasProducts'}">
+                    <div class="alert alert-danger">
+                        Cannot delete this category because there are still products assigned to it.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'invalid'}">
+                    <div class="alert alert-danger">
+                        Invalid category ID.
+                    </div>
+                </c:if>
+
+                <c:if test="${param.msg == 'error'}">
+                    <div class="alert alert-danger">
+                        An unexpected error occurred while deleting the category.
+                    </div>
+                </c:if>
+
                 <div class="card-body">
                     <div class="table-wrapper">
                         <table class="table">
@@ -201,7 +229,7 @@
                                         <td>${category.updatedAt}</td>
 
                                         <td style="text-align:center;">
-                                            <form method="get" action="${pageContext.request.contextPath}/editCategory" style="display:inline;">
+                                            <form method="get" action="${pageContext.request.contextPath}/warehouse-management/edit-category" style="display:inline;">
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
                                             </form>
@@ -222,7 +250,7 @@
                     <c:if test="${not empty successMessage}">
                         <div class="alert alert-success">${successMessage}</div>
                     </c:if>
-                        
+
                     <c:if test="${not empty errorMessage}">
                         <div class="alert alert-danger">${errorMessage}</div>
                     </c:if>

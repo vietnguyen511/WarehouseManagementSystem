@@ -36,16 +36,16 @@ public class ExportReceiptDAO extends DBContext {
 
     // Product-related operations moved to ProductDAO
 
-    public void increaseProductStock(int productId, int quantity, BigDecimal newImportPrice) throws SQLException {
-        String sql = "UPDATE Products SET quantity = quantity + ?, import_price = ISNULL(?, import_price), updated_at = GETDATE() WHERE product_id = ?";
+    public void increaseProductStock(int productId, int quantity, BigDecimal newExportPrice) throws SQLException {
+        String sql = "UPDATE Products SET quantity = quantity + ?, export_price = ISNULL(?, export_price), updated_at = GETDATE() WHERE product_id = ?";
         PreparedStatement st = connection.prepareStatement(sql);
         st.setInt(1, quantity);
-        st.setBigDecimal(2, newImportPrice);
+        st.setBigDecimal(2, newExportPrice);
         st.setInt(3, productId);
         st.executeUpdate();
     }
 
-    public void createReceiptWithDetails(ExportReceipt receipt) throws SQLException {
+    public int createReceiptWithDetails(ExportReceipt receipt) throws SQLException {
         try {
             connection.setAutoCommit(false);
             int exportId = createExportReceipt(receipt);
@@ -54,37 +54,39 @@ public class ExportReceiptDAO extends DBContext {
             ExportDetailDAO exportDetailDAO = new ExportDetailDAO(connection);
             ProductVariantDAO variantDAO = new ProductVariantDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
-            
-            for (ExportDetail d : receipt.getDetails()) {
-                // Find or create product variant
-                ProductVariant variant = variantDAO.getVariantByProductCodeSizeColor(
-                    d.getProductCode(), d.getSize(), d.getColor());
-                
-                if (variant == null) {
-                    // Create new product if not existing
-                    Integer productId = productDAO.getProductIdByCode(d.getProductCode());
-                    if (productId == null) {
-                        productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getPrice());//, d.getCategoryId()
-                    }
-                    
-                    // Create new variant
-                    variant = new ProductVariant();
-                    variant.setProductId(productId);
-                    variant.setSize(d.getSize());
-                    variant.setColor(d.getColor());
-                    variant.setQuantity(0);
-                    variant.setStatus(true);
-                    int variantId = variantDAO.createProductVariant(variant);
-                    variant.setVariantId(variantId);
-                }
-                
-                d.setVariantId(variant.getVariantId());
-                exportDetailDAO.insertExportDetail(d, exportId);
-                variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
-                
-                
-            }
+//            
+//            for (ExportDetail d : receipt.getDetails()) {
+//                // Find or create product variant
+//                ProductVariant variant = variantDAO.getVariantByProductCodeSizeColor(
+//                    d.getProductCode(), d.getSize(), d.getColor());
+//                
+//                if (variant == null) {
+//                    // Create new product if not existing
+//                    Integer productId = productDAO.getProductIdByCode(d.getProductCode());
+//                    if (productId == null) {
+//                        productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getUnit(), d.getPrice(), d.getCategoryId());
+//                    }
+//                    
+//                    // Create new variant
+//                    variant = new ProductVariant();
+//                    variant.setProductId(productId);
+//                    variant.setSize(d.getSize());
+//                    variant.setColor(d.getColor());
+//                    variant.setQuantity(0);
+//                    variant.setStatus(true);
+//                    int variantId = variantDAO.createProductVariant(variant);
+//                    variant.setVariantId(variantId);
+//                }
+//                
+//                d.setVariantId(variant.getVariantId());
+//                exportDetailDAO.insertExportDetail(d, exportId);
+//                variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
+//                
+//                
+//                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
+//            }
             connection.commit();
+            return exportId;
         } catch (SQLException e) {
             connection.rollback();
             throw e;
@@ -292,7 +294,7 @@ public class ExportReceiptDAO extends DBContext {
     }
     
     /**
-     * Get import statistics grouped by day or month
+     * Get export statistics grouped by day or month
      * @param startDate Start date
      * @param endDate End date
      * @param groupBy "day" or "month"
@@ -307,7 +309,7 @@ public class ExportReceiptDAO extends DBContext {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
         if (isMonthly) {
-            sql.append("    FORMAT(ir.date, 'yyyy-MM') AS period, ");
+            sql.append("    FORMAT(er.date, 'yyyy-MM') AS period, ");
         } else {
             sql.append("    CAST(er.date AS DATE) AS period, ");
         }
@@ -343,7 +345,7 @@ public class ExportReceiptDAO extends DBContext {
     }
     
     /**
-     * Get total import statistics (aggregated)
+     * Get total export statistics (aggregated)
      * Returns an array: [totalReceipts, totalQuantity, totalAmount, avgAmount]
      */
     public Object[] getTotalExportStatistics(java.util.Date startDate, java.util.Date endDate) throws SQLException {

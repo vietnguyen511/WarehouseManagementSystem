@@ -1,16 +1,13 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%
-    request.setAttribute("activePage", "suppliers");
-%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Suppliers - Warehouse Management System</title>
+    <title>Customers - Warehouse Management System</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/warehouse-style.css">
     <script src="${pageContext.request.contextPath}/js/warehouse-app.js" defer></script>
     <style>
@@ -44,11 +41,11 @@
         <div class="card">
             <div class="card-header">
                 <div>
-                    <h1 class="card-title">Suppliers</h1>
-                    <p class="card-subtitle">Manage supplier list</p>
+                    <h1 class="card-title">Customers</h1>
+                    <p class="card-subtitle">Manage customer list</p>
                 </div>
                 <div class="action-bar">
-                    <a href="${pageContext.request.contextPath}/suppliers/new" class="btn btn-success">Add Supplier</a>
+                    <a href="${pageContext.request.contextPath}/customers/new" class="btn btn-success">Add Customer</a>
                 </div>
             </div>
             <div class="card-body">
@@ -56,16 +53,16 @@
                     <div class="alert alert-danger">${error}</div>
                 </c:if>
                 <c:if test="${param.created == '1'}">
-                    <div class="alert alert-success">Supplier created successfully.</div>
+                    <div class="alert alert-success">Customer created successfully.</div>
                 </c:if>
                 <c:if test="${param.updated == '1'}">
-                    <div class="alert alert-success">Supplier updated successfully.</div>
+                    <div class="alert alert-success">Customer updated successfully.</div>
                 </c:if>
                 <c:if test="${param.deleted == '1'}">
-                    <div class="alert alert-success">Supplier deleted successfully.</div>
+                    <div class="alert alert-success">Customer deleted successfully.</div>
                 </c:if>
 
-                <form method="get" action="${pageContext.request.contextPath}/suppliers">
+                <form method="get" action="${pageContext.request.contextPath}/customers">
                     <div class="filter-bar" style="grid-template-columns: 2fr minmax(140px, 12%) auto;">
                         <div class="form-group" style="flex:2;">
                             <label class="form-label">Search</label>
@@ -81,7 +78,7 @@
                         </div>
                         <div class="filter-actions">
                             <button type="submit" class="btn btn-primary">Apply</button>
-                            <a href="${pageContext.request.contextPath}/suppliers" class="btn btn-secondary">Reset</a>
+                            <a href="${pageContext.request.contextPath}/customers" class="btn btn-secondary">Reset</a>
                         </div>
                     </div>
                 </form>
@@ -100,38 +97,38 @@
                         </thead>
                         <tbody>
                         <c:choose>
-                            <c:when test="${not empty suppliers}">
-                                <c:forEach var="s" items="${suppliers}">
+                            <c:when test="${not empty customers}">
+                                <c:forEach var="c" items="${customers}">
                                     <tr>
-                                        <td><span class="font-medium">${s.name}</span></td>
-                                        <td>${s.phone}</td>
-                                        <td>${s.email}</td>
-                                        <td>${s.address}</td>
+                                        <td><span class="font-medium">${c.name}</span></td>
+                                        <td>${c.phone}</td>
+                                        <td>${c.email}</td>
+                                        <td>${c.address}</td>
                                         <td style="text-align:center;">
                                             <c:choose>
-                                                <c:when test="${s.status}"><span class="badge badge-success">Active</span></c:when>
+                                                <c:when test="${c.status}"><span class="badge badge-success">Active</span></c:when>
                                                 <c:otherwise><span class="badge badge-secondary">Inactive</span></c:otherwise>
                                             </c:choose>
                                         </td>
                                         <td style="text-align:center;">
                                             <div class="d-flex gap-2" style="justify-content:center;">
-                                                <a class="btn btn-sm btn-action btn-view" href="${pageContext.request.contextPath}/suppliers/view?id=${s.supplierId}">
+                                                <a class="btn btn-sm btn-action btn-view" href="${pageContext.request.contextPath}/customers/view?id=${c.customerId}">
                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
                                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                                         <circle cx="12" cy="12" r="3"></circle>
                                                     </svg>
                                                     View
                                                 </a>
-                                                <a class="btn btn-sm btn-action btn-edit" href="${pageContext.request.contextPath}/suppliers/edit?id=${s.supplierId}">
+                                                <a class="btn btn-sm btn-action btn-edit" href="${pageContext.request.contextPath}/customers/edit?id=${c.customerId}">
                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
                                                         <path d="M12 20h9"></path>
                                                         <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
                                                     </svg>
                                                     Edit
                                                 </a>
-                                                <form method="post" action="${pageContext.request.contextPath}/suppliers/delete" class="delete-form" style="display:inline;">
-                                                    <input type="hidden" name="id" value="${s.supplierId}" />
-                                                    <button type="button" class="btn btn-sm btn-action btn-delete btn-open-delete-modal" data-supplier-id="${s.supplierId}" data-supplier-name="${fn:escapeXml(s.name)}">
+                                                <form method="post" action="${pageContext.request.contextPath}/customers/delete" class="delete-form" style="display:inline;">
+                                                    <input type="hidden" name="id" value="${c.customerId}" />
+                                                    <button type="button" class="btn btn-sm btn-action btn-delete btn-open-delete-modal" data-customer-id="${c.customerId}" data-customer-name="${fn:escapeXml(c.name)}">
                                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
                                                             <polyline points="3 6 5 6 21 6"></polyline>
                                                             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
@@ -149,7 +146,7 @@
                             </c:when>
                             <c:otherwise>
                                 <tr>
-                                    <td colspan="6" class="table-empty">No suppliers found. Try adjusting filters.</td>
+                                    <td colspan="6" class="table-empty">No customers found. Try adjusting filters.</td>
                                 </tr>
                             </c:otherwise>
                         </c:choose>
@@ -159,7 +156,7 @@
 
                 <div class="d-flex justify-content-between align-items-center" style="margin-top: 1rem; flex-wrap: nowrap; gap: 1rem;">
                     <div>
-                        <form method="get" action="${pageContext.request.contextPath}/suppliers" class="d-flex gap-2" style="align-items: center; white-space: nowrap;">
+                        <form method="get" action="${pageContext.request.contextPath}/customers" class="d-flex gap-2" style="align-items: center; white-space: nowrap;">
                             <input type="hidden" name="search" value="${fn:escapeXml(search)}" />
                             <input type="hidden" name="status" value="${statusFilter}" />
                             <input type="hidden" name="page" value="${page}" />
@@ -175,7 +172,7 @@
                         <c:if test="${totalPages > 1}">
                             <ul class="pagination" style="margin:0;">
                                 <li>
-                                    <a class="${page <= 1 ? 'disabled' : ''}" href="${pageContext.request.contextPath}/suppliers?page=${page-1}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">
+                                    <a class="${page <= 1 ? 'disabled' : ''}" href="${pageContext.request.contextPath}/customers?page=${page-1}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">
                                         <span style="display:inline-flex; align-items:center; gap:4px;">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <polyline points="15 18 9 12 15 6"></polyline>
@@ -186,11 +183,11 @@
                                 </li>
                                 <c:forEach var="p" begin="1" end="${totalPages}">
                                     <li>
-                                        <a class="${p == page ? 'active' : ''}" href="${pageContext.request.contextPath}/suppliers?page=${p}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">${p}</a>
+                                        <a class="${p == page ? 'active' : ''}" href="${pageContext.request.contextPath}/customers?page=${p}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">${p}</a>
                                     </li>
                                 </c:forEach>
                                 <li>
-                                    <a class="${page >= totalPages ? 'disabled' : ''}" href="${pageContext.request.contextPath}/suppliers?page=${page+1}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">
+                                    <a class="${page >= totalPages ? 'disabled' : ''}" href="${pageContext.request.contextPath}/customers?page=${page+1}&size=${size}&search=${fn:escapeXml(search)}&status=${statusFilter}">
                                         <span style="display:inline-flex; align-items:center; gap:4px;">
                                             Next
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -215,7 +212,7 @@
                 <h2 class="modal-title" id="deleteModalTitle">Confirm Delete</h2>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete supplier <strong id="deleteSupplierName"></strong>?</p>
+                <p>Are you sure you want to delete customer <strong id="deleteCustomerName"></strong>?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-outline" id="cancelDeleteBtn">Cancel</button>
@@ -227,14 +224,14 @@
     <script>
         (function(){
             const modal = document.getElementById('deleteModal');
-            const supplierNameEl = document.getElementById('deleteSupplierName');
+            const customerNameEl = document.getElementById('deleteCustomerName');
             const cancelBtn = document.getElementById('cancelDeleteBtn');
             const confirmBtn = document.getElementById('confirmDeleteBtn');
             let pendingForm = null;
 
             function openModal(form, name) {
                 pendingForm = form;
-                supplierNameEl.textContent = name || '';
+                customerNameEl.textContent = name || '';
                 modal.style.display = 'flex';
             }
 
@@ -247,7 +244,7 @@
                 btn.addEventListener('click', function(e){
                     e.preventDefault();
                     const form = this.closest('form');
-                    const name = this.getAttribute('data-supplier-name');
+                    const name = this.getAttribute('data-customer-name');
                     openModal(form, name);
                 });
             });

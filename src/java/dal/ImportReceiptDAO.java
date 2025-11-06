@@ -81,6 +81,8 @@ public class ImportReceiptDAO extends DBContext {
                 d.setVariantId(variant.getVariantId());
                 importDetailDAO.insertImportDetail(d, importId);
                 variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
+                // Cập nhật lại tổng quantity cho bảng product
+                productDAO.updateQuantityAsSumOfVariants(variant.getProductId());
                 
                 // Update product's import_price with new price (from this import receipt)
                 productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
