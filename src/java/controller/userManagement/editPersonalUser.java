@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.User;
 import java.io.IOException;
 import java.sql.Connection;
@@ -59,9 +60,13 @@ public class editPersonalUser extends HttpServlet
             conn.ps.setInt(6, id);
 
             conn.ps.executeUpdate();
-
+           //Session update related
+            HttpSession session = request.getSession(false);
+            User user =(User) session.getAttribute("user");
+            user.setFullname(fullname);
+            session.setAttribute("user", user);
             // 5️⃣ Redirect or reload
-            response.sendRedirect("profile"); // or change to your desired page
+            response.sendRedirect("profile"); 
 
         } catch (Exception e) 
         {
