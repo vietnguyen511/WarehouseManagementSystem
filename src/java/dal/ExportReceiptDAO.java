@@ -129,19 +129,7 @@ public class ExportReceiptDAO extends DBContext {
                             System.out.println("WARN: product lookup threw exception for code=" + d.getProductCode());
                             ex.printStackTrace();
                             productId = null;
-                        }
-
-                        if (productId == null) {
-                            try {
-                                // create product if not exists (ensure productDAO.createProduct exists)
-                                productId = productDAO.createProduct(d.getProductCode(), d.getProductName(), d.getUnit(), d.getPrice(), d.getCategoryId());
-                                System.out.println("DEBUG: Created product id=" + productId + " for code=" + d.getProductCode());
-                            } catch (Exception ex) {
-                                System.out.println("WARN: failed to create product for code=" + d.getProductCode());
-                                ex.printStackTrace();
-                                productId = null;
-                            }
-                        }
+                        }                     
 
                         if (productId != null) {
                             try {
