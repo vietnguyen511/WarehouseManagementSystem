@@ -371,7 +371,7 @@
                             <c:choose>
                                 <c:when test="${not empty product.image}">
                                     <div class="image-preview-box"
-                                         style="background-image:url('${pageContext.request.contextPath}/${previewUrl}')";color:transparent;">
+                                         style="background-image:url('${previewUrl}')";color:transparent;">
                                     </div>
                                 </c:when>
                                 <c:otherwise>
