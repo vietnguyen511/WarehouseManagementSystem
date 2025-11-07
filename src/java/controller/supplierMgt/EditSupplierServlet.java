@@ -50,6 +50,47 @@ public class EditSupplierServlet extends HttpServlet {
             String statusParam = request.getParameter("status");
             boolean status = "1".equals(statusParam) || "on".equalsIgnoreCase(statusParam) || "true".equalsIgnoreCase(statusParam);
 
+            // Validate phone number if provided
+            if (phone != null && !phone.trim().isEmpty()) {
+                String phoneTrimmed = phone.trim();
+                if (!phoneTrimmed.startsWith("0") || !phoneTrimmed.matches("^0\\d{9,10}$")) {
+                    request.setAttribute("error", "Phone number must start with 0 and contain 10-11 digits only");
+                    Supplier s = new Supplier();
+                    s.setSupplierId(id);
+                    s.setName(name);
+                    s.setPhone(phone);
+                    s.setEmail(email);
+                    s.setAddress(address);
+                    s.setStatus(status);
+                    request.setAttribute("supplier", s);
+                    request.setAttribute("activePage", "suppliers");
+                    request.setAttribute("mode", "edit");
+                    request.getRequestDispatcher("/supplier-mgt/supplier-form.jsp").forward(request, response);
+                    return;
+                }
+            }
+
+            SupplierDAO dao = new SupplierDAO();
+            // Check for duplicate supplier name (excluding current supplier)
+            if (name != null && !name.trim().isEmpty()) {
+                Supplier existing = dao.findByName(name.trim());
+                if (existing != null && existing.getSupplierId() != id) {
+                    request.setAttribute("error", "Supplier with this name already exists");
+                    Supplier s = new Supplier();
+                    s.setSupplierId(id);
+                    s.setName(name);
+                    s.setPhone(phone);
+                    s.setEmail(email);
+                    s.setAddress(address);
+                    s.setStatus(status);
+                    request.setAttribute("supplier", s);
+                    request.setAttribute("activePage", "suppliers");
+                    request.setAttribute("mode", "edit");
+                    request.getRequestDispatcher("/supplier-mgt/supplier-form.jsp").forward(request, response);
+                    return;
+                }
+            }
+
             Supplier s = new Supplier();
             s.setSupplierId(id);
             s.setName(name);
@@ -58,7 +99,6 @@ public class EditSupplierServlet extends HttpServlet {
             s.setAddress(address);
             s.setStatus(status);
 
-            SupplierDAO dao = new SupplierDAO();
             if (dao.update(s)) {
                 // Log activity
                 ActivityLogHelper.logUpdate(request.getSession(), "Suppliers", id, 
