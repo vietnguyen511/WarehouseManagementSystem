@@ -5,6 +5,7 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
@@ -336,8 +337,8 @@
                                         <td>${product.material}</td>
                                         <td>${product.unit}</td>
                                         <td>${product.quantity}</td>
-                                        <td>${product.importPrice}</td>
-                                        <td>${product.exportPrice}</td>
+                                        <td>${latestImportPrices[product.productId]}</td>
+                                        <td>${latestExportPrices[product.productId]}</td>
 
                                         <td>
                                             <c:choose>

@@ -84,8 +84,6 @@ public class EditProductServlet extends HttpServlet {
         String name = request.getParameter("name");
         String material = request.getParameter("material");
         String unit = request.getParameter("unit");
-        String importPriceStr = request.getParameter("import_price");
-        String exportPriceStr = request.getParameter("export_price");
         String description = request.getParameter("description");
         String categoryIdStr = request.getParameter("category_id");
         String statusStr = request.getParameter("status");
@@ -110,8 +108,6 @@ public class EditProductServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(idRaw.trim());
             int categoryId = Integer.parseInt(categoryIdStr.trim());
-            BigDecimal importPrice = importPriceStr.isEmpty() ? null : new BigDecimal(importPriceStr);
-            BigDecimal exportPrice = exportPriceStr.isEmpty() ? null : new BigDecimal(exportPriceStr);
             boolean status = "1".equals(statusStr);
 
             Product p = new Product();
@@ -121,8 +117,6 @@ public class EditProductServlet extends HttpServlet {
             p.setCategoryId(categoryId);
             p.setMaterial(material);
             p.setUnit(unit);
-            p.setImportPrice(importPrice);
-            p.setExportPrice(exportPrice);
             p.setStatus(status);
             p.setDescription(description);
             p.setImage(image);
