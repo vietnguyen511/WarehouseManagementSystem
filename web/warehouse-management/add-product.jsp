@@ -354,30 +354,6 @@
                             </div>
                         </div>
 
-                        <div class="form-grid-2">
-                            <div class="form-group">
-                                <label for="import_price">Import Price</label>
-                                <input type="number"
-                                       id="import_price"
-                                       name="import_price"
-                                       value="${old_import_price}"
-                                       min="0"
-                                       step="0.01"
-                                       placeholder="80000">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="export_price">Export Price</label>
-                                <input type="number"
-                                       id="export_price"
-                                       name="export_price"
-                                       value="${old_export_price}"
-                                       min="0"
-                                       step="0.01"
-                                       placeholder="150000">
-                            </div>
-                        </div>
-
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea id="description"

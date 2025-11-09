@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.annotation.MultipartConfig;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -66,8 +65,6 @@ public class AddProductServlet extends HttpServlet {
         String categoryIdStr = request.getParameter("category_id");
         String material = request.getParameter("material");
         String unit = request.getParameter("unit");
-        String importPriceStr = request.getParameter("import_price");
-        String exportPriceStr = request.getParameter("export_price");
         String description = request.getParameter("description");
         String manualImagePath = request.getParameter("image"); // optional fallback
         String statusStr = request.getParameter("status");
@@ -113,8 +110,6 @@ public class AddProductServlet extends HttpServlet {
             request.setAttribute("old_category_id", categoryIdStr);
             request.setAttribute("old_material", material);
             request.setAttribute("old_unit", unit);
-            request.setAttribute("old_import_price", importPriceStr);
-            request.setAttribute("old_export_price", exportPriceStr);
             request.setAttribute("old_description", description);
             request.setAttribute("old_image", image);
             request.setAttribute("old_status", statusStr);
@@ -127,16 +122,6 @@ public class AddProductServlet extends HttpServlet {
         try {
             int categoryId = Integer.parseInt(categoryIdStr.trim());
 
-            BigDecimal importPrice = null;
-            if (importPriceStr != null && !importPriceStr.trim().isEmpty()) {
-                importPrice = new BigDecimal(importPriceStr.trim());
-            }
-
-            BigDecimal exportPrice = null;
-            if (exportPriceStr != null && !exportPriceStr.trim().isEmpty()) {
-                exportPrice = new BigDecimal(exportPriceStr.trim());
-            }
-
             boolean status = "1".equals(statusStr);
 
             // Map vào model Product (model Product không có description/image)
@@ -147,8 +132,6 @@ public class AddProductServlet extends HttpServlet {
             p.setMaterial(material != null ? material.trim() : null);
             p.setUnit(unit != null ? unit.trim() : null);
             p.setQuantity(0); // new product starts with 0 stock
-            p.setImportPrice(importPrice);
-            p.setExportPrice(exportPrice);
             p.setStatus(status);
 
             p.setDescription((description != null && !description.trim().isEmpty()) ? description.trim() : null);
@@ -172,8 +155,6 @@ public class AddProductServlet extends HttpServlet {
                 request.setAttribute("old_category_id", categoryIdStr);
                 request.setAttribute("old_material", material);
                 request.setAttribute("old_unit", unit);
-                request.setAttribute("old_import_price", importPriceStr);
-                request.setAttribute("old_export_price", exportPriceStr);
                 request.setAttribute("old_description", description);
                 request.setAttribute("old_image", image);
                 request.setAttribute("old_status", statusStr);
@@ -195,8 +176,6 @@ public class AddProductServlet extends HttpServlet {
             request.setAttribute("old_category_id", categoryIdStr);
             request.setAttribute("old_material", material);
             request.setAttribute("old_unit", unit);
-            request.setAttribute("old_import_price", importPriceStr);
-            request.setAttribute("old_export_price", exportPriceStr);
             request.setAttribute("old_description", description);
             request.setAttribute("old_image", image);
             request.setAttribute("old_status", statusStr);
