@@ -233,7 +233,6 @@ public class CategoryDAO extends DBContext {
         String sql = "UPDATE Categories "
                 + "SET code = ?, name = ?, description = ?, status = ?, updated_at = GETDATE() "
                 + "WHERE category_id = ?";
-
         try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, category.getCode().trim());
@@ -242,12 +241,25 @@ public class CategoryDAO extends DBContext {
             ps.setBoolean(4, category.getStatus());
             ps.setInt(5, category.getCategoryId());
 
+            // Nếu chuyển sang inactive thì gọi hàm riêng để disable các sản phẩm
+            if (!category.getStatus()) {
+                deactivateProductsByCategory(category.getCategoryId());
+            }
+
             int rows = ps.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
             System.out.println("Error in updateCategory: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void deactivateProductsByCategory(int categoryId) throws SQLException {
+        String sql = "UPDATE Products SET status = 0, updated_at = GETDATE() WHERE category_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ps.executeUpdate();
         }
     }
 
