@@ -110,6 +110,28 @@ public class EditProductServlet extends HttpServlet {
             int categoryId = Integer.parseInt(categoryIdStr.trim());
             boolean status = "1".equals(statusStr);
 
+            // NEW: Validate nếu category đang inactive thì không được bật active cho product
+            Category category = categoryDAO.getCategoryById(categoryId);
+            if (category != null && !category.getStatus() && status) {
+                request.setAttribute("errorMessage", "Cannot activate product because the selected category is inactive.");
+
+                List<Category> categories = categoryDAO.getAllCategories();
+                request.setAttribute("categories", categories);
+
+                request.setAttribute("old_code", code);
+                request.setAttribute("old_name", name);
+                request.setAttribute("old_category_id", categoryIdStr);
+                request.setAttribute("old_material", material);
+                request.setAttribute("old_unit", unit);
+                request.setAttribute("old_description", description);
+                request.setAttribute("old_image", image);
+                request.setAttribute("old_status", statusStr);
+                request.setAttribute("old_image_preview_url", image);
+
+                request.getRequestDispatcher("/warehouse-management/edit-product.jsp").forward(request, response);
+                return;
+            }
+
             Product p = new Product();
             p.setProductId(id);
             p.setCode(code);

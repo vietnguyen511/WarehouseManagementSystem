@@ -192,12 +192,6 @@
                 background-color: #3b82f6;
                 color: #fff;
             }
-
-            /* DELETE / DANGER (Đỏ) */
-            .btn-danger {
-                background-color: #dc2626;
-                color: #fff;
-            }
             .btn-danger:hover {
                 background-color: #dc2626;
                 color: #fff;
@@ -274,26 +268,6 @@
                             Product created successfully.
                         </div>
                     </c:if>
-                    <c:if test="${param.msg == 'delSuccess'}">
-                        <div class="alert alert-success" style="margin-top:0.75rem;">
-                            Product deleted successfully.
-                        </div>
-                    </c:if>
-                    <c:if test="${param.msg == 'delBlocked'}">
-                        <div class="alert alert-danger" style="margin-top:0.75rem;">
-                            Cannot delete this product because it has related data (variants / import / export).
-                        </div>
-                    </c:if>
-                    <c:if test="${param.msg == 'delInvalid'}">
-                        <div class="alert alert-danger" style="margin-top:0.75rem;">
-                            Invalid product ID.
-                        </div>
-                    </c:if>
-                    <c:if test="${param.msg == 'delError'}">
-                        <div class="alert alert-danger" style="margin-top:0.75rem;">
-                            An unexpected error occurred while deleting the product.
-                        </div>
-                    </c:if>
                     <c:if test="${param.msg == 'editSuccess'}">
                         <div class="alert alert-success" style="margin-top:0.75rem;">
                             Product updated successfully.
@@ -366,14 +340,6 @@
                                                   style="display:inline;">
                                                 <input type="hidden" name="id" value="${product.productId}">
                                                 <button type="submit" class="btn-secondary">Edit</button>
-                                            </form>
-
-                                            <form method="post" 
-                                                  action="${pageContext.request.contextPath}/warehouse-management/delete-product"
-                                                  style="display:inline;"
-                                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                <input type="hidden" name="id" value="${product.productId}">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
