@@ -190,7 +190,7 @@ public class CategoryDAO extends DBContext {
             st.setString(1, category.getCode());
             st.setString(2, category.getName());
             st.setString(3, category.getDescription());
-            st.setBoolean(4, category.isStatus());
+            st.setBoolean(4, category.getStatus());
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error in insertCategory: " + e.getMessage());
@@ -211,7 +211,7 @@ public class CategoryDAO extends DBContext {
             st.setString(1, category.getCode());
             st.setString(2, category.getName());
             st.setString(3, category.getDescription());
-            st.setBoolean(4, category.isStatus());
+            st.setBoolean(4, category.getStatus());
             int result = st.executeUpdate();
 
             if (result > 0) {
@@ -239,7 +239,7 @@ public class CategoryDAO extends DBContext {
             ps.setString(1, category.getCode().trim());
             ps.setString(2, category.getName().trim());
             ps.setString(3, category.getDescription());
-            ps.setBoolean(4, category.isStatus());
+            ps.setBoolean(4, category.getStatus());
             ps.setInt(5, category.getCategoryId());
 
             int rows = ps.executeUpdate();
