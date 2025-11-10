@@ -41,7 +41,6 @@ public class CategoryDAO extends DBContext {
         List<Category> list = new ArrayList<>();
         String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
                 + "FROM Categories "
-                + "WHERE status = 1 "
                 + "ORDER BY category_id ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
@@ -227,36 +226,6 @@ public class CategoryDAO extends DBContext {
             System.out.println("Error in insertCategoryReturnId: " + e.getMessage());
             e.printStackTrace();
             return -1;
-        }
-    }
-
-    public boolean deleteCategoryById(int categoryId) {
-        String checkSql = "SELECT COUNT(*) FROM Products WHERE category_id = ?";
-        String deleteSql = "DELETE FROM Categories WHERE category_id = ?";
-
-        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
-
-            // Kiểm tra xem còn sản phẩm trong Category không
-            psCheck.setInt(1, categoryId);
-            try (ResultSet rs = psCheck.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Vẫn còn product trong category này -> KHÔNG xóa
-                    System.out.println("Cannot delete: Category still has products.");
-                    return false;
-                }
-            }
-
-            // Không có sản phẩm -> cho phép xóa cứng
-            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
-                psDelete.setInt(1, categoryId);
-                int rows = psDelete.executeUpdate();
-                return rows > 0; // true nếu xóa thành công
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in deleteCategoryById: " + e.getMessage());
-            e.printStackTrace();
-            return false;
         }
     }
 

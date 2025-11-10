@@ -178,27 +178,9 @@
                     </div>
                 </div>
 
-                <c:if test="${param.msg == 'deleted'}">
-                    <div class="alert alert-success">
-                        Category deleted successfully.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'hasProducts'}">
-                    <div class="alert alert-danger">
-                        Cannot delete this category because there are still products assigned to it.
-                    </div>
-                </c:if>
-
                 <c:if test="${param.msg == 'invalid'}">
                     <div class="alert alert-danger">
                         Invalid category ID.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'error'}">
-                    <div class="alert alert-danger">
-                        An unexpected error occurred while deleting the category.
                     </div>
                 </c:if>
 
@@ -232,7 +214,16 @@
                                         <td>${category.code}</td>
                                         <td>${category.name}</td>
                                         <td>${category.description}</td>
-                                        <td>${category.status}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${category.status}">
+                                                    <span class="status-pill status-active">Active</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-pill status-inactive">Inactive</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td>${category.createdAt}</td>
                                         <td>${category.updatedAt}</td>
 
@@ -240,10 +231,6 @@
                                             <form method="get" action="${pageContext.request.contextPath}/warehouse-management/edit-category" style="display:inline;">
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
-                                            </form>
-                                            <form method="post" action="${pageContext.request.contextPath}/warehouse-management/delete-category" style="display:inline;" onsubmit="return confirm('Delete this category?');">
-                                                <input type="hidden" name="id" value="${category.categoryId}">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
