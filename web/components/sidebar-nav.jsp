@@ -96,10 +96,8 @@
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Product Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-product" class="sidebar-sublink ${activePage == 'add-product' ? 'active' : ''}">Add New Product</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Category Management</a></li>
-                    <li><a href="${pageContext.request.contextPath}/warehouse-management/add-category" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Add New Category</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/product-management" class="sidebar-sublink ${activePage == 'products' ? 'active' : ''}">Products Management</a></li>
+                    <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Categories Management</a></li>
                 </ul>
             </li>
             
