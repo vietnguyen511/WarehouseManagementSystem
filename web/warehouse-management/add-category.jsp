@@ -93,11 +93,6 @@
                 padding: 0.75rem 1rem;
                 border-radius: var(--radius-md);
             }
-            .alert-success {
-                background-color: var(--success-50);
-                color: var(--success-700);
-                border: 1px solid var(--success-200);
-            }
             .alert-danger {
                 background-color: var(--danger-50);
                 color: var(--danger-700);
@@ -152,23 +147,17 @@
                             <button type="button" class="btn-secondary" onclick="goBack()">Back</button>
                         </div>
                     </form>
-
-                    <c:if test="${not empty successMessage}">
-                        <div class="alert alert-success">${successMessage}</div>
-                    </c:if>
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger">${errorMessage}</div>
-                    </c:if>
+                            
+                <c:if test="${param.msg == 'addFail'}">
+                    <div class="alert alert-success">
+                        Failed to add category. Please try again.
+                    </div>
+                </c:if>
+                        
                 </div>
             </div>
         </div>
-
-        <div class="message">
-            <c:if test="${not empty errorMessage}">
-                <div class="alert alert-danger">${errorMessage}</div>
-            </c:if>
-        </div>
-
+                            
         <jsp:include page="/components/footer.jsp" />
 
         <script>

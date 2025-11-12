@@ -42,7 +42,7 @@ public class EditCategoryServlet extends HttpServlet {
             int id = Integer.parseInt(idRaw.trim());
             Category category = dao.getCategoryById(id);
             if (category == null) {
-                response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?msg=notfound");
+                response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?msg=notFound");
                 return;
             }
 
@@ -94,7 +94,7 @@ public class EditCategoryServlet extends HttpServlet {
                         "Updated category: " + name + " (" + code + ")");
                 response.sendRedirect(redirectUrl + "?msg=updated");
             } else {
-                response.sendRedirect(redirectUrl + "?msg=updateFail");
+                response.sendRedirect(redirectUrl + "?msg=updateFail"); 
             }
 
         } catch (Exception e) {

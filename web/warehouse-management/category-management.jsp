@@ -26,6 +26,10 @@
             html, body {
                 height: auto;
                 overflow: auto;
+                background-color: var(--gray-50);
+                font-family: "Segoe UI", Roboto, sans-serif;
+                color: var(--gray-900);
+                margin: 0;
             }
             .main-content-with-sidebar {
                 padding: var(--spacing-lg);
@@ -36,11 +40,14 @@
                 border-radius: var(--radius-lg);
                 box-shadow: var(--shadow-sm);
                 overflow: hidden;
+                border: 1px solid var(--gray-200);
             }
             .card-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+                flex-wrap: wrap;
                 padding: var(--spacing-md) var(--spacing-lg);
                 border-bottom: 1px solid var(--gray-200);
             }
@@ -50,6 +57,8 @@
             .table-wrapper {
                 overflow-x: auto;
                 margin-top: var(--spacing-md);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
             }
             table {
                 width: 100%;
@@ -74,21 +83,6 @@
             }
             .btn-danger:hover {
                 background-color: var(--danger-700);
-            }
-            .alert {
-                padding: 0.75rem 1rem;
-                border-radius: var(--radius-md);
-                margin-top: var(--spacing-md);
-            }
-            .alert-success {
-                background-color: var(--success-50);
-                color: var(--success-700);
-                border: 1px solid var(--success-200);
-            }
-            .alert-danger {
-                background-color: var(--danger-50);
-                color: var(--danger-700);
-                border: 1px solid var(--danger-200);
             }
             .search-form {
                 display: flex;
@@ -178,21 +172,45 @@
                     </div>
                 </div>
 
-                <c:if test="${param.msg == 'invalid'}">
-                    <div class="alert alert-danger">
-                        Invalid category ID.
-                    </div>
-                </c:if>
-
-                <c:if test="${not empty successMessage}">
-                    <div class="alert alert-success">${successMessage}</div>
-                </c:if>
-
-                <c:if test="${not empty errorMessage}">
-                    <div class="alert alert-danger">${errorMessage}</div>
-                </c:if>
-
                 <div class="card-body">
+                    <!-- Add category message -->
+                    <c:if test="${param.msg == 'added'}">
+                        <div class="alert alert-success">
+                            Category added successfully.
+                        </div>
+                    </c:if>
+
+                    <!-- Edit category message -->
+                    <c:if test="${param.msg == 'updated'}">
+                        <div class="alert alert-success">
+                            Category updated successfully.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'updateFail'}">
+                        <div class="alert alert-success">
+                            Failed to update category. Please try again.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'invalid'}">
+                        <div class="alert alert-danger">
+                            Invalid category ID.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'notFound'}">
+                        <div class="alert alert-danger">
+                            Category not found.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'error'}">
+                        <div class="alert alert-danger">
+                            An unexpected error occurred.
+                        </div>
+                    </c:if>
+                    
                     <div class="table-wrapper">
                         <table class="table">
                             <thead>

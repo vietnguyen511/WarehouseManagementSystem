@@ -33,38 +33,29 @@ public class CategoryManagementServlet extends HttpServlet {
         String searchValue = request.getParameter("searchValue");
         CategoryDAO dao = new CategoryDAO();
         List<Category> categoryList = new ArrayList<>();
-
-        // check if search value is not null and its trimmed value is not empty
-        if (searchValue != null && !searchValue.trim().isEmpty()) {
-            try {
-                int categoryId = Integer.parseInt(searchValue.trim());
-                Category category = dao.getCategoryById(categoryId);
-                // check if category is not null
-                if (category != null) {
-                    categoryList.add(category);
+        try {
+            // check if search value is not null and its trimmed value is not empty
+            if (searchValue != null && !searchValue.trim().isEmpty()) {
+                try {
+                    int categoryId = Integer.parseInt(searchValue.trim());
+                    Category category = dao.getCategoryById(categoryId);
+                    // check if category is not null
+                    if (category != null) {
+                        categoryList.add(category);
+                    }
+                } catch (NumberFormatException e) {
+                    categoryList = dao.getCategoryByName(searchValue.trim());
                 }
-            } catch (NumberFormatException e) {
-                categoryList = dao.getCategoryByName(searchValue.trim());
+            } else {
+                categoryList = dao.getAllCategories();
             }
-        } else {
-            categoryList = dao.getAllCategories();
+            request.setAttribute("categoryList", categoryList);
+            request.setAttribute("searchValue", searchValue);
+            request.getRequestDispatcher("/warehouse-management/category-management.jsp").forward(request, response);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            // Lỗi hệ thống -> quay lại list với msg=error (JSP sẽ hiển thị)
+            response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?msg=error");
         }
-
-        String successParam = request.getParameter("success");
-        if ("1".equals(successParam)) {
-            request.setAttribute("successMessage", "Category added successfully!");
-        }
-        
-        // handle delete status
-        String deletedParam = request.getParameter("deleted");
-        if ("1".equals(deletedParam)) {
-            request.setAttribute("successMessage", "Category deleted successfully.");
-        } else if ("0".equals(deletedParam)) {
-            request.setAttribute("errorMessage", "Cannot delete this category because it is already in use.");
-        }
-
-        request.setAttribute("categoryList", categoryList);
-        request.setAttribute("searchValue", searchValue);
-        request.getRequestDispatcher("/warehouse-management/category-management.jsp").forward(request, response);
     }
 }
