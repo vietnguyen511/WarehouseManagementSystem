@@ -60,14 +60,14 @@
                         
                         <!-- Statistics Section -->
                         <div style="flex: 0 0 calc(50% - 12px);">
-                            <h3 style="margin-bottom: 1rem; color: var(--gray-700);">Import Statistics</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--gray-700);">Export Statistics</h3>
                             <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem;">
                                 <div class="form-group">
-                                    <label class="form-label">Total Import Receipts</label>
+                                    <label class="form-label">Total Exported Receipts</label>
                                     <div class="font-semibold" style="font-size: 1.25rem;">${totalReceipts}</div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label">Total Quantity Imported</label>
+                                    <label class="form-label">Total Quantity Exported</label>
                                     <div class="font-semibold" style="font-size: 1.25rem; color: var(--primary-700);">
                                         <fmt:formatNumber value="${totalQuantity}" type="number" />
                                     </div>
