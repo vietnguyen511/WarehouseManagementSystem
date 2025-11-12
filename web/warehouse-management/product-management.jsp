@@ -279,6 +279,7 @@
                             Failed to open Edit Product screen.
                         </div>
                     </c:if>
+                    
                     <c:if test="${param.msg == 'editFail'}">
                         <div class="alert alert-danger" style="margin-top:0.75rem;">
                             Failed to update product. Please try again.

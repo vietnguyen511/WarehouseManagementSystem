@@ -20,34 +20,6 @@ import model.Category;
  * @author DANG
  */
 public class AddCategoryServlet extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AddCategory</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AddCategory at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -79,12 +51,12 @@ public class AddCategoryServlet extends HttpServlet {
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String statusStr = request.getParameter("status");
-
+        
         boolean status = "active".equalsIgnoreCase(statusStr);
 
         if (code == null || code.trim().isEmpty()
                 || name == null || name.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Category code and name are required.");
+            response.sendRedirect(request.getContextPath() + "/warehouse-management/add-category?msg=addFail");
             request.getRequestDispatcher("/warehouse-management/add-category.jsp").forward(request, response);
             return;
         }
@@ -104,9 +76,9 @@ public class AddCategoryServlet extends HttpServlet {
             ActivityLogHelper.logCreate(request.getSession(), "Categories", categoryId, 
                 "Created new category: " + name + " (" + code + ")");
             
-            response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?success=1");
+            response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?msg=added");
         } else {
-            request.setAttribute("errorMessage", "Failed to add category. Please try again.");
+            response.sendRedirect(request.getContextPath() + "/warehouse-management/add-category?msg=addFail");
             request.setAttribute("category", category);
             request.getRequestDispatcher("/warehouse-management/add-category.jsp").forward(request, response);
         }
