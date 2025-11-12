@@ -109,4 +109,28 @@ public class ProductVariantDAO extends DBContext {
         
         return variants;
     }
+    
+    //CHANGE FROM HERE.
+    //CREATE AND CHANGE FROM HERE TO THE NEXT COMMENT
+public int findVariantIdByProductCodeSizeColor(String productCode, String size, String color) throws SQLException {
+    String sql = "SELECT pv.variant_id " +
+                 "FROM ProductVariants pv " +
+                 "INNER JOIN Products p ON pv.product_id = p.product_id " +
+                 "WHERE p.code = ? AND pv.size = ? AND pv.color = ? AND pv.status = 1";
+
+    try (PreparedStatement st = connection.prepareStatement(sql)) {
+        st.setString(1, productCode);
+        st.setString(2, size);
+        st.setString(3, color);
+
+        try (ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("variant_id");
+            }
+        }
+    }
+    return 0;
+}
+
+    //END CHANGE.
 }
