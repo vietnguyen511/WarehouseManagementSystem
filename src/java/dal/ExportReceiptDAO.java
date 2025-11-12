@@ -45,15 +45,23 @@ public class ExportReceiptDAO extends DBContext {
 
     // Product-related operations moved to ProductDAO
 
-    public void increaseProductStock(int productId, int quantity, BigDecimal newExportPrice) throws SQLException {
-        String sql = "UPDATE Products SET quantity = quantity + ?, export_price = ISNULL(?, export_price), updated_at = GETDATE() WHERE product_id = ?";
-        PreparedStatement st = connection.prepareStatement(sql);
-        st.setInt(1, quantity);
-        st.setBigDecimal(2, newExportPrice);
-        st.setInt(3, productId);
-        st.executeUpdate();
-        try { st.close(); } catch (Exception ignore) {}
+   public void decreaseProductStock(int productId, int quantity, BigDecimal newExportPrice) throws SQLException {
+    // Chỉ cập nhật nếu quantity hiện tại >= quantity yêu cầu
+    String sql = "UPDATE Products SET quantity = quantity - ?, export_price = ISNULL(?, export_price), updated_at = GETDATE() WHERE product_id = ? AND quantity >= ?";
+    PreparedStatement st = connection.prepareStatement(sql);
+    st.setInt(1, quantity);
+    st.setBigDecimal(2, newExportPrice);
+    st.setInt(3, productId);
+    st.setInt(4, quantity);
+    int affected = st.executeUpdate();
+    try { st.close(); } catch (Exception ignore) {}
+
+    if (affected == 0) {
+        // Không update được: có thể product không tồn tại hoặc không đủ tồn kho
+        throw new SQLException("Failed to decrease stock: product_id=" + productId + " (not found or insufficient stock).");
     }
+}
+
 
     /**
      * Create export receipt (header) and export details in one transaction.
