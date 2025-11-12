@@ -298,7 +298,7 @@
                                     <div class="product-section-grid">
                                         <div class="form-group">
                                             <label class="form-label required" for="size_0">Size</label>
-                                            <input type="text" id="size_0" name="items[0].size" class="form-input size" placeholder="Enter size" required>
+                                            <input type="text" id="size_0" name="items[0].size" class="form-input size" placeholder="XXS, XS, S, M, L, XL, XXL, XXXL or 20-50" required>
                                             <div class="field-error-slot"></div>
                                         </div>
                                         <div class="form-group">
@@ -376,7 +376,7 @@
             function format(amount){ 
                 return (window.formatCurrency ? window.formatCurrency(amount) : new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'}).format(amount)); 
             }
-            // Default import date to today
+            // Default import date to today and set max date
             (function setToday(){
                 const d = new Date();
                 const yyyy = d.getFullYear();
@@ -384,7 +384,11 @@
                 const dd = String(d.getDate()).padStart(2,'0');
                 const today = `${yyyy}-${mm}-${dd}`;
                 const dateInput = document.getElementById('importDate');
-                if (dateInput && !dateInput.value) { dateInput.value = today; }
+                if (dateInput) {
+                    if (!dateInput.value) { dateInput.value = today; }
+                    // Set max date to today to prevent future dates
+                    dateInput.setAttribute('max', today);
+                }
             })();
             function recalcRow(card){ 
                 const qty = parseFloat(card.querySelector('.qty')?.value || '0'); 
@@ -419,9 +423,10 @@
                 const qty = card.querySelector('.qty');
                 const price = card.querySelector('.price');
                 
-                if (code) code.addEventListener('blur', function(){ clearError(code); triggerLookup(code, card); });
-                if (code) code.addEventListener('change', function(){ clearError(code); triggerLookup(code, card); });
+                if (code) code.addEventListener('blur', function(){ sanitizeInput(code); clearError(code); triggerLookup(code, card); });
+                if (code) code.addEventListener('change', function(){ sanitizeInput(code); clearError(code); triggerLookup(code, card); });
                 if (code) code.addEventListener('input', function(){
+                    sanitizeInput(code);
                     clearError(code);
                     // If code value changes, immediately clear name, material, unit, and category to avoid stale values
                     const current = code.value.trim();
@@ -436,12 +441,38 @@
                     }
                     debounceLookup(code, card);
                 });
-                if (name) name.addEventListener('input', function(){ clearError(name); });
+                if (name) name.addEventListener('input', function(){ sanitizeInput(name); clearError(name); });
+                if (name) name.addEventListener('blur', function(){ sanitizeInput(name); });
                 if (categorySelect) categorySelect.addEventListener('change', function(){ clearError(categorySelect); });
-                if (material) material.addEventListener('input', function(){ clearError(material); });
-                if (unit) unit.addEventListener('input', function(){ clearError(unit); });
-                if (size) size.addEventListener('input', function(){ clearError(size); });
-                if (color) color.addEventListener('input', function(){ clearError(color); });
+                if (material) material.addEventListener('input', function(){ sanitizeInput(material); clearError(material); });
+                if (material) material.addEventListener('blur', function(){ sanitizeInput(material); });
+                if (unit) unit.addEventListener('input', function(){ sanitizeInput(unit); clearError(unit); });
+                if (unit) unit.addEventListener('blur', function(){ sanitizeInput(unit); });
+                
+                // Real-time validation for size
+                if (size) {
+                    size.addEventListener('input', function(){
+                        sanitizeInput(size);
+                        const sizeValidation = validateSizeWithMessage(size.value);
+                        if (size.value.trim() && !sizeValidation.valid) {
+                            setError(size, sizeValidation.message);
+                        } else {
+                            clearError(size);
+                        }
+                    });
+                    size.addEventListener('blur', function(){
+                        sanitizeInput(size);
+                        const sizeValidation = validateSizeWithMessage(size.value);
+                        if (!sizeValidation.valid) {
+                            setError(size, sizeValidation.message);
+                        } else {
+                            clearError(size);
+                        }
+                    });
+                }
+                
+                if (color) color.addEventListener('input', function(){ sanitizeInput(color); clearError(color); });
+                if (color) color.addEventListener('blur', function(){ sanitizeInput(color); });
                 if (qty) qty.addEventListener('input', function(){ clearError(qty); recalcRow(card); });
                 if (price) price.addEventListener('input', function(){ clearError(price); recalcRow(card); });
                 
@@ -544,7 +575,7 @@
                             '<div class="product-section-grid">' +
                                 '<div class="form-group">' +
                                     '<label class="form-label required">Size</label>' +
-                                    '<input type="text" name="items[' + idx + '].size" class="form-input size" placeholder="Enter size" required>' +
+                                    '<input type="text" name="items[' + idx + '].size" class="form-input size" placeholder="XXS, XS, S, M, L, XL, XXL, XXXL or 20-50" required>' +
                                     '<div class="field-error-slot"></div>' +
                                 '</div>' +
                                 '<div class="form-group">' +
@@ -693,16 +724,95 @@
                 slot.textContent = message;
                 slot.classList.add('show');
             }
+            
+            // Sanitize HTML/CSS from text input
+            function sanitizeInput(input) {
+                if (!input || input.type === 'number' || input.type === 'date') return;
+                let value = input.value;
+                // Remove HTML tags
+                value = value.replace(/<[^>]*>/g, '');
+                // Remove CSS style attributes and script tags
+                value = value.replace(/style\s*=\s*["'][^"']*["']/gi, '');
+                value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                // Remove common HTML entities that could be used for XSS
+                value = value.replace(/javascript:/gi, '');
+                value = value.replace(/on\w+\s*=/gi, '');
+                if (value !== input.value) {
+                    input.value = value;
+                }
+            }
+            
+            // Validate size: XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or number 20-50
+            function validateSize(sizeValue) {
+                if (!sizeValue || !sizeValue.trim()) return false;
+                const trimmed = sizeValue.trim().toUpperCase();
+                // Check for text sizes
+                const validTextSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+                if (validTextSizes.includes(trimmed)) return true;
+                // Check for numeric sizes 20-50
+                const numSize = parseInt(trimmed, 10);
+                if (!isNaN(numSize) && numSize >= 20 && numSize <= 50) return true;
+                return false;
+            }
+            
+            // Validate size with detailed error message (for real-time validation)
+            function validateSizeWithMessage(sizeValue) {
+                const trimmed = sizeValue ? sizeValue.trim() : '';
+                
+                // Size is required
+                if (!trimmed) {
+                    return { valid: false, message: 'Size is required' };
+                }
+                
+                const upperTrimmed = trimmed.toUpperCase();
+                
+                // Check for text sizes
+                const validTextSizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+                if (validTextSizes.includes(upperTrimmed)) {
+                    return { valid: true, message: '' };
+                }
+                
+                // Check for numeric sizes 20-50
+                const numSize = parseInt(upperTrimmed, 10);
+                if (!isNaN(numSize)) {
+                    if (numSize >= 20 && numSize <= 50) {
+                        return { valid: true, message: '' };
+                    } else {
+                        return { valid: false, message: 'Numeric size must be between 20 and 50' };
+                    }
+                }
+                
+                // Invalid format
+                return { valid: false, message: 'Size must be XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or a number between 20-50' };
+            }
+            
+            // Validate import date is not in the future
+            function validateImportDate(dateValue) {
+                if (!dateValue) return false;
+                const selectedDate = new Date(dateValue);
+                const today = new Date();
+                today.setHours(23, 59, 59, 999); // Set to end of today
+                return selectedDate <= today;
+            }
 
             function validateForm(){
                 let valid = true;
                 // Header fields
                 const importDate = document.getElementById('importDate');
                 const supplier = document.getElementById('supplierId');
+                const note = document.getElementById('note');
                 [importDate, supplier].forEach(clearError);
+                if (note) clearError(note);
 
                 if (!importDate.value) { setError(importDate, 'Import date is required'); valid = false; }
+                else if (!validateImportDate(importDate.value)) { 
+                    setError(importDate, 'Import date cannot be in the future'); 
+                    valid = false; 
+                }
                 if (!supplier.value) { setError(supplier, 'Please select a supplier'); valid = false; }
+                
+                // Sanitize note field
+                if (note) sanitizeInput(note);
 
                 // Card validations
                 Array.from(container.querySelectorAll('.product-item-card')).forEach(function(card){
@@ -719,11 +829,18 @@
                     [code, name, material, unit, size, color, qty, price].forEach(clearError);
                     if (categorySelect) clearError(categorySelect);
                     
+                    // Sanitize all text inputs
+                    [code, name, material, unit, size, color].forEach(sanitizeInput);
+                    
                     if (!code.value.trim()) { setError(code, 'Product code is required'); valid = false; }
                     if (!name.value.trim()) { setError(name, 'Product name is required'); valid = false; }
                     if (!material.value.trim()) { setError(material, 'Material is required'); valid = false; }
                     if (!unit.value.trim()) { setError(unit, 'Unit is required'); valid = false; }
                     if (!size.value.trim()) { setError(size, 'Size is required'); valid = false; }
+                    else if (!validateSize(size.value.trim())) {
+                        setError(size, 'Size must be XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or a number between 20-50');
+                        valid = false;
+                    }
                     if (!color.value.trim()) { setError(color, 'Color is required'); valid = false; }
                     
                     // Validate category - check if dropdown is visible and required
@@ -743,7 +860,18 @@
 
             // Clear error for header fields on user input/change
             document.getElementById('importDate').addEventListener('input', function(){ clearError(this); });
+            document.getElementById('importDate').addEventListener('change', function(){ 
+                if (!validateImportDate(this.value)) {
+                    setError(this, 'Import date cannot be in the future');
+                } else {
+                    clearError(this);
+                }
+            });
             document.getElementById('supplierId').addEventListener('change', function(){ clearError(this); });
+            const noteField = document.getElementById('note');
+            if (noteField) {
+                noteField.addEventListener('blur', function(){ sanitizeInput(this); });
+            }
 
             form.addEventListener('submit', function(e){
                 if (!validateForm()) {

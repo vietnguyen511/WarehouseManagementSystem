@@ -31,6 +31,7 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.BaseFont;
 
 // JFreeChart imports for chart generation
 import org.jfree.chart.ChartFactory;
@@ -53,6 +54,48 @@ import java.io.ByteArrayOutputStream;
  */
 @WebServlet(name = "ExportReportServlet", urlPatterns = {"/export-report"})
 public class ExportReportServlet extends HttpServlet {
+
+    /**
+     * Creates a font that supports Vietnamese characters using BaseFont with Unicode encoding
+     */
+    private com.itextpdf.text.Font createVietnameseFont(int size, int style) {
+        try {
+            // Use Times-Roman with IDENTITY_H encoding for better Unicode/Vietnamese support
+            BaseFont baseFont = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            return new com.itextpdf.text.Font(baseFont, size, style);
+        } catch (Exception e) {
+            // Fallback: Try with Courier
+            try {
+                BaseFont baseFont = BaseFont.createFont(BaseFont.COURIER, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                return new com.itextpdf.text.Font(baseFont, size, style);
+            } catch (Exception ex) {
+                // Final fallback: Use default font factory
+                try {
+                    if (style == com.itextpdf.text.Font.BOLD) {
+                        return FontFactory.getFont(FontFactory.TIMES_BOLD, size);
+                    } else {
+                        return FontFactory.getFont(FontFactory.TIMES_ROMAN, size);
+                    }
+                } catch (Exception finalEx) {
+                    return new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, size, style);
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a bold font that supports Vietnamese characters
+     */
+    private com.itextpdf.text.Font createVietnameseBoldFont(int size) {
+        return createVietnameseFont(size, com.itextpdf.text.Font.BOLD);
+    }
+
+    /**
+     * Creates a normal font that supports Vietnamese characters
+     */
+    private com.itextpdf.text.Font createVietnameseNormalFont(int size) {
+        return createVietnameseFont(size, com.itextpdf.text.Font.NORMAL);
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -300,13 +343,13 @@ public class ExportReportServlet extends HttpServlet {
             document.open();
 
             // Add title
-            com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+            com.itextpdf.text.Font titleFont = createVietnameseBoldFont(16);
             Paragraph title = new Paragraph(reportTitle, titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
 
             // Add generation date
-            com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            com.itextpdf.text.Font dateFont = createVietnameseNormalFont(10);
             Paragraph date = new Paragraph("Generated on: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), dateFont);
             date.setAlignment(Element.ALIGN_CENTER);
             document.add(date);
@@ -317,7 +360,7 @@ public class ExportReportServlet extends HttpServlet {
             table.setWidthPercentage(100);
 
             // Add headers
-            com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
+            com.itextpdf.text.Font headerFont = createVietnameseBoldFont(8);
             String[] headers = {"Date", "Product Code", "Product Name", "Category", "Unit",
                               "Current Stock", "Import Qty", "Export Qty", "Import Price",
                               "Export Price", "Import Value", "Export Value", "Stock Value",
@@ -331,7 +374,7 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Add data rows
-            com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 7);
+            com.itextpdf.text.Font dataFont = createVietnameseNormalFont(7);
             for (ExportReportDTO report : data) {
                 populatePdfRow(table, report, dataFont);
             }
@@ -461,13 +504,13 @@ public class ExportReportServlet extends HttpServlet {
             document.open();
 
             // Add title
-            com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+            com.itextpdf.text.Font titleFont = createVietnameseBoldFont(16);
             Paragraph title = new Paragraph("Current Inventory Report", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
 
             // Add generation date
-            com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            com.itextpdf.text.Font dateFont = createVietnameseNormalFont(10);
             Paragraph date = new Paragraph("Generated on: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), dateFont);
             date.setAlignment(Element.ALIGN_CENTER);
             document.add(date);
@@ -484,7 +527,7 @@ public class ExportReportServlet extends HttpServlet {
             table.setWidths(columnWidths);
 
             // Add headers
-            com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
+            com.itextpdf.text.Font headerFont = createVietnameseBoldFont(10);
             String[] headers = {"Product Code", "Product Name", "Category", "Unit", "Current Stock", "Import Price", "Export Price", "Stock Value", "Status"};
 
             for (String header : headers) {
@@ -495,7 +538,7 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Add data rows
-            com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 9);
+            com.itextpdf.text.Font dataFont = createVietnameseNormalFont(9);
             for (InventoryItem item : inventoryItems) {
                 table.addCell(new PdfPCell(new Phrase(item.getProductCode() != null ? item.getProductCode() : "", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(item.getProductName() != null ? item.getProductName() : "", dataFont)));
@@ -559,13 +602,13 @@ public class ExportReportServlet extends HttpServlet {
             document.open();
 
             // Add title
-            com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+            com.itextpdf.text.Font titleFont = createVietnameseBoldFont(16);
             Paragraph title = new Paragraph("Import/Export Statistics Report", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
 
             // Add date range
-            com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            com.itextpdf.text.Font dateFont = createVietnameseNormalFont(10);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Paragraph dateRange = new Paragraph("Period: " + sdf.format(startDate) + " to " + sdf.format(endDate), dateFont);
             dateRange.setAlignment(Element.ALIGN_CENTER);
@@ -587,7 +630,7 @@ public class ExportReportServlet extends HttpServlet {
             table.setWidths(columnWidths);
 
             // Add headers
-            com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);
+            com.itextpdf.text.Font headerFont = createVietnameseBoldFont(9);
             String[] headers = {"Date", "Import Qty", "Export Qty", "Import Value", "Export Value", "Stock Diff", "Value Diff", "Import Receipts", "Export Receipts"};
 
             for (String header : headers) {
@@ -598,7 +641,7 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Add data rows
-            com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
+            com.itextpdf.text.Font dataFont = createVietnameseNormalFont(8);
             for (ImportExportStatDTO stat : statistics) {
                 table.addCell(new PdfPCell(new Phrase(stat.getDate() != null ? sdf.format(stat.getDate()) : "", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stat.getImportQuantity()), dataFont)));
@@ -615,7 +658,7 @@ public class ExportReportServlet extends HttpServlet {
 
             // Add charts to PDF
             document.add(new Paragraph(" ")); // Empty line
-            document.add(new Paragraph("Charts", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            document.add(new Paragraph("Charts", createVietnameseBoldFont(14)));
             document.add(new Paragraph(" ")); // Empty line
 
             try {
@@ -644,7 +687,7 @@ public class ExportReportServlet extends HttpServlet {
 
             } catch (Exception chartException) {
                 System.out.println("Warning: Could not generate charts for PDF: " + chartException.getMessage());
-                document.add(new Paragraph("Charts could not be generated.", FontFactory.getFont(FontFactory.HELVETICA, 10)));
+                document.add(new Paragraph("Charts could not be generated.", createVietnameseNormalFont(10)));
             }
 
             document.close();
@@ -706,13 +749,13 @@ public class ExportReportServlet extends HttpServlet {
             document.open();
 
             // Add title
-            com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+            com.itextpdf.text.Font titleFont = createVietnameseBoldFont(16);
             Paragraph title = new Paragraph("Revenue Report", titleFont);
             title.setAlignment(Element.ALIGN_CENTER);
             document.add(title);
 
             // Add date range
-            com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+            com.itextpdf.text.Font dateFont = createVietnameseNormalFont(10);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Paragraph dateRange = new Paragraph("Period: " + sdf.format(startDate) + " to " + sdf.format(endDate), dateFont);
             dateRange.setAlignment(Element.ALIGN_CENTER);
@@ -725,10 +768,10 @@ public class ExportReportServlet extends HttpServlet {
 
             // Add summary section
             if (summary != null && summary.length >= 4) {
-                com.itextpdf.text.Font summaryFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+                com.itextpdf.text.Font summaryFont = createVietnameseBoldFont(12);
                 document.add(new Paragraph("Summary", summaryFont));
 
-                com.itextpdf.text.Font summaryDataFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+                com.itextpdf.text.Font summaryDataFont = createVietnameseNormalFont(10);
                 document.add(new Paragraph("Total Revenue: " + (summary[0] != null ? String.format("%.2f", summary[0]) : "0.00"), summaryDataFont));
                 document.add(new Paragraph("Total Quantity: " + (summary[1] != null ? summary[1].toString() : "0"), summaryDataFont));
                 document.add(new Paragraph("Total Receipts: " + (summary[2] != null ? summary[2].toString() : "0"), summaryDataFont));
@@ -747,7 +790,7 @@ public class ExportReportServlet extends HttpServlet {
             table.setWidths(columnWidths);
 
             // Add headers
-            com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);
+            com.itextpdf.text.Font headerFont = createVietnameseBoldFont(9);
             String[] headers = {"Date", "Product Code", "Product Name", "Category", "Qty Sold", "Total Revenue", "Receipts", "Avg Value"};
 
             for (String header : headers) {
@@ -758,7 +801,7 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Add data rows
-            com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 8);
+            com.itextpdf.text.Font dataFont = createVietnameseNormalFont(8);
             for (RevenueStatDTO stat : statistics) {
                 table.addCell(new PdfPCell(new Phrase(stat.getDate() != null ? sdf.format(stat.getDate()) : "", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(stat.getProductCode() != null ? stat.getProductCode() : "", dataFont)));
@@ -774,7 +817,7 @@ public class ExportReportServlet extends HttpServlet {
 
             // Add charts to PDF
             document.add(new Paragraph(" ")); // Empty line
-            document.add(new Paragraph("Charts", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            document.add(new Paragraph("Charts", createVietnameseBoldFont(14)));
             document.add(new Paragraph(" ")); // Empty line
 
             try {
@@ -795,7 +838,7 @@ public class ExportReportServlet extends HttpServlet {
 
             } catch (Exception chartException) {
                 System.out.println("Warning: Could not generate charts for PDF: " + chartException.getMessage());
-                document.add(new Paragraph("Charts could not be generated.", FontFactory.getFont(FontFactory.HELVETICA, 10)));
+                document.add(new Paragraph("Charts could not be generated.", createVietnameseNormalFont(10)));
             }
 
             document.close();

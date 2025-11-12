@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 import model.Product;
 import dal.ProductDAO;
+import java.math.BigDecimal;
 
 /**
  *
@@ -37,7 +38,7 @@ public class ProductManagementServlet extends HttpServlet {
 
         try {
             // check if search value is null or its trimmed is empty
-            if (searchValue == null || searchValue.trim().isEmpty()) {               
+            if (searchValue == null || searchValue.trim().isEmpty()) {
                 products = dao.getAllProducts();
             } else {
                 searchValue = searchValue.trim();
@@ -52,6 +53,16 @@ public class ProductManagementServlet extends HttpServlet {
                     products = dao.getProductByName(searchValue);
                 }
             }
+
+            Map<Integer, BigDecimal> latestImportPrices = new HashMap<>();
+            Map<Integer, BigDecimal> latestExportPrices = new HashMap<>();
+
+            for (Product p : products) {
+                latestImportPrices.put(p.getProductId(), dao.getLatestImportPrice(p.getProductId()));
+                latestExportPrices.put(p.getProductId(), dao.getLatestExportPrice(p.getProductId()));
+            }
+            request.setAttribute("latestImportPrices", latestImportPrices);
+            request.setAttribute("latestExportPrices", latestExportPrices);
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "An error orrured when retrieving data: " + e.getMessage());

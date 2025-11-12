@@ -44,7 +44,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Phone</label>
-                        <input class="form-input" type="text" name="phone" id="phone" value="${supplier.phone}" />
+                        <input class="form-input" type="text" name="phone" id="phone" value="${supplier.phone}" placeholder="0xxxxxxxxx (10-11 digits)" />
                         <div class="field-error" id="phoneError"></div>
                     </div>
                     <div class="form-group">
@@ -84,6 +84,15 @@
             const phoneInput = document.getElementById('phone');
             const emailInput = document.getElementById('email');
             const statusSelect = document.getElementById('status');
+            const nameErrorEl = document.getElementById('nameError');
+            const phoneErrorEl = document.getElementById('phoneError');
+            
+            // Get supplier ID if in edit mode
+            const supplierIdInput = form.querySelector('input[name="id"]');
+            const supplierId = supplierIdInput ? supplierIdInput.value : null;
+
+            let nameCheckTimeout = null;
+            let isCheckingName = false;
 
             function clearError(input, errorEl){
                 if (input) input.classList.remove('invalid');
@@ -97,26 +106,163 @@
             function isValidEmail(value){
                 return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
             }
+            
             function isValidPhone(value){
-                return /^[0-9+\-\s]{7,15}$/.test(value);
+                if (!value || !value.trim()) return true; // Phone is optional
+                const trimmed = value.trim();
+                // Must start with 0, contain only digits, and be 10-11 digits total
+                return /^0\d{9,10}$/.test(trimmed);
+            }
+            
+            // Validate phone with detailed error messages
+            function validatePhone(value) {
+                const trimmed = value.trim();
+                
+                // Phone is optional, so empty is valid
+                if (!trimmed) {
+                    return { valid: true, message: '' };
+                }
+                
+                // Check if contains non-digit characters
+                if (!/^\d+$/.test(trimmed)) {
+                    return { valid: false, message: 'Phone number can only contain digits (0-9)' };
+                }
+                
+                // Check if starts with 0
+                if (!trimmed.startsWith('0')) {
+                    return { valid: false, message: 'Phone number must start with 0' };
+                }
+                
+                // Check length (10-11 digits total)
+                if (trimmed.length < 10) {
+                    return { valid: false, message: 'Phone number must have 10-11 digits' };
+                }
+                if (trimmed.length > 11) {
+                    return { valid: false, message: 'Phone number must have 10-11 digits' };
+                }
+                
+                return { valid: true, message: '' };
+            }
+
+            // Check supplier name in database (real-time validation)
+            function checkSupplierName(name) {
+                if (!name || !name.trim()) {
+                    clearError(nameInput, nameErrorEl);
+                    return;
+                }
+
+                // Clear previous timeout
+                if (nameCheckTimeout) {
+                    clearTimeout(nameCheckTimeout);
+                }
+
+                // Debounce: wait 500ms after user stops typing
+                nameCheckTimeout = setTimeout(function() {
+                    if (isCheckingName) return;
+                    isCheckingName = true;
+
+                    const url = '${pageContext.request.contextPath}/api/check-supplier-name?name=' + encodeURIComponent(name.trim());
+                    const finalUrl = supplierId ? url + '&excludeId=' + encodeURIComponent(supplierId) : url;
+
+                    fetch(finalUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            isCheckingName = false;
+                            if (data.exists) {
+                                setError(nameInput, nameErrorEl, data.message || 'Supplier with this name already exists');
+                            } else {
+                                clearError(nameInput, nameErrorEl);
+                            }
+                        })
+                        .catch(error => {
+                            isCheckingName = false;
+                            console.error('Error checking supplier name:', error);
+                            // Don't show error on network failure, just clear validation
+                            clearError(nameInput, nameErrorEl);
+                        });
+                }, 500);
             }
 
             function validate(){
                 let valid = true;
-                clearError(nameInput, document.getElementById('nameError'));
-                clearError(phoneInput, document.getElementById('phoneError'));
+                clearError(nameInput, nameErrorEl);
+                clearError(phoneInput, phoneErrorEl);
                 clearError(emailInput, document.getElementById('emailError'));
                 clearError(statusSelect, document.getElementById('statusError'));
 
-                if (!nameInput.value.trim()) { setError(nameInput, document.getElementById('nameError'), 'Name is required'); valid = false; }
-                if (phoneInput.value.trim() && !isValidPhone(phoneInput.value.trim())) { setError(phoneInput, document.getElementById('phoneError'), 'Phone must be 7-15 digits/symbols'); valid = false; }
-                if (emailInput.value.trim() && !isValidEmail(emailInput.value.trim())) { setError(emailInput, document.getElementById('emailError'), 'Invalid email format'); valid = false; }
+                if (!nameInput.value.trim()) { 
+                    setError(nameInput, nameErrorEl, 'Name is required'); 
+                    valid = false; 
+                } else {
+                    // Check if name exists (synchronous check on submit)
+                    // Note: Real-time check already done, but we check again to be sure
+                    if (nameInput.classList.contains('invalid')) {
+                        valid = false;
+                    }
+                }
+                
+                // Validate phone
+                const phoneValidation = validatePhone(phoneInput.value);
+                if (!phoneValidation.valid) {
+                    setError(phoneInput, phoneErrorEl, phoneValidation.message);
+                    valid = false;
+                }
+                
+                if (emailInput.value.trim() && !isValidEmail(emailInput.value.trim())) { 
+                    setError(emailInput, document.getElementById('emailError'), 'Invalid email format'); 
+                    valid = false; 
+                }
 
                 return valid;
             }
 
-            nameInput.addEventListener('input', function(){ clearError(nameInput, document.getElementById('nameError')); });
-            phoneInput.addEventListener('input', function(){ clearError(phoneInput, document.getElementById('phoneError')); });
+            // Real-time validation for supplier name
+            nameInput.addEventListener('input', function(){
+                const name = nameInput.value.trim();
+                if (name.length > 0) {
+                    checkSupplierName(name);
+                } else {
+                    clearError(nameInput, nameErrorEl);
+                }
+            });
+            
+            // Also check on blur (when user leaves the field)
+            nameInput.addEventListener('blur', function(){
+                const name = nameInput.value.trim();
+                if (name.length > 0) {
+                    checkSupplierName(name);
+                }
+            });
+
+            // Real-time validation for phone number
+            phoneInput.addEventListener('input', function(e){
+                const value = phoneInput.value;
+                
+                // Only allow digits
+                const digitsOnly = value.replace(/[^\d]/g, '');
+                if (value !== digitsOnly) {
+                    phoneInput.value = digitsOnly;
+                }
+                
+                // Validate phone number
+                const phoneValidation = validatePhone(phoneInput.value);
+                if (phoneInput.value.trim() && !phoneValidation.valid) {
+                    setError(phoneInput, phoneErrorEl, phoneValidation.message);
+                } else {
+                    clearError(phoneInput, phoneErrorEl);
+                }
+            });
+            
+            // Also validate on blur
+            phoneInput.addEventListener('blur', function(){
+                const phoneValidation = validatePhone(phoneInput.value);
+                if (phoneInput.value.trim() && !phoneValidation.valid) {
+                    setError(phoneInput, phoneErrorEl, phoneValidation.message);
+                } else {
+                    clearError(phoneInput, phoneErrorEl);
+                }
+            });
+            
             emailInput.addEventListener('input', function(){ clearError(emailInput, document.getElementById('emailError')); });
             statusSelect.addEventListener('change', function(){ clearError(statusSelect, document.getElementById('statusError')); });
 

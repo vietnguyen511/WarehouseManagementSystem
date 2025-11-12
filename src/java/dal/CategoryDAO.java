@@ -41,7 +41,6 @@ public class CategoryDAO extends DBContext {
         List<Category> list = new ArrayList<>();
         String sql = "SELECT category_id, code, name, description, status, created_at, updated_at "
                 + "FROM Categories "
-                + "WHERE status = 1 "
                 + "ORDER BY category_id ASC";
         PreparedStatement st = null;
         ResultSet rs = null;
@@ -191,7 +190,7 @@ public class CategoryDAO extends DBContext {
             st.setString(1, category.getCode());
             st.setString(2, category.getName());
             st.setString(3, category.getDescription());
-            st.setBoolean(4, category.isStatus());
+            st.setBoolean(4, category.getStatus());
             return st.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Error in insertCategory: " + e.getMessage());
@@ -212,7 +211,7 @@ public class CategoryDAO extends DBContext {
             st.setString(1, category.getCode());
             st.setString(2, category.getName());
             st.setString(3, category.getDescription());
-            st.setBoolean(4, category.isStatus());
+            st.setBoolean(4, category.getStatus());
             int result = st.executeUpdate();
 
             if (result > 0) {
@@ -230,48 +229,22 @@ public class CategoryDAO extends DBContext {
         }
     }
 
-    public boolean deleteCategoryById(int categoryId) {
-        String checkSql = "SELECT COUNT(*) FROM Products WHERE category_id = ?";
-        String deleteSql = "DELETE FROM Categories WHERE category_id = ?";
-
-        try (Connection conn = dal.DBContext.getConnection(); PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
-
-            // Kiểm tra xem còn sản phẩm trong Category không
-            psCheck.setInt(1, categoryId);
-            try (ResultSet rs = psCheck.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Vẫn còn product trong category này -> KHÔNG xóa
-                    System.out.println("Cannot delete: Category still has products.");
-                    return false;
-                }
-            }
-
-            // Không có sản phẩm -> cho phép xóa cứng
-            try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
-                psDelete.setInt(1, categoryId);
-                int rows = psDelete.executeUpdate();
-                return rows > 0; // true nếu xóa thành công
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Error in deleteCategoryById: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean updateCategory(model.Category category) {
         String sql = "UPDATE Categories "
                 + "SET code = ?, name = ?, description = ?, status = ?, updated_at = GETDATE() "
                 + "WHERE category_id = ?";
-
         try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, category.getCode().trim());
             ps.setString(2, category.getName().trim());
             ps.setString(3, category.getDescription());
-            ps.setBoolean(4, category.isStatus());
+            ps.setBoolean(4, category.getStatus());
             ps.setInt(5, category.getCategoryId());
+
+            // Nếu chuyển sang inactive thì gọi hàm riêng để disable các sản phẩm
+            if (!category.getStatus()) {
+                deactivateProductsByCategory(category.getCategoryId());
+            }
 
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -279,6 +252,14 @@ public class CategoryDAO extends DBContext {
             System.out.println("Error in updateCategory: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void deactivateProductsByCategory(int categoryId) throws SQLException {
+        String sql = "UPDATE Products SET status = 0, updated_at = GETDATE() WHERE category_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ps.executeUpdate();
         }
     }
 

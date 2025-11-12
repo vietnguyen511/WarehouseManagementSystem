@@ -120,9 +120,34 @@ public class CreateImportReceiptServlet extends HttpServlet {
             String totalAmountStr = request.getParameter("totalAmount");
             String note = request.getParameter("note");
 
+            // Validate and sanitize note
+            note = sanitizeHtml(note);
+
             int supplierId = Integer.parseInt(supplierIdStr);
             // Use current timestamp when creating receipt to include time information
             Date importDate = (importDateStr == null || importDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(importDateStr);
+            
+            // Validate import date is not in the future
+            if (importDateStr != null && !importDateStr.isEmpty()) {
+                LocalDate selectedDate = LocalDate.parse(importDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                LocalDate today = LocalDate.now();
+                if (selectedDate.isAfter(today)) {
+                    request.setAttribute("errorMessage", "Import date cannot be in the future.");
+                    // Reload suppliers and categories for form
+                    SupplierDAO supplierDAO = new SupplierDAO();
+                    java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
+                    request.setAttribute("suppliers", suppliers);
+                    dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
+                    java.util.List<model.Category> categories = categoryDAO.getAllCategories();
+                    request.setAttribute("categories", categories);
+                    String todayStr = java.time.LocalDate.now().toString();
+                    request.setAttribute("today", todayStr);
+                    request.setAttribute("activePage", "add-import-receipt");
+                    request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+                    return;
+                }
+            }
+            
             BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(totalAmountStr);
 
             // Build receipt model
@@ -156,8 +181,36 @@ public class CreateImportReceiptServlet extends HttpServlet {
                     index++;
                     continue;
                 }
+                // Sanitize all text inputs
+                code = sanitizeHtml(code);
+                name = sanitizeHtml(name);
+                material = sanitizeHtml(material);
+                unit = sanitizeHtml(unit);
+                size = sanitizeHtml(size);
+                color = sanitizeHtml(color);
+                
+                // Validate size
+                if (size != null && !size.trim().isEmpty()) {
+                    String sizeTrimmed = size.trim();
+                    if (!isValidSize(sizeTrimmed)) {
+                        request.setAttribute("errorMessage", "Invalid size for item " + (index + 1) + ": Size must be XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or a number between 20-50.");
+                        // Reload suppliers and categories for form
+                        SupplierDAO supplierDAO = new SupplierDAO();
+                        java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
+                        request.setAttribute("suppliers", suppliers);
+                        dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
+                        java.util.List<model.Category> categories = categoryDAO.getAllCategories();
+                        request.setAttribute("categories", categories);
+                        String todayStr = java.time.LocalDate.now().toString();
+                        request.setAttribute("today", todayStr);
+                        request.setAttribute("activePage", "add-import-receipt");
+                        request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+                        return;
+                    }
+                }
+                
                 ImportDetail d = new ImportDetail();
-                d.setProductCode(code.trim());
+                d.setProductCode(code != null ? code.trim() : "");
                 d.setProductName(name != null ? name.trim() : null);
                 d.setMaterial(material != null ? material.trim() : "");
                 d.setUnit(unit != null ? unit.trim() : "");
@@ -252,6 +305,48 @@ public class CreateImportReceiptServlet extends HttpServlet {
         }
         // Fallback to current timestamp if parsing fails
         return new Date();
+    }
+    
+    /**
+     * Sanitize HTML/CSS from text input to prevent XSS attacks
+     */
+    private String sanitizeHtml(String input) {
+        if (input == null) return null;
+        // Remove HTML tags
+        String sanitized = input.replaceAll("<[^>]*>", "");
+        // Remove CSS style attributes
+        sanitized = sanitized.replaceAll("(?i)style\\s*=\\s*[\"'][^\"']*[\"']", "");
+        // Remove script tags
+        sanitized = sanitized.replaceAll("(?i)<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>", "");
+        // Remove javascript: protocol
+        sanitized = sanitized.replaceAll("(?i)javascript:", "");
+        // Remove event handlers (onclick, onerror, etc.)
+        sanitized = sanitized.replaceAll("(?i)on\\w+\\s*=", "");
+        return sanitized;
+    }
+    
+    /**
+     * Validate size: XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or number 20-50
+     */
+    private boolean isValidSize(String size) {
+        if (size == null || size.trim().isEmpty()) {
+            return false;
+        }
+        String trimmed = size.trim().toUpperCase();
+        // Check for text sizes
+        String[] validTextSizes = {"XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"};
+        for (String validSize : validTextSizes) {
+            if (validSize.equals(trimmed)) {
+                return true;
+            }
+        }
+        // Check for numeric sizes 20-50
+        try {
+            int numSize = Integer.parseInt(trimmed);
+            return numSize >= 20 && numSize <= 50;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /** 

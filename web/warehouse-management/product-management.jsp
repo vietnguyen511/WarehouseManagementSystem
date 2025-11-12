@@ -5,6 +5,7 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored="false" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
@@ -153,100 +154,59 @@
                 background: #fff;
             }
 
-            .btn-add {
-                background-color: var(--primary-600);
-                color: #fff;
+            /* Common button base */
+            button, .btn {
+                font-size: 0.85rem;
+                padding: 6px 12px;
                 border: none;
-                border-radius: var(--radius-md);
-                padding: 8px 14px;
-                font-weight: 600;
-                font-size: .9rem;
+                border-radius: 6px;
+                font-weight: 500;
                 cursor: pointer;
-                line-height: 1.2rem;
                 text-decoration: none;
             }
 
-            .btn-add:hover {
-                background-color: var(--primary-700);
+            .btn-add {
+                background-color: #059669; /* Màu xanh ngọc */
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 14px 16px;
+                text-decoration: none;
+                cursor: pointer;
+                transition: none;
             }
 
-            .btn-secondary {
-                background-color: var(--gray-500);
+            .btn-add:hover {
+                background-color: #059669; /* Giữ nguyên màu khi hover */
+                color: white;
+            }
+
+            /* RESET / SEARCH / PRIMARY */
+            .btn-reset,
+            .btn-primary {
+                background-color: #3b82f6;
                 color: #fff;
-                border: none;
-                border-radius: var(--radius-md);
-                padding: 6px 10px;
-                cursor: pointer;
-                font-size: .8rem;
-                line-height: 1.2rem;
+            }
+            .btn-reset:hover,
+            .btn-primary:hover {
+                background-color: #3b82f6;
+                color: #fff;
+            }
+            .btn-danger:hover {
+                background-color: #dc2626;
+                color: #fff;
+            }
+
+            /* SECONDARY (xám, có viền) */
+            .btn-secondary {
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
             }
 
             .btn-secondary:hover {
-                background-color: var(--gray-600);
+                border: 1px solid #d1d5db;
             }
 
-            .btn-danger {
-                background-color: var(--danger-600);
-                color: white;
-                border: none;
-                border-radius: var(--radius-md);
-                padding: 6px 10px;
-                cursor: pointer;
-                font-size: .8rem;
-                line-height: 1.2rem;
-            }
-
-            .btn-danger:hover {
-                background-color: var(--danger-700);
-            }
-
-            .status-pill {
-                display: inline-block;
-                font-size: .75rem;
-                line-height: 1rem;
-                font-weight: 600;
-                padding: 3px 8px;
-                border-radius: 999px;
-            }
-
-            .status-active {
-                background-color: var(--success-50);
-                border: 1px solid var(--success-200);
-                color: var(--success-700);
-            }
-
-            .status-inactive {
-                background-color: var(--gray-100);
-                border: 1px solid var(--gray-300);
-                color: var(--gray-600);
-            }
-
-            .alert {
-                padding: 0.75rem 1rem;
-                border-radius: var(--radius-md);
-                margin-top: var(--spacing-md);
-                font-size: .9rem;
-                line-height: 1.4;
-            }
-
-            .alert-success {
-                background-color: var(--success-50);
-                color: var(--success-700);
-                border: 1px solid var(--success-200);
-            }
-
-            .alert-danger {
-                background-color: var(--danger-50);
-                color: var(--danger-700);
-                border: 1px solid var(--danger-200);
-            }
-
-            .no-data-row td {
-                text-align: center;
-                color: var(--gray-500);
-                padding: 2rem 0;
-                font-size: .9rem;
-            }
         </style>
     </head>
     <body>
@@ -263,50 +223,7 @@
                 <div class="card-header">
                     <div class="card-header-left">
                         <h1 class="card-title">Product Management</h1>
-                        <p class="card-subtitle">Manage products in the warehouse</p>
-
-                        <!-- flash message from redirect (?msg=created / updated / deleted) -->
-                        <c:if test="${param.msg == 'created'}">
-                            <div class="alert alert-success" style="margin-top:0.75rem;">
-                                Product created successfully.
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'delSuccess'}">
-                            <div class="alert alert-success" style="margin-top:0.75rem;">
-                                Product deleted successfully.
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'delBlocked'}">
-                            <div class="alert alert-danger" style="margin-top:0.75rem;">
-                                Cannot delete this product because it has related data (variants / import / export).
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'delInvalid'}">
-                            <div class="alert alert-danger" style="margin-top:0.75rem;">
-                                Invalid product ID.
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'delError'}">
-                            <div class="alert alert-danger" style="margin-top:0.75rem;">
-                                An unexpected error occurred while deleting the product.
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'editSuccess'}">
-                            <div class="alert alert-success" style="margin-top:0.75rem;">
-                                Product updated successfully.
-                            </div>
-                        </c:if>
-
-                        <c:if test="${param.msg == 'editError'}">
-                            <div class="alert alert-danger" style="margin-top:0.75rem;">
-                                Failed to open Edit Product screen.
-                            </div>
-                        </c:if>
-                        <c:if test="${param.msg == 'editFail'}">
-                            <div class="alert alert-danger" style="margin-top:0.75rem;">
-                                Failed to update product. Please try again.
-                            </div>
-                        </c:if>
+                        <p class="card-subtitle">Manage products in the warehouse</p>                       
                     </div>
 
                     <div class="action-bar">
@@ -336,7 +253,38 @@
 
                 <!-- ========== CARD BODY / TABLE ========== -->
                 <div class="card-body">
+                    <!-- server-pushed messages (optional if you're also using ?msg=...) -->
+                    <c:if test="${not empty successMessage}">
+                        <div class="alert alert-success">${successMessage}</div>
+                    </c:if>
 
+                    <c:if test="${not empty errorMessage}">
+                        <div class="alert alert-danger">${errorMessage}</div>
+                    </c:if>
+
+                    <!-- flash message from redirect (?msg=created / updated / deleted) -->
+                    <c:if test="${param.msg == 'created'}">
+                        <div class="alert alert-success" style="margin-top:0.75rem;">
+                            Product created successfully.
+                        </div>
+                    </c:if>
+                    <c:if test="${param.msg == 'editSuccess'}">
+                        <div class="alert alert-success" style="margin-top:0.75rem;">
+                            Product updated successfully.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'editError'}">
+                        <div class="alert alert-danger" style="margin-top:0.75rem;">
+                            Failed to open Edit Product screen.
+                        </div>
+                    </c:if>
+                    
+                    <c:if test="${param.msg == 'editFail'}">
+                        <div class="alert alert-danger" style="margin-top:0.75rem;">
+                            Failed to update product. Please try again.
+                        </div>
+                    </c:if>
                     <div class="table-wrapper">
                         <table class="data-table">
                             <thead>
@@ -364,8 +312,8 @@
                                         <td>${product.material}</td>
                                         <td>${product.unit}</td>
                                         <td>${product.quantity}</td>
-                                        <td>${product.importPrice}</td>
-                                        <td>${product.exportPrice}</td>
+                                        <td>${latestImportPrices[product.productId]}</td>
+                                        <td>${latestExportPrices[product.productId]}</td>
 
                                         <td>
                                             <c:choose>
@@ -394,14 +342,6 @@
                                                 <input type="hidden" name="id" value="${product.productId}">
                                                 <button type="submit" class="btn-secondary">Edit</button>
                                             </form>
-
-                                            <form method="post" 
-                                                  action="${pageContext.request.contextPath}/warehouse-management/delete-product"
-                                                  style="display:inline;"
-                                                  onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                <input type="hidden" name="id" value="${product.productId}">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                            </form>
                                         </td>
                                     </tr>
                                 </c:forEach>
@@ -414,15 +354,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- server-pushed messages (optional if you're also using ?msg=...) -->
-                    <c:if test="${not empty successMessage}">
-                        <div class="alert alert-success">${successMessage}</div>
-                    </c:if>
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger">${errorMessage}</div>
-                    </c:if>
-
                 </div>
             </div>
         </div>

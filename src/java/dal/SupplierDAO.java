@@ -46,6 +46,22 @@ public class SupplierDAO extends DBContext {
         return null;
     }
 
+    /**
+     * Find supplier by name (case-insensitive)
+     * Used to check for duplicate supplier names
+     */
+    public Supplier findByName(String name) throws SQLException {
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
+        String sql = "SELECT supplier_id, name, phone, email, address, status FROM Suppliers WHERE LOWER(TRIM(name)) = LOWER(TRIM(?))";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setString(1, name);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) return mapRow(rs);
+        return null;
+    }
+
     public int create(Supplier s) throws SQLException {
         String sql = "INSERT INTO Suppliers(name, phone, email, address, status, created_at, updated_at) VALUES(?,?,?,?,?,GETDATE(),GETDATE())";
         PreparedStatement st = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);

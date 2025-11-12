@@ -26,6 +26,10 @@
             html, body {
                 height: auto;
                 overflow: auto;
+                background-color: var(--gray-50);
+                font-family: "Segoe UI", Roboto, sans-serif;
+                color: var(--gray-900);
+                margin: 0;
             }
             .main-content-with-sidebar {
                 padding: var(--spacing-lg);
@@ -36,11 +40,14 @@
                 border-radius: var(--radius-lg);
                 box-shadow: var(--shadow-sm);
                 overflow: hidden;
+                border: 1px solid var(--gray-200);
             }
             .card-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+                flex-wrap: wrap;
                 padding: var(--spacing-md) var(--spacing-lg);
                 border-bottom: 1px solid var(--gray-200);
             }
@@ -50,6 +57,8 @@
             .table-wrapper {
                 overflow-x: auto;
                 margin-top: var(--spacing-md);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-md);
             }
             table {
                 width: 100%;
@@ -74,21 +83,6 @@
             }
             .btn-danger:hover {
                 background-color: var(--danger-700);
-            }
-            .alert {
-                padding: 0.75rem 1rem;
-                border-radius: var(--radius-md);
-                margin-top: var(--spacing-md);
-            }
-            .alert-success {
-                background-color: var(--success-50);
-                color: var(--success-700);
-                border: 1px solid var(--success-200);
-            }
-            .alert-danger {
-                background-color: var(--danger-50);
-                color: var(--danger-700);
-                border: 1px solid var(--danger-200);
             }
             .search-form {
                 display: flex;
@@ -178,31 +172,45 @@
                     </div>
                 </div>
 
-                <c:if test="${param.msg == 'deleted'}">
-                    <div class="alert alert-success">
-                        Category deleted successfully.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'hasProducts'}">
-                    <div class="alert alert-danger">
-                        Cannot delete this category because there are still products assigned to it.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'invalid'}">
-                    <div class="alert alert-danger">
-                        Invalid category ID.
-                    </div>
-                </c:if>
-
-                <c:if test="${param.msg == 'error'}">
-                    <div class="alert alert-danger">
-                        An unexpected error occurred while deleting the category.
-                    </div>
-                </c:if>
-
                 <div class="card-body">
+                    <!-- Add category message -->
+                    <c:if test="${param.msg == 'added'}">
+                        <div class="alert alert-success">
+                            Category added successfully.
+                        </div>
+                    </c:if>
+
+                    <!-- Edit category message -->
+                    <c:if test="${param.msg == 'updated'}">
+                        <div class="alert alert-success">
+                            Category updated successfully.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'updateFail'}">
+                        <div class="alert alert-success">
+                            Failed to update category. Please try again.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'invalid'}">
+                        <div class="alert alert-danger">
+                            Invalid category ID.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'notFound'}">
+                        <div class="alert alert-danger">
+                            Category not found.
+                        </div>
+                    </c:if>
+
+                    <c:if test="${param.msg == 'error'}">
+                        <div class="alert alert-danger">
+                            An unexpected error occurred.
+                        </div>
+                    </c:if>
+                    
                     <div class="table-wrapper">
                         <table class="table">
                             <thead>
@@ -224,7 +232,16 @@
                                         <td>${category.code}</td>
                                         <td>${category.name}</td>
                                         <td>${category.description}</td>
-                                        <td>${category.status}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${category.status}">
+                                                    <span class="status-pill status-active">Active</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="status-pill status-inactive">Inactive</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td>${category.createdAt}</td>
                                         <td>${category.updatedAt}</td>
 
@@ -232,10 +249,6 @@
                                             <form method="get" action="${pageContext.request.contextPath}/warehouse-management/edit-category" style="display:inline;">
                                                 <input type="hidden" name="id" value="${category.categoryId}">
                                                 <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
-                                            </form>
-                                            <form method="post" action="${pageContext.request.contextPath}/warehouse-management/delete-category" style="display:inline;" onsubmit="return confirm('Delete this category?');">
-                                                <input type="hidden" name="id" value="${category.categoryId}">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -246,14 +259,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <c:if test="${not empty successMessage}">
-                        <div class="alert alert-success">${successMessage}</div>
-                    </c:if>
-
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger">${errorMessage}</div>
-                    </c:if>
                 </div>
             </div>
         </div>
