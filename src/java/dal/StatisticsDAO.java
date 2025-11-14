@@ -73,7 +73,7 @@ public class StatisticsDAO extends DBContext {
         sql.append("        ISNULL(SUM(id.amount), 0) AS total_value ");
         sql.append("    FROM ImportReceipts ir ");
         sql.append("    LEFT JOIN ImportDetails id ON ir.import_id = id.import_id ");
-        sql.append("    WHERE ir.date >= ? AND ir.date <= ? ");
+        sql.append("    WHERE CAST(ir.date AS DATE) >= ? AND CAST(ir.date AS DATE) <= ? ");
         sql.append("    GROUP BY ");
         if ("month".equalsIgnoreCase(groupBy)) {
             sql.append("        FORMAT(ir.date, 'yyyy-MM') ");
@@ -93,7 +93,7 @@ public class StatisticsDAO extends DBContext {
         sql.append("        ISNULL(SUM(ed.amount), 0) AS total_value ");
         sql.append("    FROM ExportReceipts er ");
         sql.append("    LEFT JOIN ExportDetails ed ON er.export_id = ed.export_id ");
-        sql.append("    WHERE er.date >= ? AND er.date <= ? ");
+        sql.append("    WHERE CAST(er.date AS DATE) >= ? AND CAST(er.date AS DATE) <= ? ");
         sql.append("    GROUP BY ");
         if ("month".equalsIgnoreCase(groupBy)) {
             sql.append("        FORMAT(er.date, 'yyyy-MM') ");
@@ -310,7 +310,7 @@ public class StatisticsDAO extends DBContext {
         sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
         sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
-        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        sql.append("WHERE CAST(er.date AS DATE) >= ? AND CAST(er.date AS DATE) <= ? ");
         
         // Add filters
         if (productId != null) {
@@ -446,7 +446,7 @@ public class StatisticsDAO extends DBContext {
         sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
         sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
-        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        sql.append("WHERE CAST(er.date AS DATE) >= ? AND CAST(er.date AS DATE) <= ? ");
         
         if (productId != null) {
             sql.append("AND p.product_id = ? ");
@@ -514,7 +514,7 @@ public class StatisticsDAO extends DBContext {
         sql.append("INNER JOIN ProductVariants pv ON ed.variant_id = pv.variant_id ");
         sql.append("INNER JOIN Products p ON pv.product_id = p.product_id ");
         sql.append("INNER JOIN Categories c ON p.category_id = c.category_id ");
-        sql.append("WHERE er.date >= ? AND er.date <= ? ");
+        sql.append("WHERE CAST(er.date AS DATE) >= ? AND CAST(er.date AS DATE) <= ? ");
         
         if (productId != null) {
             sql.append("AND p.product_id = ? ");
@@ -731,7 +731,7 @@ public class StatisticsDAO extends DBContext {
                     FROM ImportReceipts ir
                     JOIN ImportDetails id ON ir.import_id = id.import_id
                     JOIN ProductVariants pv ON id.variant_id = pv.variant_id
-                    WHERE ir.date >= ? AND ir.date <= ?
+                    WHERE CAST(ir.date AS DATE) >= ? AND CAST(ir.date AS DATE) <= ?
                     GROUP BY CAST(ir.date AS DATE), pv.product_id
                 ),
                 ExportData AS (
@@ -745,7 +745,7 @@ public class StatisticsDAO extends DBContext {
                     FROM ExportReceipts er
                     JOIN ExportDetails ed ON er.export_id = ed.export_id
                     JOIN ProductVariants pv ON ed.variant_id = pv.variant_id
-                    WHERE er.date >= ? AND er.date <= ?
+                    WHERE CAST(er.date AS DATE) >= ? AND CAST(er.date AS DATE) <= ?
                     GROUP BY CAST(er.date AS DATE), pv.product_id
                 )
                 SELECT
