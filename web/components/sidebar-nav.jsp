@@ -10,19 +10,6 @@
 <aside class="sidebar-nav">
     <nav class="sidebar-nav-content">
         <ul class="sidebar-menu">
-            <!-- Dashboard 
-            <li class="sidebar-item">
-                <a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
-                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    <span class="sidebar-text">Dashboard</span>
-                </a>
-            </li>  -->
-
             <%
               if (session == null) 
               {
@@ -34,7 +21,20 @@
              // Admin: User Management and Reports only
              if("admin".equals(role))
               {
-           %>  
+            %>
+         
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            
             <!-- User Management (Admin only) -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'Userlist' || activePage == 'AddUser' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
@@ -54,28 +54,7 @@
                     <li><a href="${pageContext.request.contextPath}/register" class="sidebar-sublink ${activePage == 'AddUser' ? 'active' : ''}">Add User</a></li>
                 </ul>
             </li>
-            
-            <!-- Statistics & Reports (Admin) -->
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' ? 'active' : ''}">
-                <a href="#" class="sidebar-link sidebar-toggle">
-                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="20" x2="12" y2="10"></line>
-                    <line x1="18" y1="20" x2="18" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="16"></line>
-                    </svg>
-                    <span class="sidebar-text">Reports and Statistics</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </a>
-                <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink ${activePage == 'current-inventory' ? 'active' : ''}">Current Inventory</a></li>
-                    <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink ${activePage == 'import-export-stats' ? 'active' : ''}">Import/Export Stats</a></li>
-                    <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink ${activePage == 'revenue-report' ? 'active' : ''}">Revenue Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/export-report" class="sidebar-sublink ${activePage == 'export-report' ? 'active' : ''}">Export Report</a></li>
-                </ul>
-            </li>
-            
+
             <%
                }
              
@@ -83,15 +62,28 @@
              if("manager".equals(role))
               {
             %>
+            
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/dashboard/manager-dashboard.jsp" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            
             <!-- Products & Categories (Manager) -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'products' || activePage == 'add-product' || activePage == 'categories' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
                     <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                     </svg>
                     <span class="sidebar-text">Products and Categories</span>
                     <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
+                    <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </a>
                 <ul class="sidebar-submenu">
@@ -99,7 +91,7 @@
                     <li><a href="${pageContext.request.contextPath}/warehouse-management/category-management" class="sidebar-sublink ${activePage == 'categories' ? 'active' : ''}">Categories Management</a></li>
                 </ul>
             </li>
-            
+
             <!-- Suppliers (Manager) -->
             <li class="sidebar-item">
                 <a href="${pageContext.request.contextPath}/suppliers" class="sidebar-link ${activePage == 'suppliers' ? 'active' : ''}">
@@ -112,7 +104,7 @@
                     <span class="sidebar-text">Suppliers</span>
                 </a>
             </li>
-            
+
             <!-- Customers (Manager) -->
             <li class="sidebar-item">
                 <a href="${pageContext.request.contextPath}/customers" class="sidebar-link ${activePage == 'customers' ? 'active' : ''}">
@@ -125,7 +117,7 @@
                     <span class="sidebar-text">Customers</span>
                 </a>
             </li>
-            
+
             <!-- Statistics & Reports (Manager) -->
             <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' ? 'active' : ''}">
                 <a href="#" class="sidebar-link sidebar-toggle">
@@ -146,7 +138,7 @@
                     <li><a href="${pageContext.request.contextPath}/export-report" class="sidebar-sublink ${activePage == 'export-report' ? 'active' : ''}">Export Report</a></li>
                 </ul>
             </li>
-            
+
             <%
               }
              
@@ -154,6 +146,19 @@
              if("staff".equals(role))
               {
             %>
+            
+            <li class="sidebar-item">
+                <a href="${pageContext.request.contextPath}/dashboard/staff-dashboard.jsp" class="sidebar-link ${activePage == 'dashboard' ? 'active' : ''}">
+                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            
             <!-- Import Receipts (Staff) -->
             <li class="sidebar-item">
                 <a href="${pageContext.request.contextPath}/warehouse-import-mgt/import-receipt-list" class="sidebar-link ${activePage == 'import-receipts' ? 'active' : ''}">
@@ -165,7 +170,7 @@
                     <span class="sidebar-text">Import Receipts</span>
                 </a>
             </li>
-            
+
             <!-- Export Receipts (Staff) -->
             <li class="sidebar-item">
                 <a href="${pageContext.request.contextPath}/warehouse-export-mgt/export-receipt-list" class="sidebar-link ${activePage == 'export-receipts' ? 'active' : ''}">
@@ -177,24 +182,10 @@
                     <span class="sidebar-text">Export Receipts</span>
                 </a>
             </li>
-            
+
             <%
               }
-            %>
-            <!-- User Management (Admin only)
-            <c:if test="${sessionScope.user != null && sessionScope.user.role == 'admin'}">
-                <li class="sidebar-item">
-                    <a href="${pageContext.request.contextPath}/users" class="sidebar-link ${activePage == 'users' ? 'active' : ''}">
-                        <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                        <span class="sidebar-text">Users</span>
-                    </a>
-                </li>
-            </c:if> -->
+            %>         
         </ul>
     </nav>
 </aside>
