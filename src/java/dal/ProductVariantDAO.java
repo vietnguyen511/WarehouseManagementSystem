@@ -77,6 +77,23 @@ public class ProductVariantDAO extends DBContext {
         st.setInt(2, variantId);
         st.executeUpdate();
     }
+    
+    public void decreaseVariantStock(int variantId, int quantity) throws SQLException {
+    String sql = "UPDATE ProductVariants SET quantity = quantity - ?, updated_at = GETDATE() " +
+                 "WHERE variant_id = ? AND quantity >= ?";
+    PreparedStatement st = connection.prepareStatement(sql);
+    st.setInt(1, quantity);
+    st.setInt(2, variantId);
+    st.setInt(3, quantity);
+
+    int rows = st.executeUpdate();
+
+        if (rows == 0) {
+            throw new SQLException("Failed to decrease variant stock: variant_id=" + variantId 
+                                   + " (not found or insufficient stock).");
+        }
+    }
+
 
     public List<ProductVariant> getVariantsByProductCode(String productCode) throws SQLException {
         List<ProductVariant> variants = new ArrayList<>();
