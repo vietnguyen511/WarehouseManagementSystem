@@ -1,9 +1,3 @@
-<%-- 
-    Document   : view-product-details
-    Created on : Oct 30, 2025, 9:25:58 PM
-    Author     : DANG
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -181,29 +175,6 @@
                 cursor: not-allowed;
             }
 
-            .image-preview-wrapper {
-                display: flex;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .image-preview-box {
-                width: 80px;
-                height: 80px;
-                border: 1px solid var(--gray-300);
-                border-radius: var(--radius-md);
-                background-color: var(--gray-100);
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                font-size: .7rem;
-                color: var(--gray-500);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-            }
-
             .btn-bar {
                 display: flex;
                 flex-wrap: wrap;
@@ -360,32 +331,6 @@
                     <div class="form-group">
                         <label>Description</label>
                         <textarea rows="3" disabled><c:out value='${product.description}'/></textarea>
-                    </div>
-
-                    <!-- SECTION: Image -->
-                    <div class="section-title">Product Image</div>
-
-                    <div class="form-group">
-                        <label>Main Image</label>
-                        <div class="image-preview-wrapper">
-                            <c:choose>
-                                <c:when test="${not empty product.image}">
-                                    <div class="image-preview-box"
-                                         style="background-image:url('${previewUrl}')";color:transparent;">
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <div class="image-preview-box">No Image</div>
-                                </c:otherwise>
-                            </c:choose>
-
-                            <div style="flex:1;">
-                                <label style="font-size:.8rem; color:var(--gray-500); display:block;">Image Path / URL</label>
-                                <input type="text"
-                                       value="<c:out value='${product.image}'/>"
-                                       disabled>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- SECTION: Status -->

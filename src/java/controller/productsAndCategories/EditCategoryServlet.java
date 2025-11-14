@@ -4,7 +4,6 @@
  */
 package controller.productsAndCategories;
 
-import dal.ActivityLogHelper;
 import dal.CategoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -90,8 +89,6 @@ public class EditCategoryServlet extends HttpServlet {
             boolean success = dao.updateCategory(category);
 
             if (success) {
-                ActivityLogHelper.logUpdate(request.getSession(), "Categories", id,
-                        "Updated category: " + name + " (" + code + ")");
                 response.sendRedirect(redirectUrl + "?msg=updated");
             } else {
                 response.sendRedirect(redirectUrl + "?msg=updateFail"); 

@@ -66,33 +66,7 @@ public class AddProductServlet extends HttpServlet {
         String material = request.getParameter("material");
         String unit = request.getParameter("unit");
         String description = request.getParameter("description");
-        String manualImagePath = request.getParameter("image"); // optional fallback
         String statusStr = request.getParameter("status");
-
-        // ====== LẤY FILE ẢNH UPLOAD (neu co) ======
-        jakarta.servlet.http.Part imagePart = request.getPart("imageFile");
-        String uploadedPath = null;
-        if (imagePart != null && imagePart.getSize() > 0) {
-            String submittedFileName = imagePart.getSubmittedFileName();
-
-            // nơi lưu file trên server
-            String uploadFolder = getServletContext().getRealPath("/uploads/products");
-            java.io.File dir = new java.io.File(uploadFolder);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            java.io.File savedFile = new java.io.File(dir, submittedFileName);
-            imagePart.write(savedFile.getAbsolutePath());
-
-            // path tương đối để lưu vào DB
-            uploadedPath = "uploads/products/" + submittedFileName;
-        }
-
-        // ảnh cuối cùng dùng để insert DB
-        String image = (uploadedPath != null && !uploadedPath.isEmpty())
-                ? uploadedPath
-                : manualImagePath;
 
         // ====== VALIDATE TỐI THIỂU ======
         if (code == null || code.trim().isEmpty()
@@ -111,9 +85,7 @@ public class AddProductServlet extends HttpServlet {
             request.setAttribute("old_material", material);
             request.setAttribute("old_unit", unit);
             request.setAttribute("old_description", description);
-            request.setAttribute("old_image", image);
             request.setAttribute("old_status", statusStr);
-            request.setAttribute("old_image_preview_url", image);
 
             request.getRequestDispatcher("/warehouse-management/add-product.jsp").forward(request, response);
             return;
@@ -138,9 +110,7 @@ public class AddProductServlet extends HttpServlet {
                 request.setAttribute("old_material", material);
                 request.setAttribute("old_unit", unit);
                 request.setAttribute("old_description", description);
-                request.setAttribute("old_image", image);
                 request.setAttribute("old_status", statusStr);
-                request.setAttribute("old_image_preview_url", image);
 
                 request.getRequestDispatcher("/warehouse-management/add-product.jsp").forward(request, response);
                 return;
@@ -157,7 +127,6 @@ public class AddProductServlet extends HttpServlet {
             p.setStatus(status);
 
             p.setDescription((description != null && !description.trim().isEmpty()) ? description.trim() : null);
-            p.setImage((image != null && !image.trim().isEmpty()) ? image.trim() : null);
 
             boolean ok = productDAO.insertProduct(p);
 
@@ -178,9 +147,7 @@ public class AddProductServlet extends HttpServlet {
                 request.setAttribute("old_material", material);
                 request.setAttribute("old_unit", unit);
                 request.setAttribute("old_description", description);
-                request.setAttribute("old_image", image);
                 request.setAttribute("old_status", statusStr);
-                request.setAttribute("old_image_preview_url", image);
 
                 request.getRequestDispatcher("/warehouse-management/add-product.jsp").forward(request, response);
             }
@@ -199,9 +166,7 @@ public class AddProductServlet extends HttpServlet {
             request.setAttribute("old_material", material);
             request.setAttribute("old_unit", unit);
             request.setAttribute("old_description", description);
-            request.setAttribute("old_image", image);
             request.setAttribute("old_status", statusStr);
-            request.setAttribute("old_image_preview_url", image);
 
             request.getRequestDispatcher("/warehouse-management/add-product.jsp").forward(request, response);
         }

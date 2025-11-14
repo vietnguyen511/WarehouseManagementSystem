@@ -1,9 +1,3 @@
-<%-- 
-    Document   : add-product
-    Created on : Oct 29, 2025, 9:05:30 PM
-    Author     : DANG
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -213,28 +207,6 @@
                 padding-top: 1rem;
             }
 
-            .image-preview-wrapper {
-                display: flex;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            .image-preview-box {
-                width: 80px;
-                height: 80px;
-                border: 1px solid var(--gray-300);
-                border-radius: var(--radius-md);
-                background-color: var(--gray-100);
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                font-size: .7rem;
-                color: var(--gray-500);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-            }
-
             @media (max-width: 768px) {
                 .form-grid-2 {
                     grid-template-columns: 1fr;
@@ -363,43 +335,6 @@
                                       placeholder="Short description of the product...">${old_description}</textarea>
                         </div>
 
-                        <!-- SECTION: Image -->
-                        <div class="section-title">Product Image</div>
-
-                        <div class="form-group">
-                            <label class="required">Main Image</label>
-
-                            <div class="image-preview-wrapper">
-                                <div class="image-preview-box"
-                                     id="previewBox"
-                                     style="<c:if test='${not empty old_image_preview_url}'>background-image:url('${old_image_preview_url}');color:transparent;</c:if>">
-                                    <c:if test="${empty old_image_preview_url}">
-                                        Preview
-                                    </c:if>
-                                </div>
-
-                                <div style="flex:1;">
-                                    <input type="file"
-                                           id="imageFile"
-                                           name="imageFile"
-                                           accept="image/*">
-                                    <small style="color:var(--gray-500); font-size:.8rem;">
-                                        Upload product photo (JPG/PNG). Max ~2MB (tùy bạn validate server).
-                                    </small>
-
-                                    <!-- fallback: optional manual URL (in case you still want text path) -->
-                                    <div class="form-group" style="margin-top:.75rem;">
-                                        <label for="imagePath">or Image Path / URL</label>
-                                        <input type="text"
-                                               id="imagePath"
-                                               name="image"
-                                               value="${old_image}"
-                                               placeholder="images/ao_thun_nam.jpg">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- SECTION: Status -->
                         <div class="section-title">Status</div>
 
@@ -437,29 +372,6 @@
                 if (confirm("Unsaved data will be lost. Go back?")) {
                     window.location.href = "${pageContext.request.contextPath}/warehouse-management/product-management";
                 }
-            }
-
-            // preview image when selecting file
-            const fileInput = document.getElementById('imageFile');
-            const previewBox = document.getElementById('previewBox');
-
-            if (fileInput && previewBox) {
-                fileInput.addEventListener('change', function () {
-                    const file = this.files && this.files[0];
-                    if (!file) {
-                        previewBox.style.backgroundImage = 'none';
-                        previewBox.style.color = 'var(--gray-500)';
-                        previewBox.textContent = 'Preview';
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewBox.style.backgroundImage = 'url(' + e.target.result + ')';
-                        previewBox.style.color = 'transparent';
-                        previewBox.textContent = '';
-                    };
-                    reader.readAsDataURL(file);
-                });
             }
 
             // basic front-end check
