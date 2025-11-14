@@ -720,16 +720,13 @@ public class ExportReportServlet extends HttpServlet {
         }
 
         // Add header row for revenue
-        out.println("Date,Product Code,Product Name,Category,Quantity Sold,Total Revenue,Receipt Count,Average Value");
+        out.println("Date,Quantity Sold,Total Revenue,Receipt Count,Average Value");
 
         // Add data rows
         for (RevenueStatDTO stat : statistics) {
             StringBuilder row = new StringBuilder();
 
             row.append(stat.getDate() != null ? new SimpleDateFormat("MM/dd/yyyy").format(stat.getDate()) : "").append(",");
-            row.append(escapeCSV(stat.getProductCode())).append(",");
-            row.append(escapeCSV(stat.getProductName())).append(",");
-            row.append(escapeCSV(stat.getCategoryName())).append(",");
             row.append(stat.getTotalQuantity()).append(",");
             row.append(stat.getTotalValue() != null ? String.format("%.2f", stat.getTotalValue()) : "0.00").append(",");
             row.append(stat.getReceiptCount()).append(",");
@@ -780,18 +777,18 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Create table
-            PdfPTable table = new PdfPTable(8); // 8 columns
+            PdfPTable table = new PdfPTable(5); // 5 columns (removed Product Code, Product Name, Category)
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
             // Set column widths
-            float[] columnWidths = {1.5f, 1.5f, 2.5f, 1.5f, 1.2f, 1.5f, 1.2f, 1.3f};
+            float[] columnWidths = {2f, 1.5f, 2f, 1.5f, 1.5f};
             table.setWidths(columnWidths);
 
             // Add headers
             com.itextpdf.text.Font headerFont = createVietnameseBoldFont(9);
-            String[] headers = {"Date", "Product Code", "Product Name", "Category", "Qty Sold", "Total Revenue", "Receipts", "Avg Value"};
+            String[] headers = {"Date", "Qty Sold", "Total Revenue", "Receipts", "Avg Value"};
 
             for (String header : headers) {
                 PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
@@ -804,9 +801,6 @@ public class ExportReportServlet extends HttpServlet {
             com.itextpdf.text.Font dataFont = createVietnameseNormalFont(8);
             for (RevenueStatDTO stat : statistics) {
                 table.addCell(new PdfPCell(new Phrase(stat.getDate() != null ? sdf.format(stat.getDate()) : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getProductCode() != null ? stat.getProductCode() : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getProductName() != null ? stat.getProductName() : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getCategoryName() != null ? stat.getCategoryName() : "", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stat.getTotalQuantity()), dataFont)));
                 table.addCell(new PdfPCell(new Phrase(stat.getTotalValue() != null ? String.format("%.2f", stat.getTotalValue()) : "0.00", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stat.getReceiptCount()), dataFont)));
