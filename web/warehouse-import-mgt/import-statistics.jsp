@@ -248,16 +248,23 @@
                     <c:if test="${totalPages > 1}">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
                             <div style="color: var(--gray-600); font-size: 0.875rem;">
-                                Showing ${fromIndex + 1} to ${toIndex} of ${totalRecords} records
+                                <c:choose>
+                                    <c:when test="${totalRecords > 0}">
+                                        Showing ${fromIndex + 1} to ${toIndex} of ${totalRecords} records
+                                    </c:when>
+                                    <c:otherwise>
+                                        No records to display
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                             <div style="display: flex; gap: 0.5rem;">
-                                <c:url var="prevUrl" value="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics">
+                                <c:url var="prevUrl" value="/warehouse-import-mgt/import-statistics">
                                     <c:param name="startDate" value="${startDateDisplay}" />
                                     <c:param name="endDate" value="${endDateDisplay}" />
                                     <c:param name="groupBy" value="${groupBy}" />
                                     <c:param name="page" value="${currentPage - 1}" />
                                 </c:url>
-                                <c:url var="nextUrl" value="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics">
+                                <c:url var="nextUrl" value="/warehouse-import-mgt/import-statistics">
                                     <c:param name="startDate" value="${startDateDisplay}" />
                                     <c:param name="endDate" value="${endDateDisplay}" />
                                     <c:param name="groupBy" value="${groupBy}" />
@@ -278,7 +285,7 @@
                                 <c:if test="${totalPages > 1}">
                                     <c:forEach var="i" begin="1" end="${totalPages}">
                                         <c:if test="${i == currentPage || (i >= currentPage - 2 && i <= currentPage + 2)}">
-                                            <c:url var="pageUrl" value="${pageContext.request.contextPath}/warehouse-import-mgt/import-statistics">
+                                            <c:url var="pageUrl" value="/warehouse-import-mgt/import-statistics">
                                                 <c:param name="startDate" value="${startDateDisplay}" />
                                                 <c:param name="endDate" value="${endDateDisplay}" />
                                                 <c:param name="groupBy" value="${groupBy}" />
