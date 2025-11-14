@@ -5,28 +5,24 @@
         <servlet-class>controller.NewServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>NewServlet1</servlet-name>
-        <servlet-class>controller.statisticsAndReporting.NewServlet1</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CurrentInventoryServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.CurrentInventoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateImportReceiptServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.CreateImportReceiptServlet</servlet-class>
+        <servlet-class>controller.imports.CreateImportReceiptServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateExportReceiptServlet</servlet-name>
-        <servlet-class>controller.warehouseExportMgt.CreateExportReceiptServlet</servlet-class>
+        <servlet-class>controller.export.CreateExportReceiptServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ProductLookupServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.ProductLookupServlet</servlet-class>
+        <servlet-class>controller.imports.ProductLookupServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CategoryLookupServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.CategoryLookupServlet</servlet-class>
+        <servlet-class>controller.imports.CategoryLookupServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ImportExportStatsServlet</servlet-name>
@@ -34,23 +30,23 @@
     </servlet>
     <servlet>
         <servlet-name>ImportReceiptListServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.ImportReceiptListServlet</servlet-class>
+        <servlet-class>controller.imports.ImportReceiptListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExportReceiptListServlet</servlet-name>
-        <servlet-class>controller.warehouseExportMgt.ExportReceiptListServlet</servlet-class>
+        <servlet-class>controller.export.ExportReceiptListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExportReceiptDetailServlet</servlet-name>
-        <servlet-class>controller.warehouseExportMgt.ExportReceiptDetailServlet</servlet-class>
+        <servlet-class>controller.export.ExportReceiptDetailServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ImportReceiptDetailServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.ImportReceiptDetailServlet</servlet-class>
+        <servlet-class>controller.imports.ImportReceiptDetailServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CategoryManagementServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.CategoryManagementServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.CategoriesListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RevenueReportServlet</servlet-name>
@@ -58,51 +54,51 @@
     </servlet>
     <servlet>
         <servlet-name>ViewSuppliersListServlet</servlet-name>
-        <servlet-class>controller.supplierMgt.ViewSuppliersListServlet</servlet-class>
+        <servlet-class>controller.supplier.ViewSuppliersListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateSupplierServlet</servlet-name>
-        <servlet-class>controller.supplierMgt.CreateSupplierServlet</servlet-class>
+        <servlet-class>controller.supplier.CreateSupplierServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditSupplierServlet</servlet-name>
-        <servlet-class>controller.supplierMgt.EditSupplierServlet</servlet-class>
+        <servlet-class>controller.supplier.EditSupplierServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteSupplierServlet</servlet-name>
-        <servlet-class>controller.supplierMgt.DeleteSupplierServlet</servlet-class>
+        <servlet-class>controller.supplier.DeleteSupplierServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
-        <servlet-class>controller.supplierMgt.ViewSupplierDetailServlet</servlet-class>
-    </servlet>    
+        <servlet-class>controller.supplier.ViewSupplierDetailServlet</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>ViewCustomersListServlet</servlet-name>
-        <servlet-class>controller.customerMgt.ViewCustomersListServlet</servlet-class>
+        <servlet-class>controller.customer.ViewCustomersListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>CreateCustomerServlet</servlet-name>
-        <servlet-class>controller.customerMgt.CreateCustomerServlet</servlet-class>
+        <servlet-class>controller.customer.CreateCustomerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditCustomerServlet</servlet-name>
-        <servlet-class>controller.customerMgt.EditCustomerServlet</servlet-class>
+        <servlet-class>controller.customer.EditCustomerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteCustomerServlet</servlet-name>
-        <servlet-class>controller.customerMgt.DeleteCustomerServlet</servlet-class>
+        <servlet-class>controller.customer.DeleteCustomerServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewCustomerDetailServlet</servlet-name>
-        <servlet-class>controller.customerMgt.ViewCustomerDetailServlet</servlet-class>
-    </servlet>    
+        <servlet-class>controller.customer.ViewCustomerDetailServlet</servlet-class>
+    </servlet>
     <servlet>
         <servlet-name>ProductManagementServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.ProductManagementServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.ProductsListServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AddCategoryServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.AddCategoryServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.AddCategoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteCategoryServlet</servlet-name>
@@ -110,19 +106,19 @@
     </servlet>
     <servlet>
         <servlet-name>AddProductServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.AddProductServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.AddProductServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditCategoryServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.EditCategoryServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.EditCategoryServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>EditProductServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.EditProductServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.EditProductServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewProductDetailsServlet</servlet-name>
-        <servlet-class>controller.warehouseManagement.ViewProductDetailsServlet</servlet-class>
+        <servlet-class>controller.productsAndCategories.ViewProductDetailsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>DeleteProductServlet</servlet-name>
@@ -146,11 +142,11 @@
     </servlet>
     <servlet>
         <servlet-name>ImportStatisticsServlet</servlet-name>
-        <servlet-class>controller.warehouseImportMgt.ImportStatisticsServlet</servlet-class>
+        <servlet-class>controller.imports.ImportStatisticsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ExportStatisticsServlet</servlet-name>
-        <servlet-class>controller.warehouseExportMgt.ExportStatisticsServlet</servlet-class>
+        <servlet-class>controller.export.ExportStatisticsServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>StaffDashboardServlet</servlet-name>
@@ -175,7 +171,7 @@
     <servlet-mapping>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
         <url-pattern>/suppliers/view</url-pattern>
-    </servlet-mapping>   
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewCustomersListServlet</servlet-name>
         <url-pattern>/customers</url-pattern>
@@ -195,7 +191,7 @@
     <servlet-mapping>
         <servlet-name>ViewCustomerDetailServlet</servlet-name>
         <url-pattern>/customers/view</url-pattern>
-    </servlet-mapping>    
+    </servlet-mapping>
     <servlet>
         <servlet-name>ExportReportServlet</servlet-name>
         <servlet-class>controller.statisticsAndReporting.ExportReportServlet</servlet-class>
@@ -203,10 +199,6 @@
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>NewServlet1</servlet-name>
-        <url-pattern>/new1</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CurrentInventoryServlet</servlet-name>
