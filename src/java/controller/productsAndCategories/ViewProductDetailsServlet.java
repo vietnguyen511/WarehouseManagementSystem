@@ -52,23 +52,6 @@ public class ViewProductDetailsServlet extends HttpServlet {
                 return;
             }
 
-            // >>> THÊM KHỐI NÀY: build previewUrl an toàn
-            String previewUrl = null;
-            if (product.getImage() != null && !product.getImage().isBlank()) {
-                String img = product.getImage().trim().replace("\\", "/"); // đổi \ thành /
-                if (img.startsWith("http://") || img.startsWith("https://")) {
-                    // URL tuyệt đối
-                    previewUrl = img;
-                } else if (img.startsWith("/")) {
-                    // đường dẫn tuyệt đối trong app
-                    previewUrl = request.getContextPath() + img;
-                } else {
-                    // đường dẫn tương đối lưu trong DB (ví dụ uploads/products/abc.jpg)
-                    previewUrl = request.getContextPath() + "/" + img;
-                }
-            }
-            request.setAttribute("previewUrl", previewUrl);
-
             request.setAttribute("product", product);
             request.setAttribute("categories", categories);
             request.getRequestDispatcher("/warehouse-management/view-product-details.jsp").forward(request, response);
