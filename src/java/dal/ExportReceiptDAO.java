@@ -178,22 +178,30 @@ public class ExportReceiptDAO extends DBContext {
                     }
 
                     // Update variant stock and product price if we have variant info
+                    // Update variant/product stock for export (decrease)
                     try {
-                        if (variant != null && variant.getVariantId() > 0) {
-                            variantDAO.increaseVariantStock(variant.getVariantId(), d.getQuantity());
-                            // update product price if method available (productId present on variant)
-                            if (variant.getProductId() > 0) {
-                                productDAO.updateImportPrice(variant.getProductId(), d.getPrice());
-                            }
-                            System.out.println("DEBUG: Updated stock for variantId=" + variant.getVariantId() + " by +" + d.getQuantity());
+                       if (variant != null && variant.getVariantId() > 0) {
+                           variantDAO.decreaseVariantStock(variant.getVariantId(), d.getQuantity());
+                           if (variant.getProductId() > 0) {
+                               productDAO.updateQuantityAsSumOfVariants(variant.getProductId());
+                               }
+                            System.out.println("DEBUG: Decreased variant stock for variantId=" + variant.getVariantId() + " by -" + d.getQuantity());
                         } else {
-                            System.out.println("WARN: variant missing for productCode=" + d.getProductCode() + " -> cannot update stock");
+
+                        Integer productId = productDAO.getProductIdByCode(d.getProductCode());
+                        if (productId != null) {
+                             productDAO.decreaseProductStock(productId, d.getQuantity());
+                             System.out.println("DEBUG: Decreased product stock for productId=" + productId + " by -" + d.getQuantity());
+                        } else {
+                        System.out.println("WARN: cannot find product to decrease stock for code=" + d.getProductCode());
                         }
-                    } catch (Exception ex) {
-                        // warn but continue; overall transaction will commit only if no fatal errors occurred previously
-                        System.out.println("WARN: failed to update stock/price for productCode=" + d.getProductCode());
-                        ex.printStackTrace();
                     }
+                } catch (SQLException ex) {
+                        System.err.println("ERROR: Failed to decrease stock for productCode=" + d.getProductCode());
+                        ex.printStackTrace();
+                    throw ex;
+                    }
+
                 } // end for each detail
             } // end if details != null
 
