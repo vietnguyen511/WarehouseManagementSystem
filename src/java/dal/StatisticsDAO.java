@@ -771,4 +771,3 @@ public class StatisticsDAO extends DBContext {
         }
     }
 }
-
