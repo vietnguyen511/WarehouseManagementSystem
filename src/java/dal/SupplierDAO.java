@@ -95,6 +95,26 @@ public class SupplierDAO extends DBContext {
         st.setInt(1, id);
         return st.executeUpdate() > 0;
     }
+    
+    /**
+     * Soft delete - Deactivate a supplier (set status to 0)
+     */
+    public boolean deactivate(int id) throws SQLException {
+        String sql = "UPDATE Suppliers SET status = 0, updated_at = GETDATE() WHERE supplier_id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, id);
+        return st.executeUpdate() > 0;
+    }
+    
+    /**
+     * Reactivate a supplier (set status to 1)
+     */
+    public boolean activate(int id) throws SQLException {
+        String sql = "UPDATE Suppliers SET status = 1, updated_at = GETDATE() WHERE supplier_id = ?";
+        PreparedStatement st = connection.prepareStatement(sql);
+        st.setInt(1, id);
+        return st.executeUpdate() > 0;
+    }
 
     // Search, filter, pagination
     public int countAll(String searchTerm, String statusFilter) throws SQLException {
