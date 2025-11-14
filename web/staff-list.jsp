@@ -135,12 +135,6 @@
                         <h1 class="card-title">User list Management</h1>
                         <p class="card-subtitle">Manage all users in the warehouse</p>
                     </div>
-                    <select name="sort" onchange="this.form.submit()">
-                          <option type="submit" value="fullname">Sort by Name</option>
-                          <option type="submit" value="email">Sort by Email</option>
-                          <option type="submit" value="role">Sort by Role</option>
-                         <option type="submit" value="status">Sort by Status</option>
-                    </select>
                    <!--Further upgrade -->
                 </div>
 
