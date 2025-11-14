@@ -55,27 +55,6 @@
                 </ul>
             </li>
             
-            <!-- Statistics & Reports (Admin) -->
-            <li class="sidebar-item sidebar-dropdown ${activePage == 'current-inventory' || activePage == 'import-export-stats' || activePage == 'revenue-report' || activePage == 'export-report' ? 'active' : ''}">
-                <a href="#" class="sidebar-link sidebar-toggle">
-                    <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="20" x2="12" y2="10"></line>
-                    <line x1="18" y1="20" x2="18" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="16"></line>
-                    </svg>
-                    <span class="sidebar-text">Reports and Statistics</span>
-                    <svg class="sidebar-dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </a>
-                <ul class="sidebar-submenu">
-                    <li><a href="${pageContext.request.contextPath}/current-inventory" class="sidebar-sublink ${activePage == 'current-inventory' ? 'active' : ''}">Current Inventory</a></li>
-                    <li><a href="${pageContext.request.contextPath}/import-export-stats" class="sidebar-sublink ${activePage == 'import-export-stats' ? 'active' : ''}">Import/Export Stats</a></li>
-                    <li><a href="${pageContext.request.contextPath}/revenue-report" class="sidebar-sublink ${activePage == 'revenue-report' ? 'active' : ''}">Revenue Report</a></li>
-                    <li><a href="${pageContext.request.contextPath}/export-report" class="sidebar-sublink ${activePage == 'export-report' ? 'active' : ''}">Export Report</a></li>
-                </ul>
-            </li>
-            
             <%
                }
              
