@@ -93,16 +93,7 @@ public class CurrentInventoryServlet extends HttpServlet {
                 System.out.println("Invalid pagination params, using defaults.");
             }
 
-            // Get total count and page data
-            System.out.println("Calling countCurrentInventory...");
-            int totalItems = inventoryDAO.countCurrentInventory(categoryId, searchQuery);
-            System.out.println("Total items: " + totalItems);
-            
-            int totalPages = (int) Math.ceil(totalItems / (double) pageSize);
-            if (totalPages == 0) totalPages = 1;
-            if (page > totalPages) page = totalPages;
-
-            // Get inventory data with filters
+            // Get inventory data with filters FIRST
             System.out.println("Calling getCurrentInventory...");
             List<InventoryItem> allItems;
             
@@ -131,10 +122,32 @@ public class CurrentInventoryServlet extends HttpServlet {
             
             System.out.println("Retrieved " + allItems.size() + " total items");
             
-            // Manual pagination in Java (temporary workaround)
+            // Calculate pagination based on FILTERED results
+            int totalItems = allItems.size();
+            System.out.println("Total items after filtering: " + totalItems);
+            
+            int totalPages = (int) Math.ceil(totalItems / (double) pageSize);
+            if (totalPages == 0) totalPages = 1;
+            if (page > totalPages) page = totalPages;
+            
+            // Manual pagination in Java
             int startIdx = Math.max(0, (page - 1) * pageSize);
             int endIdx = Math.min(allItems.size(), startIdx + pageSize);
-            List<InventoryItem> inventoryList = allItems.subList(startIdx, endIdx);
+            
+            // Ensure startIdx is not greater than the list size
+            if (startIdx >= allItems.size()) {
+                startIdx = Math.max(0, allItems.size() - pageSize);
+                if (startIdx < 0) startIdx = 0;
+                endIdx = allItems.size();
+                page = totalPages; // Reset to last valid page
+            }
+            
+            List<InventoryItem> inventoryList;
+            if (allItems.isEmpty()) {
+                inventoryList = allItems; // Empty list
+            } else {
+                inventoryList = allItems.subList(startIdx, endIdx);
+            }
             System.out.println("Showing items " + startIdx + " to " + endIdx);
 
             // Get all categories for the filter dropdown
