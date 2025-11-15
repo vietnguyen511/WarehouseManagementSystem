@@ -87,22 +87,6 @@ public class EditProductServlet extends HttpServlet {
         String description = request.getParameter("description");
         String categoryIdStr = request.getParameter("category_id");
         String statusStr = request.getParameter("status");
-        String image = request.getParameter("image");
-
-        Part imagePart = request.getPart("imageFile");
-        if (imagePart != null && imagePart.getSize() > 0) {
-            String fileName = Paths.get(imagePart.getSubmittedFileName()).getFileName().toString();
-            String uploadDir = getServletContext().getRealPath("/") + "uploaded-images";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            File uploadedFile = new File(dir, fileName);
-            imagePart.write(uploadedFile.getAbsolutePath());
-
-            image = "uploaded-images/" + fileName;
-        }
-
         String redirectUrl = request.getContextPath() + "/warehouse-management/product-management";
 
         try {
@@ -124,9 +108,7 @@ public class EditProductServlet extends HttpServlet {
                 request.setAttribute("old_material", material);
                 request.setAttribute("old_unit", unit);
                 request.setAttribute("old_description", description);
-                request.setAttribute("old_image", image);
                 request.setAttribute("old_status", statusStr);
-                request.setAttribute("old_image_preview_url", image);
 
                 request.getRequestDispatcher("/warehouse-management/edit-product.jsp").forward(request, response);
                 return;
@@ -141,13 +123,10 @@ public class EditProductServlet extends HttpServlet {
             p.setUnit(unit);
             p.setStatus(status);
             p.setDescription(description);
-            p.setImage(image);
 
             boolean success = productDAO.updateProduct(p);
 
             if (success) {
-                ActivityLogHelper.logUpdate(request.getSession(), "Products", id,
-                        "Updated product: " + name + " (" + code + ")");
                 response.sendRedirect(redirectUrl + "?msg=editSuccess");
             } else {
                 response.sendRedirect(redirectUrl + "?msg=editFail");

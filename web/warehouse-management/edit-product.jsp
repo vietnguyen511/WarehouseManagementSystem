@@ -213,28 +213,6 @@
                 padding-top: 1rem;
             }
 
-            .image-preview-wrapper {
-                display: flex;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .image-preview-box {
-                width: 80px;
-                height: 80px;
-                border: 1px solid var(--gray-300);
-                border-radius: var(--radius-md);
-                background-color: var(--gray-100);
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                font-size: .7rem;
-                color: var(--gray-500);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                text-align: center;
-            }
             @media (max-width: 768px) {
                 .form-grid-2 {
                     grid-template-columns: 1fr;
@@ -372,53 +350,6 @@
                                       placeholder="Short description of the product..."><c:out value='${not empty old_description ? old_description : product.description}'/></textarea>
                         </div>
 
-                        <!-- SECTION: Image -->
-                        <div class="section-title">Product Image</div>
-
-                        <div class="form-group">
-                            <label class="required">Main Image</label>
-
-                            <div class="image-preview-wrapper">
-
-                                <!-- quyết định previewUrl -->
-                                <c:set var="previewUrl"
-                                       value="${not empty old_image ? old_image : product.image}" />
-
-                                <!-- an toàn cho JSP: dùng choose để render 2 div khác nhau -->
-                                <c:choose>
-                                    <c:when test="${not empty previewUrl}">
-                                        <div class="image-preview-box"
-                                             id="previewBox"
-                                             style="background-image:url('${pageContext.request.contextPath}/${previewUrl}')";color:transparent;">
-                                        </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="image-preview-box" id="previewBox">Preview</div>
-                                    </c:otherwise>
-                                </c:choose>
-
-                                <div style="flex:1;">
-                                    <input type="file"
-                                           id="imageFile"
-                                           name="imageFile"
-                                           accept="image/*">
-                                    <small style="color:var(--gray-500); font-size:.8rem;">
-                                        Upload product photo (JPG/PNG). Max ~2MB
-                                    </small>
-
-                                    <!-- fallback: optional manual URL / path -->
-                                    <div class="form-group" style="margin-top:.75rem;">
-                                        <label for="imagePath">or Image Path / URL</label>
-                                        <input type="text"
-                                               id="imagePath"
-                                               name="image"
-                                               value="<c:out value='${previewUrl}'/>"
-                                               placeholder="images/ao_thun_nam.jpg">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- SECTION: Status -->
                         <div class="section-title">Status</div>
 
@@ -465,31 +396,6 @@
                     window.location.href = "${pageContext.request.contextPath}/warehouse-management/product-management";
                 }
             }
-
-            // live preview for newly selected image file
-            (function () {
-                const fileInput = document.getElementById('imageFile');
-                const previewBox = document.getElementById('previewBox');
-                if (!fileInput || !previewBox)
-                    return;
-
-                fileInput.addEventListener('change', function () {
-                    const file = this.files && this.files[0];
-                    if (!file) {
-                        previewBox.style.backgroundImage = 'none';
-                        previewBox.style.color = 'var(--gray-500)';
-                        previewBox.textContent = 'Preview';
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        previewBox.style.backgroundImage = 'url(' + e.target.result + ')';
-                        previewBox.style.color = 'transparent';
-                        previewBox.textContent = '';
-                    };
-                    reader.readAsDataURL(file);
-                });
-            })();
 
             // basic front-end check
             (function () {

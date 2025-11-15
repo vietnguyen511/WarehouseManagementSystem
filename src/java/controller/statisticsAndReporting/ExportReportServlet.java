@@ -32,6 +32,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.FontFactory;
 
 // JFreeChart imports for chart generation
 import org.jfree.chart.ChartFactory;
@@ -60,26 +61,63 @@ public class ExportReportServlet extends HttpServlet {
      */
     private com.itextpdf.text.Font createVietnameseFont(int size, int style) {
         try {
-            // Use Times-Roman with IDENTITY_H encoding for better Unicode/Vietnamese support
-            BaseFont baseFont = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            // Try to use Arial font from Windows system fonts (best for Vietnamese)
+            String fontPath = "c:/windows/fonts/arial.ttf";
+            if (style == com.itextpdf.text.Font.BOLD) {
+                fontPath = "c:/windows/fonts/arialbd.ttf"; // Arial Bold
+            }
+            
+            // Check if file exists
+            java.io.File fontFile = new java.io.File(fontPath);
+            if (fontFile.exists()) {
+                BaseFont baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                return new com.itextpdf.text.Font(baseFont, size, style);
+            }
+        } catch (Exception e) {
+            System.out.println("Could not load Arial font from system: " + e.getMessage());
+        }
+        
+        try {
+            // Fallback 1: Try DejaVu Sans (good Unicode support)
+            String fontPath = "c:/windows/fonts/DejaVuSans.ttf";
+            if (style == com.itextpdf.text.Font.BOLD) {
+                fontPath = "c:/windows/fonts/DejaVuSans-Bold.ttf";
+            }
+            java.io.File fontFile = new java.io.File(fontPath);
+            if (fontFile.exists()) {
+                BaseFont baseFont = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                return new com.itextpdf.text.Font(baseFont, size, style);
+            }
+        } catch (Exception e) {
+            System.out.println("Could not load DejaVu font: " + e.getMessage());
+        }
+        
+        try {
+            // Fallback 2: Use Helvetica with IDENTITY_H encoding
+            BaseFont baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             return new com.itextpdf.text.Font(baseFont, size, style);
         } catch (Exception e) {
-            // Fallback: Try with Courier
-            try {
-                BaseFont baseFont = BaseFont.createFont(BaseFont.COURIER, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                return new com.itextpdf.text.Font(baseFont, size, style);
-            } catch (Exception ex) {
-                // Final fallback: Use default font factory
-                try {
-                    if (style == com.itextpdf.text.Font.BOLD) {
-                        return FontFactory.getFont(FontFactory.TIMES_BOLD, size);
-                    } else {
-                        return FontFactory.getFont(FontFactory.TIMES_ROMAN, size);
-                    }
-                } catch (Exception finalEx) {
-                    return new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.TIMES_ROMAN, size, style);
-                }
+            System.out.println("Could not create Helvetica font: " + e.getMessage());
+        }
+        
+        try {
+            // Fallback 3: Try with Times-Roman
+            BaseFont baseFont = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            return new com.itextpdf.text.Font(baseFont, size, style);
+        } catch (Exception ex) {
+            System.out.println("Could not create Times-Roman font: " + ex.getMessage());
+        }
+        
+        // Final fallback: Use FontFactory
+        try {
+            if (style == com.itextpdf.text.Font.BOLD) {
+                return FontFactory.getFont(FontFactory.HELVETICA_BOLD, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, size);
+            } else {
+                return FontFactory.getFont(FontFactory.HELVETICA, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, size);
             }
+        } catch (Exception finalEx) {
+            // Last resort: default font
+            return new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, size, style);
         }
     }
 
@@ -312,24 +350,34 @@ public class ExportReportServlet extends HttpServlet {
         // Debug: Print to console to verify this method is being called
         System.out.println("DEBUG: generateExcelReport called with fileName: " + fileName + ".csv");
 
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".csv\"");
 
-        PrintWriter out = response.getWriter();
+        // Use OutputStream to write both BOM and content
+        java.io.OutputStream os = response.getOutputStream();
+        java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(os, "UTF-8");
+        
+        // Write UTF-8 BOM to help Excel recognize UTF-8 encoding
+        os.write(0xEF);
+        os.write(0xBB);
+        os.write(0xBF);
 
         // Add title row
-        out.println(reportTitle + " - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        out.println(); // Empty line
+        writer.write(reportTitle + " - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\r\n");
+        writer.write("\r\n"); // Empty line
 
         // Add header row based on report type
         String headerRow = getHeaderRowForReportType(reportTitle);
-        out.println(headerRow);
+        writer.write(headerRow + "\r\n");
 
         // Add data rows based on report type
         for (ExportReportDTO report : data) {
             String dataRow = getDataRowForReportType(reportTitle, report);
-            out.println(dataRow);
+            writer.write(dataRow + "\r\n");
         }
+        
+        writer.flush();
     }
 
     private void generatePdfReport(HttpServletResponse response, List<ExportReportDTO> data,
@@ -464,17 +512,25 @@ public class ExportReportServlet extends HttpServlet {
     private void generateInventoryExcelReport(HttpServletResponse response, List<InventoryItem> inventoryItems, String fileName) throws IOException {
         System.out.println("DEBUG: generateInventoryExcelReport called with fileName: " + fileName + ".csv");
 
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".csv\"");
 
-        PrintWriter out = response.getWriter();
+        // Use OutputStream to write both BOM and content
+        java.io.OutputStream os = response.getOutputStream();
+        java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(os, "UTF-8");
+        
+        // Write UTF-8 BOM to help Excel recognize UTF-8 encoding
+        os.write(0xEF);
+        os.write(0xBB);
+        os.write(0xBF);
 
         // Add title row
-        out.println("Current Inventory Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        out.println(); // Empty line
+        writer.write("Current Inventory Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\r\n");
+        writer.write("\r\n"); // Empty line
 
         // Add header row for inventory
-        out.println("Product Code,Product Name,Category,Unit,Current Stock,Import Price,Export Price,Stock Value,Stock Status");
+        writer.write("Product Code,Product Name,Category,Unit,Current Stock,Import Price,Export Price,Stock Value,Stock Status\r\n");
 
         // Add data rows
         for (InventoryItem item : inventoryItems) {
@@ -490,8 +546,10 @@ public class ExportReportServlet extends HttpServlet {
             row.append(item.getInventoryValue() != null ? String.format("%.2f", item.getInventoryValue()) : "0.00").append(",");
             row.append(escapeCSV(item.getStockStatus()));
 
-            out.println(row.toString());
+            writer.write(row.toString() + "\r\n");
         }
+        
+        writer.flush();
     }
 
     private void generateInventoryPdfReport(HttpServletResponse response, List<InventoryItem> inventoryItems, List<Category> categories, String fileName) throws IOException {
@@ -562,17 +620,25 @@ public class ExportReportServlet extends HttpServlet {
     private void generateImportExportExcelReport(HttpServletResponse response, List<ImportExportStatDTO> statistics, String fileName) throws IOException {
         System.out.println("DEBUG: generateImportExportExcelReport called with fileName: " + fileName + ".csv");
 
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".csv\"");
 
-        PrintWriter out = response.getWriter();
+        // Use OutputStream to write both BOM and content
+        java.io.OutputStream os = response.getOutputStream();
+        java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(os, "UTF-8");
+        
+        // Write UTF-8 BOM to help Excel recognize UTF-8 encoding
+        os.write(0xEF);
+        os.write(0xBB);
+        os.write(0xBF);
 
         // Add title row
-        out.println("Import/Export Statistics Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        out.println(); // Empty line
+        writer.write("Import/Export Statistics Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\r\n");
+        writer.write("\r\n"); // Empty line
 
         // Add header row for import/export
-        out.println("Date,Import Qty,Export Qty,Import Value,Export Value,Stock Difference,Value Difference,Import Receipts,Export Receipts");
+        writer.write("Date,Import Qty,Export Qty,Import Value,Export Value,Stock Difference,Value Difference,Import Receipts,Export Receipts\r\n");
 
         // Add data rows
         for (ImportExportStatDTO stat : statistics) {
@@ -588,8 +654,10 @@ public class ExportReportServlet extends HttpServlet {
             row.append(stat.getImportReceiptCount()).append(",");
             row.append(stat.getExportReceiptCount());
 
-            out.println(row.toString());
+            writer.write(row.toString() + "\r\n");
         }
+        
+        writer.flush();
     }
 
     private void generateImportExportPdfReport(HttpServletResponse response, List<ImportExportStatDTO> statistics, String fileName, Date startDate, Date endDate) throws IOException {
@@ -700,43 +768,50 @@ public class ExportReportServlet extends HttpServlet {
     private void generateRevenueExcelReport(HttpServletResponse response, List<RevenueStatDTO> statistics, Object[] summary, String fileName) throws IOException {
         System.out.println("DEBUG: generateRevenueExcelReport called with fileName: " + fileName + ".csv");
 
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".csv\"");
 
-        PrintWriter out = response.getWriter();
+        // Use OutputStream to write both BOM and content
+        java.io.OutputStream os = response.getOutputStream();
+        java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(os, "UTF-8");
+        
+        // Write UTF-8 BOM to help Excel recognize UTF-8 encoding
+        os.write(0xEF);
+        os.write(0xBB);
+        os.write(0xBF);
 
         // Add title row
-        out.println("Revenue Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        out.println(); // Empty line
+        writer.write("Revenue Report - Generated on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "\r\n");
+        writer.write("\r\n"); // Empty line
 
         // Add summary section
         if (summary != null && summary.length >= 4) {
-            out.println("SUMMARY");
-            out.println("Total Revenue," + (summary[0] != null ? String.format("%.2f", summary[0]) : "0.00"));
-            out.println("Total Quantity," + (summary[1] != null ? summary[1].toString() : "0"));
-            out.println("Total Receipts," + (summary[2] != null ? summary[2].toString() : "0"));
-            out.println("Average Value," + (summary[3] != null ? String.format("%.2f", summary[3]) : "0.00"));
-            out.println(); // Empty line
+            writer.write("SUMMARY\r\n");
+            writer.write("Total Revenue," + (summary[0] != null ? String.format("%.2f", summary[0]) : "0.00") + "\r\n");
+            writer.write("Total Quantity," + (summary[1] != null ? summary[1].toString() : "0") + "\r\n");
+            writer.write("Total Receipts," + (summary[2] != null ? summary[2].toString() : "0") + "\r\n");
+            writer.write("Average Value," + (summary[3] != null ? String.format("%.2f", summary[3]) : "0.00") + "\r\n");
+            writer.write("\r\n"); // Empty line
         }
 
         // Add header row for revenue
-        out.println("Date,Product Code,Product Name,Category,Quantity Sold,Total Revenue,Receipt Count,Average Value");
+        writer.write("Date,Quantity Sold,Total Revenue,Receipt Count,Average Value\r\n");
 
         // Add data rows
         for (RevenueStatDTO stat : statistics) {
             StringBuilder row = new StringBuilder();
 
             row.append(stat.getDate() != null ? new SimpleDateFormat("MM/dd/yyyy").format(stat.getDate()) : "").append(",");
-            row.append(escapeCSV(stat.getProductCode())).append(",");
-            row.append(escapeCSV(stat.getProductName())).append(",");
-            row.append(escapeCSV(stat.getCategoryName())).append(",");
             row.append(stat.getTotalQuantity()).append(",");
             row.append(stat.getTotalValue() != null ? String.format("%.2f", stat.getTotalValue()) : "0.00").append(",");
             row.append(stat.getReceiptCount()).append(",");
             row.append(stat.getAverageValue() != null ? String.format("%.2f", stat.getAverageValue()) : "0.00");
 
-            out.println(row.toString());
+            writer.write(row.toString() + "\r\n");
         }
+        
+        writer.flush();
     }
 
     private void generateRevenuePdfReport(HttpServletResponse response, List<RevenueStatDTO> statistics, Object[] summary, String fileName, Date startDate, Date endDate) throws IOException {
@@ -780,18 +855,18 @@ public class ExportReportServlet extends HttpServlet {
             }
 
             // Create table
-            PdfPTable table = new PdfPTable(8); // 8 columns
+            PdfPTable table = new PdfPTable(5); // 5 columns (removed Product Code, Product Name, Category)
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
             // Set column widths
-            float[] columnWidths = {1.5f, 1.5f, 2.5f, 1.5f, 1.2f, 1.5f, 1.2f, 1.3f};
+            float[] columnWidths = {2f, 1.5f, 2f, 1.5f, 1.5f};
             table.setWidths(columnWidths);
 
             // Add headers
             com.itextpdf.text.Font headerFont = createVietnameseBoldFont(9);
-            String[] headers = {"Date", "Product Code", "Product Name", "Category", "Qty Sold", "Total Revenue", "Receipts", "Avg Value"};
+            String[] headers = {"Date", "Qty Sold", "Total Revenue", "Receipts", "Avg Value"};
 
             for (String header : headers) {
                 PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
@@ -804,9 +879,6 @@ public class ExportReportServlet extends HttpServlet {
             com.itextpdf.text.Font dataFont = createVietnameseNormalFont(8);
             for (RevenueStatDTO stat : statistics) {
                 table.addCell(new PdfPCell(new Phrase(stat.getDate() != null ? sdf.format(stat.getDate()) : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getProductCode() != null ? stat.getProductCode() : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getProductName() != null ? stat.getProductName() : "", dataFont)));
-                table.addCell(new PdfPCell(new Phrase(stat.getCategoryName() != null ? stat.getCategoryName() : "", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stat.getTotalQuantity()), dataFont)));
                 table.addCell(new PdfPCell(new Phrase(stat.getTotalValue() != null ? String.format("%.2f", stat.getTotalValue()) : "0.00", dataFont)));
                 table.addCell(new PdfPCell(new Phrase(String.valueOf(stat.getReceiptCount()), dataFont)));

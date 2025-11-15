@@ -16,12 +16,11 @@ public class Product {
     private Integer categoryId;
     private String categoryName;
     private String description;
-    private String image;
 
     public Product() {
     }
 
-    public Product(int productId, String code, String name, String material, String unit, int quantity, BigDecimal importPrice, BigDecimal exportPrice, boolean status, String description, String image) {
+    public Product(int productId, String code, String name, String material, String unit, int quantity, BigDecimal importPrice, BigDecimal exportPrice, boolean status, String description) {
         this.productId = productId;
         this.code = code;
         this.name = name;
@@ -31,8 +30,7 @@ public class Product {
         this.importPrice = importPrice;
         this.exportPrice = exportPrice;
         this.status = status;
-        this.description = description;
-        this.image = image; 
+        this.description = description; 
     }
 
     public int getProductId() {
@@ -129,13 +127,5 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 }

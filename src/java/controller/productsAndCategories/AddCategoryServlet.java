@@ -71,11 +71,7 @@ public class AddCategoryServlet extends HttpServlet {
         int categoryId = dao.insertCategoryReturnId(category);
 
         // check if success
-        if (categoryId > 0) {
-            // Log activity
-            ActivityLogHelper.logCreate(request.getSession(), "Categories", categoryId, 
-                "Created new category: " + name + " (" + code + ")");
-            
+        if (categoryId > 0) {            
             response.sendRedirect(request.getContextPath() + "/warehouse-management/category-management?msg=added");
         } else {
             response.sendRedirect(request.getContextPath() + "/warehouse-management/add-category?msg=addFail");

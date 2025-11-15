@@ -72,11 +72,25 @@ public class ImportStatisticsServlet extends HttpServlet {
             // Pagination logic
             int totalRecords = allStatistics.size();
             int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-            if (page > totalPages && totalPages > 0) page = totalPages;
+            
+            // Ensure page is within valid bounds
+            if (totalPages == 0) {
+                page = 1;
+                totalPages = 1;
+            } else if (page > totalPages) {
+                page = totalPages;
+            }
             
             int fromIndex = (page - 1) * pageSize;
             int toIndex = Math.min(fromIndex + pageSize, totalRecords);
-            List<ImportStatDTO> statistics = allStatistics.subList(fromIndex, toIndex);
+            
+            // Get paginated statistics (handle empty list)
+            List<ImportStatDTO> statistics;
+            if (totalRecords > 0 && fromIndex < totalRecords) {
+                statistics = allStatistics.subList(fromIndex, toIndex);
+            } else {
+                statistics = allStatistics; // Empty list if no records
+            }
             
             // Set attributes
             request.setAttribute("statistics", statistics); // Paginated data for table

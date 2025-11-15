@@ -189,7 +189,7 @@ public class ProductDAO extends DBContext {
     public model.Product getProductById(int productId) {
         String sql = "SELECT p.product_id, p.code, p.name, p.material, p.unit, p.quantity, "
                 + "       p.import_price, p.export_price, p.status, p.category_id, "
-                + "       c.name AS category_name, p.description, p.image, "
+                + "       c.name AS category_name, p.description, "
                 + "       p.created_at, p.updated_at "
                 + "FROM Products p "
                 + "LEFT JOIN Categories c ON p.category_id = c.category_id "
@@ -212,7 +212,6 @@ public class ProductDAO extends DBContext {
                     product.setCategoryId(rs.wasNull() ? null : categoryId);
                     product.setCategoryName(rs.getString("category_name"));
                     product.setDescription(rs.getString("description"));
-                    product.setImage(rs.getString("image"));
                     return product;
                 }
             }
@@ -269,9 +268,9 @@ public class ProductDAO extends DBContext {
     public boolean insertProduct(Product product) {
         String sql = "INSERT INTO Products "
                 + " (code, name, category_id, material, unit, quantity, "
-                + "  description, image, status, "
+                + "  description, status, "
                 + "  created_at, updated_at) "
-                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE())";
 
         try (Connection conn = dal.DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -294,16 +293,7 @@ public class ProductDAO extends DBContext {
             } else {
                 ps.setString(7, product.getDescription().trim());
             }
-
-            // 10. image (nullable)
-            if (product.getImage() == null || product.getImage().trim().isEmpty()) {
-                ps.setNull(8, Types.NVARCHAR);
-            } else {
-                ps.setString(8, product.getImage().trim());
-            }
-
-            // 11. status (bit)
-            ps.setBoolean(9, product.isStatus());
+            ps.setBoolean(8, product.isStatus());
 
             int rows = ps.executeUpdate();
             return rows > 0;
@@ -317,7 +307,7 @@ public class ProductDAO extends DBContext {
     public boolean updateProduct(Product product) {
         String sql = "UPDATE Products SET "
                 + "code = ?, name = ?, category_id = ?, material = ?, unit = ?, "
-                + "description = ?, image = ?, status = ?, "
+                + "description = ?, status = ?, "
                 + "updated_at = GETDATE() "
                 + "WHERE product_id = ?";
 
@@ -349,15 +339,8 @@ public class ProductDAO extends DBContext {
             } else {
                 ps.setString(6, product.getDescription().trim());
             }
-
-            if (product.getImage() == null || product.getImage().trim().isEmpty()) {
-                ps.setNull(7, Types.NVARCHAR);
-            } else {
-                ps.setString(7, product.getImage().trim());
-            }
-
-            ps.setBoolean(8, product.isStatus());
-            ps.setInt(9, product.getProductId());
+            ps.setBoolean(7, product.isStatus());
+            ps.setInt(8, product.getProductId());
 
             int rows = ps.executeUpdate();
             return rows > 0;

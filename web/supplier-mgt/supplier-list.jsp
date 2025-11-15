@@ -23,6 +23,8 @@
         .btn-edit:hover { background: rgba(2, 132, 199, 0.35); }
         .btn-delete { color: var(--danger-700); border-color: var(--danger-600); }
         .btn-delete:hover { background: rgba(220, 38, 38, 0.35); }
+        .btn-activate { color: var(--success-700); border-color: var(--success-600); }
+        .btn-activate:hover { background: rgba(34, 197, 94, 0.35); }
         /* Modal styles */
         .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal { background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 420px; max-width: calc(100% - 2rem); border: 1px solid var(--gray-200); }
@@ -60,6 +62,12 @@
                 </c:if>
                 <c:if test="${param.updated == '1'}">
                     <div class="alert alert-success">Supplier updated successfully.</div>
+                </c:if>
+                <c:if test="${param.deactivated == '1'}">
+                    <div class="alert alert-success">Supplier deactivated successfully.</div>
+                </c:if>
+                <c:if test="${param.activated == '1'}">
+                    <div class="alert alert-success">Supplier activated successfully.</div>
                 </c:if>
                 <c:if test="${param.deleted == '1'}">
                     <div class="alert alert-success">Supplier deleted successfully.</div>
@@ -129,19 +137,35 @@
                                                     </svg>
                                                     Edit
                                                 </a>
-                                                <form method="post" action="${pageContext.request.contextPath}/suppliers/delete" class="delete-form" style="display:inline;">
-                                                    <input type="hidden" name="id" value="${s.supplierId}" />
-                                                    <button type="button" class="btn btn-sm btn-action btn-delete btn-open-delete-modal" data-supplier-id="${s.supplierId}" data-supplier-name="${fn:escapeXml(s.name)}">
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
-                                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-                                                            <path d="M10 11v6"></path>
-                                                            <path d="M14 11v6"></path>
-                                                            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
-                                                        </svg>
-                                                        Delete
-                                                    </button>
-                                                </form>
+                                                <c:choose>
+                                                    <c:when test="${s.status}">
+                                                        <!-- Show Deactivate button for active suppliers -->
+                                                        <form method="post" action="${pageContext.request.contextPath}/suppliers/delete" class="deactivate-form" style="display:inline;">
+                                                            <input type="hidden" name="id" value="${s.supplierId}" />
+                                                            <button type="button" class="btn btn-sm btn-action btn-delete btn-open-deactivate-modal" data-supplier-id="${s.supplierId}" data-supplier-name="${fn:escapeXml(s.name)}">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                                </svg>
+                                                                Deactivate
+                                                            </button>
+                                                        </form>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <!-- Show Activate button for inactive suppliers -->
+                                                        <form method="post" action="${pageContext.request.contextPath}/suppliers/activate" class="activate-form" style="display:inline;">
+                                                            <input type="hidden" name="id" value="${s.supplierId}" />
+                                                            <button type="button" class="btn btn-sm btn-action btn-activate btn-open-activate-modal" data-supplier-id="${s.supplierId}" data-supplier-name="${fn:escapeXml(s.name)}">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <polyline points="9 12 11 14 15 10"></polyline>
+                                                                </svg>
+                                                                Activate
+                                                            </button>
+                                                        </form>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                         </td>
                                     </tr>
@@ -208,54 +232,113 @@
     </div>
 
     <jsp:include page="/components/footer.jsp" />
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-backdrop" id="deleteModal">
-        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    
+    <!-- Deactivate Confirmation Modal -->
+    <div class="modal-backdrop" id="deactivateModal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deactivateModalTitle">
             <div class="modal-header">
-                <h2 class="modal-title" id="deleteModalTitle">Confirm Delete</h2>
+                <h2 class="modal-title" id="deactivateModalTitle">Confirm Deactivate</h2>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete supplier <strong id="deleteSupplierName"></strong>?</p>
+                <p>Are you sure you want to deactivate supplier <strong id="deactivateSupplierName"></strong>?</p>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">The supplier will be marked as inactive but can be reactivated later.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-outline" id="cancelDeleteBtn">Cancel</button>
-                <button type="button" class="btn btn-sm btn-danger-solid" id="confirmDeleteBtn">Delete</button>
+                <button type="button" class="btn btn-sm btn-outline" id="cancelDeactivateBtn">Cancel</button>
+                <button type="button" class="btn btn-sm btn-danger-solid" id="confirmDeactivateBtn">Deactivate</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activate Confirmation Modal -->
+    <div class="modal-backdrop" id="activateModal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="activateModalTitle">
+            <div class="modal-header">
+                <h2 class="modal-title" id="activateModalTitle">Confirm Activate</h2>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to activate supplier <strong id="activateSupplierName"></strong>?</p>
+                <p style="color: var(--gray-600); font-size: 0.875rem; margin-top: 0.5rem;">The supplier will be marked as active and available for use.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline" id="cancelActivateBtn">Cancel</button>
+                <button type="button" class="btn btn-sm" id="confirmActivateBtn" style="background: var(--success-600); border-color: var(--success-600); color: #fff;">Activate</button>
             </div>
         </div>
     </div>
 
     <script>
         (function(){
-            const modal = document.getElementById('deleteModal');
-            const supplierNameEl = document.getElementById('deleteSupplierName');
-            const cancelBtn = document.getElementById('cancelDeleteBtn');
-            const confirmBtn = document.getElementById('confirmDeleteBtn');
-            let pendingForm = null;
+            // Deactivate Modal
+            const deactivateModal = document.getElementById('deactivateModal');
+            const deactivateSupplierNameEl = document.getElementById('deactivateSupplierName');
+            const cancelDeactivateBtn = document.getElementById('cancelDeactivateBtn');
+            const confirmDeactivateBtn = document.getElementById('confirmDeactivateBtn');
+            let pendingDeactivateForm = null;
 
-            function openModal(form, name) {
-                pendingForm = form;
-                supplierNameEl.textContent = name || '';
-                modal.style.display = 'flex';
+            function openDeactivateModal(form, name) {
+                pendingDeactivateForm = form;
+                deactivateSupplierNameEl.textContent = name || '';
+                deactivateModal.style.display = 'flex';
             }
 
-            function closeModal() {
-                modal.style.display = 'none';
-                pendingForm = null;
+            function closeDeactivateModal() {
+                deactivateModal.style.display = 'none';
+                pendingDeactivateForm = null;
             }
 
-            document.querySelectorAll('.btn-open-delete-modal').forEach(btn => {
+            document.querySelectorAll('.btn-open-deactivate-modal').forEach(btn => {
                 btn.addEventListener('click', function(e){
                     e.preventDefault();
                     const form = this.closest('form');
                     const name = this.getAttribute('data-supplier-name');
-                    openModal(form, name);
+                    openDeactivateModal(form, name);
                 });
             });
 
-            cancelBtn.addEventListener('click', function(){ closeModal(); });
-            modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
-            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
-            confirmBtn.addEventListener('click', function(){ if (pendingForm) pendingForm.submit(); });
+            cancelDeactivateBtn.addEventListener('click', function(){ closeDeactivateModal(); });
+            deactivateModal.addEventListener('click', function(e){ if (e.target === deactivateModal) closeDeactivateModal(); });
+            confirmDeactivateBtn.addEventListener('click', function(){ if (pendingDeactivateForm) pendingDeactivateForm.submit(); });
+
+            // Activate Modal
+            const activateModal = document.getElementById('activateModal');
+            const activateSupplierNameEl = document.getElementById('activateSupplierName');
+            const cancelActivateBtn = document.getElementById('cancelActivateBtn');
+            const confirmActivateBtn = document.getElementById('confirmActivateBtn');
+            let pendingActivateForm = null;
+
+            function openActivateModal(form, name) {
+                pendingActivateForm = form;
+                activateSupplierNameEl.textContent = name || '';
+                activateModal.style.display = 'flex';
+            }
+
+            function closeActivateModal() {
+                activateModal.style.display = 'none';
+                pendingActivateForm = null;
+            }
+
+            document.querySelectorAll('.btn-open-activate-modal').forEach(btn => {
+                btn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    const form = this.closest('form');
+                    const name = this.getAttribute('data-supplier-name');
+                    openActivateModal(form, name);
+                });
+            });
+
+            cancelActivateBtn.addEventListener('click', function(){ closeActivateModal(); });
+            activateModal.addEventListener('click', function(e){ if (e.target === activateModal) closeActivateModal(); });
+            confirmActivateBtn.addEventListener('click', function(){ if (pendingActivateForm) pendingActivateForm.submit(); });
+
+            // Close modals on Escape key
+            document.addEventListener('keydown', function(e){ 
+                if (e.key === 'Escape') {
+                    closeDeactivateModal();
+                    closeActivateModal();
+                }
+            });
+
             // Auto-hide success alerts after 3 seconds
             window.addEventListener('load', function(){
                 const successAlerts = document.querySelectorAll('.alert.alert-success');
@@ -269,5 +352,6 @@
     </script>
 </body>
 </html>
+
 
 

@@ -69,6 +69,10 @@
         <servlet-class>controller.supplier.DeleteSupplierServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>ActivateSupplierServlet</servlet-name>
+        <servlet-class>controller.supplier.ActivateSupplierServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
         <servlet-class>controller.supplier.ViewSupplierDetailServlet</servlet-class>
     </servlet>
@@ -167,6 +171,10 @@
     <servlet-mapping>
         <servlet-name>DeleteSupplierServlet</servlet-name>
         <url-pattern>/suppliers/delete</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ActivateSupplierServlet</servlet-name>
+        <url-pattern>/suppliers/activate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewSupplierDetailServlet</servlet-name>
