@@ -41,12 +41,12 @@ public class ExportReceiptDAO extends DBContext {
         return -1;
     }
 
-    // Import detail operations moved to ImportDetailDAO
+    
 
-    // Product-related operations moved to ProductDAO
+    
 
    public void decreaseProductStock(int productId, int quantity, BigDecimal newExportPrice) throws SQLException {
-    // Chỉ cập nhật nếu quantity hiện tại >= quantity yêu cầu
+    
     String sql = "UPDATE Products SET quantity = quantity - ?, export_price = ISNULL(?, export_price), updated_at = GETDATE() WHERE product_id = ? AND quantity >= ?";
     PreparedStatement st = connection.prepareStatement(sql);
     st.setInt(1, quantity);
@@ -57,7 +57,7 @@ public class ExportReceiptDAO extends DBContext {
     try { st.close(); } catch (Exception ignore) {}
 
     if (affected == 0) {
-        // Không update được: có thể product không tồn tại hoặc không đủ tồn kho
+        
         throw new SQLException("Failed to decrease stock: product_id=" + productId + " (not found or insufficient stock).");
     }
 }
@@ -77,7 +77,7 @@ public class ExportReceiptDAO extends DBContext {
         ResultSet rsKeys = null;
         boolean prevAuto = true;
         try {
-            // preserve previous auto-commit
+            
             try { prevAuto = connection.getAutoCommit(); } catch (SQLException ignore) {}
 
             connection.setAutoCommit(false);
@@ -106,7 +106,7 @@ public class ExportReceiptDAO extends DBContext {
                 throw new SQLException("Failed to obtain generated exportId.");
             }
 
-            // DAOs sharing the same connection for transactional consistency
+            
             ExportDetailDAO exportDetailDAO = new ExportDetailDAO(connection);
             ProductVariantDAO variantDAO = new ProductVariantDAO(connection);
             ProductDAO productDAO = new ProductDAO(connection);
@@ -119,17 +119,17 @@ public class ExportReceiptDAO extends DBContext {
 
                     ProductVariant variant = null;
                     try {
-                        // try find existing variant by product code + size + color
+                        
                         variant = variantDAO.getVariantByProductCodeSizeColor(d.getProductCode(), d.getSize(), d.getColor());
                     } catch (Exception ex) {
-                        // Log and continue (variant lookup may fail if method signature differs)
+                        
                         System.out.println("WARN: variant lookup threw exception for code=" + d.getProductCode());
                         ex.printStackTrace();
                         variant = null;
                     }
 
                     if (variant == null) {
-                        // try find product by code
+                        
                         Integer productId = null;
                         try {
                             productId = productDAO.getProductIdByCode(d.getProductCode());
@@ -141,7 +141,7 @@ public class ExportReceiptDAO extends DBContext {
 
                         if (productId != null) {
                             try {
-                                // create variant
+                                
                                 ProductVariant newVar = new ProductVariant();
                                 newVar.setProductId(productId);
                                 newVar.setSize(d.getSize());
@@ -160,25 +160,24 @@ public class ExportReceiptDAO extends DBContext {
                         }
                     }
 
-                    // If we have a variant, set variantId on detail; otherwise leave as 0 (insertExportDetail will write NULL)
+                    
                     if (variant != null) {
                         d.setVariantId(variant.getVariantId());
                     } else {
-                        d.setVariantId(0); // insertExportDetail handles 0 -> NULL
+                        d.setVariantId(0); 
                     }
 
-                    // Insert detail
+                    
                     try {
                         exportDetailDAO.insertExportDetail(d, exportId);
                         System.out.println("DEBUG: Inserted ExportDetail for exportId=" + exportId + " productCode=" + d.getProductCode());
                     } catch (Exception ex) {
                         System.err.println("ERROR: Failed to insert ExportDetail for productCode=" + d.getProductCode());
                         ex.printStackTrace();
-                        throw ex; // will be caught by outer catch and rollback
+                        throw ex; 
                     }
 
-                    // Update variant stock and product price if we have variant info
-                    // Update variant/product stock for export (decrease)
+                    
                     try {
                        if (variant != null && variant.getVariantId() > 0) {
                            variantDAO.decreaseVariantStock(variant.getVariantId(), d.getQuantity());
@@ -202,8 +201,8 @@ public class ExportReceiptDAO extends DBContext {
                     throw ex;
                     }
 
-                } // end for each detail
-            } // end if details != null
+                } 
+            } 
 
             connection.commit();
             System.out.println("DEBUG: Transaction committed for exportId=" + exportId);
@@ -232,7 +231,7 @@ public class ExportReceiptDAO extends DBContext {
     public List<ExportReceiptListDTO> getAllExportReceipts(int offset, int limit, String searchTerm, String dateFilter) throws SQLException {
         List<ExportReceiptListDTO> receipts = new ArrayList<>();
         
-        // Build dynamic SQL with search and filter conditions
+        
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT er.export_id, er.date, c.name as customer_name, ");
         sql.append("er.total_quantity, er.total_amount, u.fullname as user_name, er.note ");
@@ -240,7 +239,7 @@ public class ExportReceiptDAO extends DBContext {
         sql.append("INNER JOIN Customers c ON er.customer_id = c.customer_id ");
         sql.append("INNER JOIN Users u ON er.user_id = u.user_id ");
         
-        // Add WHERE conditions
+        
         boolean hasWhere = false;
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             sql.append("WHERE (");
@@ -274,7 +273,7 @@ public class ExportReceiptDAO extends DBContext {
                     sql.append("er.date >= DATEADD(MONTH, -3, GETDATE()) ");
                     break;
                 default:
-                    // Remove the AND/WHERE if invalid filter
+                    
                     sql.setLength(sql.length() - (hasWhere && searchTerm != null ? 4 : 5));
                     hasWhere = false;
                     break;
@@ -287,7 +286,7 @@ public class ExportReceiptDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sql.toString());
         int paramIndex = 1;
         
-        // Set search parameters
+        
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             String searchPattern = "%" + searchTerm.trim() + "%";
             st.setString(paramIndex++, searchPattern);
@@ -296,7 +295,7 @@ public class ExportReceiptDAO extends DBContext {
             st.setString(paramIndex++, searchPattern);
         }
         
-        // Set pagination parameters
+        
         st.setInt(paramIndex++, offset);
         st.setInt(paramIndex++, limit);
         
@@ -329,7 +328,7 @@ public class ExportReceiptDAO extends DBContext {
         sql.append("INNER JOIN Customers c ON er.customer_id = c.customer_id ");
         sql.append("INNER JOIN Users u ON er.user_id = u.user_id ");
         
-        // Add WHERE conditions
+        
         boolean hasWhere = false;
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             sql.append("WHERE (");
@@ -363,7 +362,7 @@ public class ExportReceiptDAO extends DBContext {
                     sql.append("er.date >= DATEADD(MONTH, -3, GETDATE()) ");
                     break;
                 default:
-                    // Remove the AND/WHERE if invalid filter
+                    
                     sql.setLength(sql.length() - (hasWhere && searchTerm != null ? 4 : 5));
                     hasWhere = false;
                     break;
@@ -373,7 +372,7 @@ public class ExportReceiptDAO extends DBContext {
         PreparedStatement st = connection.prepareStatement(sql.toString());
         int paramIndex = 1;
         
-        // Set search parameters
+        
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             String searchPattern = "%" + searchTerm.trim() + "%";
             st.setString(paramIndex++, searchPattern);
@@ -437,7 +436,7 @@ public class ExportReceiptDAO extends DBContext {
     public List<model.ExportStatDTO> getExportStatistics(java.util.Date startDate, java.util.Date endDate, String groupBy) throws SQLException {
         List<model.ExportStatDTO> stats = new ArrayList<>();
         
-        // Determine grouping
+        
         boolean isMonthly = "month".equalsIgnoreCase(groupBy);
         
         StringBuilder sql = new StringBuilder();
@@ -513,4 +512,167 @@ public class ExportReceiptDAO extends DBContext {
         try { st.close(); } catch (Exception ignore) {}
         return new Object[]{0, 0, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO};
     }
-}
+    
+    // Thêm import nếu cần ở đầu file:
+// import java.util.Map; (không bắt buộc)
+
+    public int countByFilters(String searchTerm, String dateFilter) throws SQLException {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM ExportReceipts er ");
+        sql.append("INNER JOIN Customers c ON er.customer_id = c.customer_id ");
+        sql.append("INNER JOIN Users u ON er.user_id = u.user_id ");
+
+        List<Object> params = new ArrayList<>();
+        boolean hasWhere = false;
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql.append("WHERE (");
+            sql.append("CAST(er.export_id AS VARCHAR(50)) LIKE ? OR ");
+            sql.append("c.name LIKE ? OR ");
+            sql.append("u.fullname LIKE ? OR ");
+            sql.append("er.note LIKE ?");
+            sql.append(") ");
+            String like = "%" + searchTerm.trim() + "%";
+            params.add(like);
+            params.add(like);
+            params.add(like);
+            params.add(like);
+            hasWhere = true;
+        }
+
+        if (dateFilter != null && !dateFilter.trim().isEmpty()) {
+            if (hasWhere) {
+                sql.append("AND ");
+            } else {
+                sql.append("WHERE ");
+                hasWhere = true;
+            }
+
+            switch (dateFilter.toLowerCase()) {
+                case "today":
+                    sql.append("CAST(er.date AS DATE) = CAST(GETDATE() AS DATE) ");
+                    break;
+                case "week":
+                    sql.append("er.date >= DATEADD(DAY, -7, GETDATE()) ");
+                break;
+                case "month":
+                    sql.append("YEAR(er.date) = YEAR(GETDATE()) AND MONTH(er.date) = MONTH(GETDATE()) ");
+                    break;
+                case "quarter":
+                    sql.append("er.date >= DATEADD(MONTH, -3, GETDATE()) ");
+                    break;
+                default:
+                break;
+        }
+    }
+
+    PreparedStatement st = connection.prepareStatement(sql.toString());
+    try {
+        int idx = 1;
+        for (Object p : params) {
+            st.setString(idx++, p.toString());
+        }
+        ResultSet rs = st.executeQuery();
+        try {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        } finally {
+            try { rs.close(); } catch (Exception ignore) {}
+        }
+    } finally {
+        try { st.close(); } catch (Exception ignore) {}
+    }
+    }
+
+    public List<ExportReceiptListDTO> findByFiltersWithPaging(int offset, int limit, String searchTerm, String dateFilter) throws SQLException {
+        List<ExportReceiptListDTO> receipts = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT er.export_id, er.date, c.name as customer_name, ");
+        sql.append("er.total_quantity, er.total_amount, u.fullname as user_name, er.note ");
+        sql.append("FROM ExportReceipts er ");
+        sql.append("INNER JOIN Customers c ON er.customer_id = c.customer_id ");
+        sql.append("INNER JOIN Users u ON er.user_id = u.user_id ");
+
+        List<Object> params = new ArrayList<>();
+        boolean hasWhere = false;
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+        sql.append("WHERE (");
+        sql.append("CAST(er.export_id AS VARCHAR(50)) LIKE ? OR ");
+        sql.append("c.name LIKE ? OR ");
+        sql.append("u.fullname LIKE ? OR ");
+        sql.append("er.note LIKE ?");
+        sql.append(") ");
+        String like = "%" + searchTerm.trim() + "%";
+        params.add(like);
+        params.add(like);
+        params.add(like);
+        params.add(like);
+        hasWhere = true;
+    }
+
+    if (dateFilter != null && !dateFilter.trim().isEmpty()) {
+        if (hasWhere) {
+            sql.append("AND ");
+        } else {
+            sql.append("WHERE ");
+            hasWhere = true;
+        }
+
+        switch (dateFilter.toLowerCase()) {
+            case "today":
+                sql.append("CAST(er.date AS DATE) = CAST(GETDATE() AS DATE) ");
+                break;
+            case "week":
+                sql.append("er.date >= DATEADD(DAY, -7, GETDATE()) ");
+                break;
+            case "month":
+                sql.append("YEAR(er.date) = YEAR(GETDATE()) AND MONTH(er.date) = MONTH(GETDATE()) ");
+                break;
+            case "quarter":
+                sql.append("er.date >= DATEADD(MONTH, -3, GETDATE()) ");
+                break;
+            default:
+                break;
+        }
+    }
+
+    sql.append("ORDER BY er.export_id ASC ");
+    sql.append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+    PreparedStatement st = connection.prepareStatement(sql.toString());
+    try {
+        int idx = 1;
+        for (Object p : params) {
+            st.setString(idx++, p.toString());
+        }
+        st.setInt(idx++, offset);
+        st.setInt(idx++, limit);
+
+        ResultSet rs = st.executeQuery();
+        try {
+            while (rs.next()) {
+                ExportReceiptListDTO dto = new ExportReceiptListDTO();
+                dto.setExportId(rs.getInt("export_id"));
+                dto.setDate(rs.getTimestamp("date"));
+                dto.setCustomerName(rs.getString("customer_name"));
+                dto.setTotalQuantity(rs.getInt("total_quantity"));
+                dto.setTotalAmount(rs.getBigDecimal("total_amount"));
+                dto.setUserName(rs.getString("user_name"));
+                dto.setNote(rs.getString("note"));
+                receipts.add(dto);
+            }
+        } finally {
+            try { rs.close(); } catch (Exception ignore) {}
+        }
+    } finally {
+        try { st.close(); } catch (Exception ignore) {}
+    }
+
+    return receipts;
+    }
+
+    }

@@ -3,8 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <c:set var="baseUrl" value="?page=" />
-<c:set var="searchParam" value="${not empty searchTerm ? '&search=' : ''}${searchTerm}" />
-<c:set var="dateParam" value="${not empty dateFilter ? '&dateFilter=' : ''}${dateFilter}" />
+<c:set var="searchParam" value="${not empty search ? '&search=' : ''}${fn:escapeXml(search)}" />
+<c:set var="dateParam" value="${not empty dateFilter ? '&dateFilter=' : ''}${fn:escapeXml(dateFilter)}" />
 <c:set var="fullParams" value="${searchParam}${dateParam}" />
 <!DOCTYPE html>
 <html lang="en">
