@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller.imports;
 
 import java.io.IOException;
@@ -26,58 +21,40 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-/**
- *
- * @author admin
- */
 public class CreateImportReceiptServlet extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CreateImportReceiptServlet</title>");  
+            out.println("<title>Servlet CreateImportReceiptServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet CreateImportReceiptServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet CreateImportReceiptServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
+    }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         // Load suppliers for dropdown
         SupplierDAO supplierDAO = new SupplierDAO();
         java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
         request.setAttribute("suppliers", suppliers);
-        
+
         // Load categories for dropdown
         dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
         java.util.List<model.Category> categories = categoryDAO.getAllCategories();
         request.setAttribute("categories", categories);
-        
+
         // Provide today's date for default value
         String today = java.time.LocalDate.now().toString();
         request.setAttribute("today", today);
@@ -93,77 +70,80 @@ public class CreateImportReceiptServlet extends HttpServlet {
 
         // Set active page for sidebar navigation
         request.setAttribute("activePage", "add-import-receipt");
-
         request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
-    } 
+    }
 
-    /** 
-     * Handles the HTTP <code>POST</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
-        // Quick debug: log start
+
         System.out.println("=== CREATE IMPORT RECEIPT POST START ===");
 
         try {
-            // Basic receipt info
+
             String supplierIdStr = request.getParameter("supplierId");
             String importDateStr = request.getParameter("importDate");
             String totalAmountStr = request.getParameter("totalAmount");
             String note = request.getParameter("note");
 
-            // Validate and sanitize note
+            // Sanitize note
             note = sanitizeHtml(note);
 
             int supplierId = Integer.parseInt(supplierIdStr);
-            // Use current timestamp when creating receipt to include time information
-            Date importDate = (importDateStr == null || importDateStr.isEmpty()) ? new Date() : toSqlTimestampFlexible(importDateStr);
-            
-            // Validate import date is not in the future
+
+            // Dùng timestamp (ngày + giờ hiện tại) cho phiếu nhập
+            Date importDate = (importDateStr == null || importDateStr.isEmpty())
+                    ? new Date()
+                    : toSqlTimestampFlexible(importDateStr);
+
+            // Validate Input day <= Current day
             if (importDateStr != null && !importDateStr.isEmpty()) {
                 LocalDate selectedDate = LocalDate.parse(importDateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 LocalDate today = LocalDate.now();
                 if (selectedDate.isAfter(today)) {
                     request.setAttribute("errorMessage", "Import date cannot be in the future.");
-                    // Reload suppliers and categories for form
+
+                    // Load  suppliers, categories, today form
                     SupplierDAO supplierDAO = new SupplierDAO();
                     java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
                     request.setAttribute("suppliers", suppliers);
+
                     dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
                     java.util.List<model.Category> categories = categoryDAO.getAllCategories();
                     request.setAttribute("categories", categories);
+
                     String todayStr = java.time.LocalDate.now().toString();
                     request.setAttribute("today", todayStr);
                     request.setAttribute("activePage", "add-import-receipt");
-                    request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+
+                    request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp")
+                            .forward(request, response);
                     return;
                 }
             }
-            
-            BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty()) ? BigDecimal.ZERO : new BigDecimal(totalAmountStr);
 
-            // Build receipt model
+            BigDecimal totalAmount = (totalAmountStr == null || totalAmountStr.isEmpty())
+                    ? BigDecimal.ZERO
+                    : new BigDecimal(totalAmountStr);
+
+            // Build ImportReceipt
             ImportReceipt receipt = new ImportReceipt();
             receipt.setSupplierId(supplierId);
-            // Temporary: no login yet – hardcode staff user id = 3 (Mike Johnson)
+            // TODO: sau này lấy userId từ session
             receipt.setUserId(3);
             receipt.setDate(importDate);
             receipt.setTotalAmount(totalAmount);
             receipt.setNote(note);
-            
-            System.out.println("Receipt created: " + receipt.getSupplierId() + " " + receipt.getDate() + " " + receipt.getTotalAmount());
 
-            // Parse item rows by scanning sequential indices until none found
+            System.out.println("Receipt created (header): supplierId=" + supplierId
+                    + ", date=" + importDate + ", totalAmount=" + totalAmount);
+
+            // Read list item from form
             List<ImportDetail> details = new ArrayList<>();
             int index = 0;
+
             while (true) {
                 String code = request.getParameter("items[" + index + "].productCode");
                 String name = request.getParameter("items[" + index + "].productName");
@@ -174,41 +154,51 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 String color = request.getParameter("items[" + index + "].color");
                 String qtyStr = request.getParameter("items[" + index + "].quantity");
                 String priceStr = request.getParameter("items[" + index + "].price");
+
                 if (code == null && name == null && qtyStr == null && priceStr == null) {
                     break;
                 }
+
                 if (code == null || qtyStr == null || priceStr == null || code.trim().isEmpty()) {
                     index++;
                     continue;
                 }
-                // Sanitize all text inputs
+
+                // Sanitize text
                 code = sanitizeHtml(code);
                 name = sanitizeHtml(name);
                 material = sanitizeHtml(material);
                 unit = sanitizeHtml(unit);
                 size = sanitizeHtml(size);
                 color = sanitizeHtml(color);
-                
+
                 // Validate size
                 if (size != null && !size.trim().isEmpty()) {
                     String sizeTrimmed = size.trim();
                     if (!isValidSize(sizeTrimmed)) {
-                        request.setAttribute("errorMessage", "Invalid size for item " + (index + 1) + ": Size must be XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or a number between 20-50.");
-                        // Reload suppliers and categories for form
+                        request.setAttribute("errorMessage",
+                                "Invalid size for item " + (index + 1)
+                                + ": Size must be XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or a number between 20-50.");
+
+                        // Re-load suppliers, categories, today for form
                         SupplierDAO supplierDAO = new SupplierDAO();
                         java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
                         request.setAttribute("suppliers", suppliers);
+
                         dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
                         java.util.List<model.Category> categories = categoryDAO.getAllCategories();
                         request.setAttribute("categories", categories);
+
                         String todayStr = java.time.LocalDate.now().toString();
                         request.setAttribute("today", todayStr);
                         request.setAttribute("activePage", "add-import-receipt");
-                        request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
+
+                        request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp")
+                                .forward(request, response);
                         return;
                     }
                 }
-                
+
                 ImportDetail d = new ImportDetail();
                 d.setProductCode(code != null ? code.trim() : "");
                 d.setProductName(name != null ? name.trim() : null);
@@ -216,44 +206,95 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 d.setUnit(unit != null ? unit.trim() : "");
                 d.setSize(size != null ? size.trim() : "");
                 d.setColor(color != null ? color.trim() : "");
-                
-                // Parse category ID if provided
+
+                // Parse categoryId if have
                 if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
                     try {
                         d.setCategoryId(Integer.parseInt(categoryIdStr.trim()));
                     } catch (NumberFormatException e) {
-                        // Ignore invalid category ID
+                        // remove categoryId error
                     }
                 }
-                
+
                 d.setQuantity(Integer.parseInt(qtyStr));
                 BigDecimal price = new BigDecimal(priceStr);
                 d.setPrice(price);
                 d.setAmount(price.multiply(BigDecimal.valueOf(d.getQuantity())));
+
                 details.add(d);
                 index++;
             }
 
-            int totalQty = details.stream().mapToInt(ImportDetail::getQuantity).sum();
-            receipt.setTotalQuantity(totalQty);
-            receipt.setDetails(details);
+            // If item Empty
+            if (details.isEmpty()) {
+                request.setAttribute("errorMessage", "Please add at least one product item.");
 
-            // Persist within transaction and update stock
-            System.out.println("Detailed items: " + details.size());
+                SupplierDAO supplierDAO = new SupplierDAO();
+                java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
+                request.setAttribute("suppliers", suppliers);
+
+                dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
+                java.util.List<model.Category> categories = categoryDAO.getAllCategories();
+                request.setAttribute("categories", categories);
+
+                String todayStr = java.time.LocalDate.now().toString();
+                request.setAttribute("today", todayStr);
+                request.setAttribute("activePage", "add-import-receipt");
+
+                request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp")
+                        .forward(request, response);
+                return;
+            }
+
+            System.out.println("Raw item count (before merge): " + details.size());
+
+            // ----- Merge (productCode + size + color + price) -----
+            Map<String, ImportDetail> grouped = new LinkedHashMap<>();
+
+            for (ImportDetail d : details) {
+                String codeKey = d.getProductCode() == null ? "" : d.getProductCode().trim().toUpperCase();
+                String sizeKey = d.getSize() == null ? "" : d.getSize().trim().toUpperCase();
+                String colorKey = d.getColor() == null ? "" : d.getColor().trim().toUpperCase();
+                String priceKey = (d.getPrice() == null ? "0" : d.getPrice().toPlainString());
+
+                String key = codeKey + "|" + sizeKey + "|" + colorKey + "|" + priceKey;
+
+                ImportDetail existing = grouped.get(key);
+                if (existing == null) {
+                    grouped.put(key, d);
+                } else {
+                    // quantity ++
+                    int mergedQty = existing.getQuantity() + d.getQuantity();
+                    existing.setQuantity(mergedQty);
+
+                    // amount = price * total quantity
+                    BigDecimal price = existing.getPrice() != null ? existing.getPrice() : BigDecimal.ZERO;
+                    existing.setAmount(price.multiply(BigDecimal.valueOf(mergedQty)));
+                }
+            }
+
+            List<ImportDetail> mergedDetails = new ArrayList<>(grouped.values());
+
+            System.out.println("Merged item count: " + mergedDetails.size());
+
+            // ----- 4. Calculate quantity and set to Receipt -----
+            int totalQty = mergedDetails.stream().mapToInt(ImportDetail::getQuantity).sum();
+            receipt.setTotalQuantity(totalQty);
+            receipt.setDetails(mergedDetails);
+
+            // ----- 5. DAO Save import receipts + details in transaction -----
             ImportReceiptDAO dao = new ImportReceiptDAO();
-            System.out.println("About to create receipt with details...");
-            
-            // Create the receipt with details in a single transactional method
+            System.out.println("About to create receipt with merged details...");
+
             int importId = dao.createReceiptWithDetails(receipt);
             receipt.setImportId(importId);
-            
+
             System.out.println("Receipt created successfully with ID: " + importId);
 
-            // Redirect back to form with success message
+            // ----- 6. Set message sucess + log activity -----
             HttpSession session = request.getSession(true);
             session.setAttribute("successMessage", "Import receipt created successfully.");
-            
-            // Log activity
+
             SupplierDAO supplierDAO = new SupplierDAO();
             String supplierName = "supplier_" + supplierId;
             try {
@@ -262,32 +303,35 @@ public class CreateImportReceiptServlet extends HttpServlet {
                     supplierName = supplier.getName();
                 }
             } catch (Exception e) {
-                // Use default
             }
-            
+
             ActivityLogHelper.logCreate(request.getSession(), "ImportReceipts", importId,
-                "Created import receipt for supplier: " + supplierName + ", Total: " + totalAmount + ", Items: " + details.size());
-            
+                    "Created import receipt for supplier: " + supplierName
+                    + ", Total: " + totalAmount
+                    + ", Items: " + mergedDetails.size());
+
             System.out.println("Redirecting to success page...");
             response.sendRedirect(request.getContextPath() + "/createImportReceipt");
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Failed to save import receipt: " + e.getMessage());
-            request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp").forward(request, response);
-        }
-    }
 
-    private java.sql.Date toSqlDateFlexible(String dateStr) {
-        // Accept both yyyy-MM-dd (native date input) and MM/dd/yyyy (some browsers/regional settings)
-        String[] patterns = {"yyyy-MM-dd", "MM/dd/yyyy"};
-        for (String p : patterns) {
-            try {
-                LocalDate ld = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(p));
-                return java.sql.Date.valueOf(ld);
-            } catch (DateTimeParseException ignored) {}
+            // Re-Load  suppliers, categories, today cho form when have error
+            SupplierDAO supplierDAO = new SupplierDAO();
+            java.util.List<model.Supplier> suppliers = supplierDAO.getAllSuppliers();
+            request.setAttribute("suppliers", suppliers);
+
+            dal.CategoryDAO categoryDAO = new dal.CategoryDAO();
+            java.util.List<model.Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
+
+            String todayStr = java.time.LocalDate.now().toString();
+            request.setAttribute("today", todayStr);
+            request.setAttribute("activePage", "add-import-receipt");
+
+            request.getRequestDispatcher("/warehouse-import-mgt/add-import-receipt.jsp")
+                    .forward(request, response);
         }
-        // Fallback to today if parsing fails
-        return new java.sql.Date(System.currentTimeMillis());
     }
 
     private Date toSqlTimestampFlexible(String dateStr) {
@@ -301,17 +345,20 @@ public class CreateImportReceiptServlet extends HttpServlet {
                 LocalDateTime ldt = LocalDateTime.of(ld, currentTime);
                 // Convert to Timestamp
                 return java.sql.Timestamp.valueOf(ldt);
-            } catch (DateTimeParseException ignored) {}
+            } catch (DateTimeParseException ignored) {
+            }
         }
         // Fallback to current timestamp if parsing fails
         return new Date();
     }
-    
+
     /**
      * Sanitize HTML/CSS from text input to prevent XSS attacks
      */
     private String sanitizeHtml(String input) {
-        if (input == null) return null;
+        if (input == null) {
+            return null;
+        }
         // Remove HTML tags
         String sanitized = input.replaceAll("<[^>]*>", "");
         // Remove CSS style attributes
@@ -324,9 +371,10 @@ public class CreateImportReceiptServlet extends HttpServlet {
         sanitized = sanitized.replaceAll("(?i)on\\w+\\s*=", "");
         return sanitized;
     }
-    
+
     /**
-     * Validate size: XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or number 20-50
+     * Validate size: XXS, XS, S, M, L, XL, XXL, XXXL (case insensitive) or
+     * number 20-50
      */
     private boolean isValidSize(String size) {
         if (size == null || size.trim().isEmpty()) {
@@ -349,8 +397,9 @@ public class CreateImportReceiptServlet extends HttpServlet {
         }
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override
